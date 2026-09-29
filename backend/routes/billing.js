@@ -3,16 +3,18 @@ const db = require("../config/db");
 
 const router = express.Router();
 
-// GET all billing records
+// GET billing records with filters
 router.get("/", async (req, res) => {
     try {
-        const [billingRecords] = await db.query(`
+        const { month, tenant_id, room_id, status } = req.query;
+
+        let query = `
             SELECT
                 b.id,
                 b.tenant_id,
                 t.full_name,
                 r.room_number,
-                b.billing_month,
+                DATE_FORMAT(b.billing_month, '%Y-%m-%d') AS billing_month,
                 b.electricity_consumption,
                 b.electricity_charge,
                 b.water_consumption,
@@ -24,8 +26,36 @@ router.get("/", async (req, res) => {
             FROM billing_records b
             INNER JOIN tenants t ON t.id = b.tenant_id
             LEFT JOIN rooms r ON r.id = t.room_id
-            ORDER BY b.billing_month DESC, t.full_name;
-        `);
+            WHERE 1 = 1
+        `;
+
+        const params = [];
+
+        if (month) {
+            query += ` AND DATE_FORMAT(b.billing_month, '%Y-%m') = ?`;
+            params.push(month);
+        }
+
+        if (tenant_id) {
+            query += ` AND b.tenant_id = ?`;
+            params.push(tenant_id);
+        }
+
+        if (room_id) {
+            query += ` AND t.room_id = ?`;
+            params.push(room_id);
+        }
+
+        if (status) {
+            query += ` AND b.status = ?`;
+            params.push(status);
+        }
+
+        query += `
+            ORDER BY b.billing_month DESC, t.full_name
+        `;
+
+        const [billingRecords] = await db.query(query, params);
 
         res.json({
             success: true,
@@ -50,6 +80,29 @@ router.post("/", async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Tenant and billing month are required",
+            });
+        }
+
+        const [tenantRows] = await db.query(
+            `
+            SELECT id, status
+            FROM tenants
+            WHERE id = ?
+            `,
+            [tenant_id]
+        );
+
+        if (tenantRows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Tenant not found",
+            });
+        }
+
+        if (tenantRows[0].status !== "Active") {
+            return res.status(409).json({
+                success: false,
+                message: "Billing can only be generated for an active tenant",
             });
         }
 
@@ -111,14 +164,16 @@ router.post("/", async (req, res) => {
         if (electricityRates.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "No applicable electricity rate found for this billing month",
+                message:
+                    "No applicable electricity rate found for this billing month",
             });
         }
 
         if (waterRates.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "No applicable water rate found for this billing month",
+                message:
+                    "No applicable water rate found for this billing month",
             });
         }
 
@@ -187,7 +242,8 @@ router.post("/", async (req, res) => {
         if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
                 success: false,
-                message: "A billing record already exists for this tenant and billing month",
+                message:
+                    "A billing record already exists for this tenant and billing month",
             });
         }
 
