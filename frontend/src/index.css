@@ -8,24 +8,36 @@
     "Segoe UI",
     sans-serif;
 
-  color: #263238;
-  background: #e7ecf1;
+  color: #1f2937;
+  background: #edf2f4;
 
-  --surface: #e7ecf1;
-  --accent: #4f6d8a;
-  --text-muted: #687681;
+  --surface: #edf2f4;
+  --accent: #176b87;
+  --accent-dark: #12566d;
+  --accent-soft: #dcecf1;
+
+  --text-main: #1f2937;
+  --text-muted: #667782;
+
+  --success: #2f855a;
+  --warning: #b7791f;
+  --danger: #c53030;
 
   --shadow-raised:
-    10px 10px 22px rgba(163, 174, 184, 0.55),
-    -10px -10px 22px rgba(255, 255, 255, 0.9);
+    10px 10px 22px rgba(174, 184, 192, 0.45),
+    -10px -10px 22px rgba(255, 255, 255, 0.92);
 
   --shadow-soft:
-    6px 6px 14px rgba(163, 174, 184, 0.45),
-    -6px -6px 14px rgba(255, 255, 255, 0.85);
+    6px 6px 14px rgba(174, 184, 192, 0.38),
+    -6px -6px 14px rgba(255, 255, 255, 0.88);
 
   --shadow-hover:
-    14px 14px 28px rgba(163, 174, 184, 0.6),
-    -12px -12px 26px rgba(255, 255, 255, 0.95);
+    14px 14px 28px rgba(174, 184, 192, 0.5),
+    -12px -12px 26px rgba(255, 255, 255, 0.96);
+
+  --shadow-pressed:
+    inset 4px 4px 9px rgba(174, 184, 192, 0.4),
+    inset -4px -4px 9px rgba(255, 255, 255, 0.9);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;

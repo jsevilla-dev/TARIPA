@@ -14,6 +14,7 @@ const navigationItems = [
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     fetch("/api/health")
@@ -36,7 +37,16 @@ function App() {
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
+        <button
+          type="button"
+          className="sidebar-toggle"
+          onClick={() => setSidebarCollapsed((current) => !current)}
+          aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {sidebarCollapsed ? "›" : "‹"}
+        </button>
+
         <div className="brand">
           <div className="brand-mark">T</div>
 
@@ -85,6 +95,7 @@ function App() {
             <p className="eyebrow">TARIPA</p>
             <h1>{activeItem?.label}</h1>
           </div>
+
 
           <div className="status-card">
             <span
@@ -3122,3 +3133,12 @@ function UtilityRatesPage() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
