@@ -466,7 +466,7 @@ function TenantsPage() {
           <div className="form-header">
             <div>
               <p className="eyebrow">
-                {editingTenant ? "EDIT TENANT" : "NEW TENANT"}
+
               </p>
 
               <h3>
@@ -535,8 +535,7 @@ function TenantsPage() {
                         value={room.id}
                         disabled={isFull}
                       >
-                        Room {room.room_number}
-                        {room.occupied_count}/{room.capacity}
+                        Room {room.room_number} - {room.occupied_count}/{room.capacity}
                         {isFull ? " (Full)" : ""}
                       </option>
                     );
@@ -1334,7 +1333,7 @@ function MeterReadingsPage() {
               className="close-button"
               onClick={closeForm}
             >
-              +ù
+              +
             </button>
           </div>
 
@@ -1359,7 +1358,7 @@ function MeterReadingsPage() {
                     >
                       {tenant.full_name}
                       {tenant.room_number
-                        ? ` GÇö Room ${tenant.room_number}`
+                        ? ` - Room ${tenant.room_number}`
                         : ""}
                     </option>
                   ))}
@@ -1460,7 +1459,7 @@ function MeterReadingsPage() {
                   {electricityConsumption !== null &&
                     !Number.isNaN(electricityConsumption)
                     ? `${electricityConsumption.toFixed(3)} kWh`
-                    : "GÇö"}
+                    : "-"}
                 </strong>
 
                 <small>
@@ -1476,8 +1475,8 @@ function MeterReadingsPage() {
                 <strong>
                   {waterConsumption !== null &&
                     !Number.isNaN(waterConsumption)
-                    ? `${waterConsumption.toFixed(3)} m-¦`
-                    : "GÇö"}
+                    ? `${waterConsumption.toFixed(3)} m3`
+                    : "-"}
                 </strong>
 
                 <small>
@@ -1584,7 +1583,7 @@ function MeterReadingsPage() {
                     {Number(
                       reading.water_consumption
                     ).toFixed(3)}{" "}
-                    m-¦
+                    m3
                   </strong>
                 </div>
 
