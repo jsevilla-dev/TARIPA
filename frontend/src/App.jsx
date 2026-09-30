@@ -459,8 +459,7 @@ function TenantsPage() {
       if (!response.ok || !data.success) {
         setFormError(
           data.message ||
-          `Failed to ${isEditing ? "update" : "create"
-          } tenant.`
+            `Failed to ${isEditing ? "update" : "create"} tenant.`
         );
         return;
       }
@@ -495,8 +494,7 @@ function TenantsPage() {
           <h2>Tenants</h2>
 
           <p>
-            Manage tenant profiles, room assignments, and account
-            status.
+            Manage tenant profiles, room assignments, and account status.
           </p>
         </div>
 
@@ -513,10 +511,6 @@ function TenantsPage() {
         <div className="tenant-form-card">
           <div className="form-header">
             <div>
-              <p className="eyebrow">
-
-              </p>
-
               <h3>
                 {editingTenant ? "Edit Tenant" : "Add Tenant"}
               </h3>
@@ -574,7 +568,7 @@ function TenantsPage() {
 
                     const isFull =
                       Number(room.occupied_count) >=
-                      Number(room.capacity) &&
+                        Number(room.capacity) &&
                       !isCurrentRoom;
 
                     return (
@@ -583,7 +577,8 @@ function TenantsPage() {
                         value={room.id}
                         disabled={isFull}
                       >
-                        Room {room.room_number} - {room.occupied_count}/{room.capacity}
+                        Room {room.room_number} - {room.occupied_count}/
+                        {room.capacity}
                         {isFull ? " (Full)" : ""}
                       </option>
                     );
@@ -702,10 +697,11 @@ function TenantsPage() {
                   <span>STATUS</span>
 
                   <strong
-                    className={`tenant-status ${tenant.status === "Active"
-                      ? "active"
-                      : "inactive"
-                      }`}
+                    className={`tenant-status ${
+                      tenant.status === "Active"
+                        ? "active"
+                        : "inactive"
+                    }`}
                   >
                     {tenant.status}
                   </strong>
