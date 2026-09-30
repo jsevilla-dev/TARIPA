@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+/* ─────────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────────── */
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -8,16 +11,137 @@ const formatCurrency = (value) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Number(value || 0));
+
+/* ─────────────────────────────────────────────
+   SVG ICONS
+───────────────────────────────────────────── */
+const Icons = {
+  Dashboard: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  ),
+  Tenants: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  ),
+  Rooms: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  ),
+  Meters: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  ),
+  Rates: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+    </svg>
+  ),
+  Billing: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+      <line x1="1" y1="10" x2="23" y2="10" />
+    </svg>
+  ),
+  Reports: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  ),
+  Plus: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  ),
+  Close: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
+  Edit: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+  ),
+  Delete: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+      <path d="M10 11v6" /><path d="M14 11v6" />
+      <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+    </svg>
+  ),
+  Refresh: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
+  ),
+  Electricity: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  ),
+  Water: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+    </svg>
+  ),
+  Alert: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+    </svg>
+  ),
+  Check: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  ),
+  ChevronLeft: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  ),
+  Filter: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+    </svg>
+  ),
+};
+
 const navigationItems = [
-  { id: "dashboard", label: "Dashboard", icon: "DB" },
-  { id: "tenants", label: "Tenants", icon: "TN" },
-  { id: "rooms", label: "Rooms", icon: "RM" },
-  { id: "meters", label: "Meter Readings", icon: "MR" },
-  { id: "rates", label: "Utility Rates", icon: "UR" },
-  { id: "billing", label: "Billing", icon: "BL" },
-  { id: "reports", label: "Reports", icon: "RP" },
+  { id: "dashboard", label: "Dashboard", Icon: Icons.Dashboard },
+  { id: "tenants", label: "Tenants", Icon: Icons.Tenants },
+  { id: "rooms", label: "Rooms", Icon: Icons.Rooms },
+  { id: "meters", label: "Meter Readings", Icon: Icons.Meters },
+  { id: "rates", label: "Utility Rates", Icon: Icons.Rates },
+  { id: "billing", label: "Billing", Icon: Icons.Billing },
+  { id: "reports", label: "Reports", Icon: Icons.Reports },
 ];
 
+/* ─────────────────────────────────────────────
+   APP SHELL
+───────────────────────────────────────────── */
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
@@ -38,72 +162,64 @@ function App() {
       });
   }, []);
 
-  const activeItem = navigationItems.find(
-    (item) => item.id === activePage
-  );
+  const isOnline = backendStatus === "Connected";
 
   return (
     <div className="app-shell">
+      {/* ── SIDEBAR ── */}
       <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <button
           type="button"
           className="sidebar-toggle"
-          onClick={() => setSidebarCollapsed((current) => !current)}
+          onClick={() => setSidebarCollapsed((c) => !c)}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {sidebarCollapsed ? "-" : "+"}
+          {sidebarCollapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
         </button>
 
+        {/* Brand */}
         <div className="brand">
-          <div className="brand-mark">T</div>
-
-          <div>
+          <div className="brand-mark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </div>
+          <div className="brand-text">
             <strong>TARIPA</strong>
             <span>Utility Management</span>
           </div>
         </div>
 
+        {/* Nav */}
         <nav className="navigation">
           <p className="nav-label">MAIN MENU</p>
-
-          {navigationItems.map((item) => (
+          {navigationItems.map(({ id, label, Icon }) => (
             <button
-              key={item.id}
+              key={id}
               type="button"
-              className={`nav-item ${activePage === item.id ? "active" : ""
-                }`}
-              onClick={() => setActivePage(item.id)}
+              className={`nav-item ${activePage === id ? "active" : ""}`}
+              onClick={() => setActivePage(id)}
             >
               <span className="nav-icon">
-                {item.label.charAt(0)}
+                <Icon />
               </span>
-
-              <span>{item.label}</span>
+              <span className="nav-label-text">{label}</span>
             </button>
           ))}
         </nav>
 
+        {/* Footer status */}
         <div className="sidebar-footer">
-          <div
-            className={`connection-indicator ${backendStatus === "Connected" ? "online" : ""
-              }`}
-          ></div>
-
-          <div>
+          <div className={`status-dot ${isOnline ? "online" : "offline"}`} />
+          <div className="sidebar-footer-text">
             <strong>System Status</strong>
             <span>{backendStatus}</span>
           </div>
         </div>
       </aside>
 
+      {/* ── MAIN CONTENT ── */}
       <main className="main-content">
-        <header className="topbar">
-          <div>
-          </div>
-
-
-        </header>
-
         {activePage === "dashboard" ? (
           <Dashboard />
         ) : activePage === "tenants" ? (
@@ -118,201 +234,208 @@ function App() {
           <BillingPage />
         ) : activePage === "reports" ? (
           <ReportsPage />
-        ) : (
-          <section className="page-placeholder">
-            <div className="placeholder-icon">
-              {activeItem?.label.charAt(0)}
-            </div>
-
-            <p className="eyebrow">MODULE</p>
-
-            <h2>{activeItem?.label}</h2>
-
-            <p>
-              This module is ready for the next development
-              stage.
-            </p>
-          </section>
-        )}
+        ) : null}
       </main>
     </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   PAGE HEADER (reusable)
+───────────────────────────────────────────── */
+function PageHeader({ eyebrow, title, description, action }) {
+  return (
+    <div className="page-header">
+      <div className="page-header-text">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2>{title}</h2>
+        {description && <p className="page-description">{description}</p>}
+      </div>
+      {action && <div className="page-header-action">{action}</div>}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────────── */
+function EmptyState({ icon, title, description }) {
+  return (
+    <div className="empty-state">
+      <div className="empty-icon">{icon}</div>
+      <h3>{title}</h3>
+      {description && <p>{description}</p>}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   STATUS BADGE
+───────────────────────────────────────────── */
+function StatusBadge({ status }) {
+  const map = {
+    Active: "badge-active",
+    Inactive: "badge-inactive",
+    Paid: "badge-paid",
+    Pending: "badge-pending",
+    Overdue: "badge-overdue",
+    Available: "badge-active",
+    Full: "badge-inactive",
+  };
+  return (
+    <span className={`status-badge ${map[status] ?? "badge-default"}`}>
+      {status}
+    </span>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────────────── */
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
     fetch("/api/dashboard")
-      .then((response) => response.json())
+      .then((r) => r.json())
       .then((data) => {
-        if (data.success) {
-          setDashboardData(data.data);
-        }
+        if (data.success) setDashboardData(data.data);
       })
-      .catch((error) => {
-        console.error("Failed to load dashboard data:", error);
-      });
+      .catch((e) => console.error("Failed to load dashboard data:", e));
   }, []);
 
+  const kpis = [
+    {
+      label: "Active Tenants",
+      value: dashboardData?.total_tenants ?? 0,
+      sub: "Registered residents",
+      icon: <Icons.Tenants />,
+      accent: "kpi-indigo",
+    },
+    {
+      label: "Total Rooms",
+      value: dashboardData?.total_rooms ?? 0,
+      sub: `${dashboardData?.available_rooms ?? 0} available`,
+      icon: <Icons.Rooms />,
+      accent: "kpi-blue",
+    },
+    {
+      label: "Pending Bills",
+      value: dashboardData?.pending_bills ?? 0,
+      sub: "Awaiting payment",
+      icon: <Icons.Billing />,
+      accent: "kpi-warning",
+    },
+    {
+      label: "Outstanding",
+      value: formatCurrency(dashboardData?.outstanding_amount ?? 0),
+      sub: "Pending & overdue",
+      icon: <Icons.Rates />,
+      accent: "kpi-danger",
+      large: true,
+    },
+  ];
+
+  const modules = [
+    {
+      num: "01",
+      Icon: Icons.Tenants,
+      title: "Tenant Management",
+      desc: "Manage tenant profiles, room assignments, and account status.",
+      accent: "mod-indigo",
+    },
+    {
+      num: "02",
+      Icon: Icons.Meters,
+      title: "Utility Tracking",
+      desc: "Record electricity and water meter readings for each billing period.",
+      accent: "mod-electric",
+    },
+    {
+      num: "03",
+      Icon: Icons.Billing,
+      title: "Automated Billing",
+      desc: "Calculate utility charges automatically using the applicable rates.",
+      accent: "mod-water",
+    },
+    {
+      num: "04",
+      Icon: Icons.Reports,
+      title: "Reports",
+      desc: "Search and review utility usage and billing records at a glance.",
+      accent: "mod-success",
+    },
+  ];
+
   return (
-    <div className="dashboard">
-      <section className="welcome-card dashboard-hero">
-        <div>
+    <div className="page-wrap dashboard-page">
+      {/* Hero */}
+      <div className="dashboard-hero">
+        <div className="dashboard-hero-body">
           <p className="eyebrow">DASHBOARD OVERVIEW</p>
-
-          <h2>Welcome to TARIPA</h2>
-
-          <p>
-            Automated residential utility tracking and billing
-            management.
+          <h1 className="dashboard-title">Welcome to TARIPA</h1>
+          <p className="dashboard-subtitle">
+            Automated residential utility tracking and billing management system.
           </p>
         </div>
-
-        <div className="dashboard-hero-mark">T</div>
-      </section>
-
-      <section className="stat-grid">
-        <div className="stat-card dashboard-stat">
-          <div className="stat-icon tenants-icon">TN</div>
-
-          <div>
-            <span className="stat-label">TENANTS</span>
-
-            <strong>
-              {dashboardData?.total_tenants ?? 0}
-            </strong>
-
-            <small>Active tenants</small>
-          </div>
+        <div className="dashboard-hero-emblem">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
         </div>
+      </div>
 
-        <div className="stat-card dashboard-stat">
-          <div className="stat-icon rooms-icon">RM</div>
-
-          <div>
-            <span className="stat-label">ROOMS</span>
-
-            <strong>
-              {dashboardData?.total_rooms ?? 0}
-            </strong>
-
-            <small>
-              {dashboardData?.available_rooms ?? 0} room available
-            </small>
+      {/* KPI Row */}
+      <div className="kpi-grid">
+        {kpis.map((k) => (
+          <div className={`kpi-card ${k.accent}`} key={k.label}>
+            <div className="kpi-icon">{k.icon}</div>
+            <div className="kpi-body">
+              <span className="kpi-label">{k.label}</span>
+              <strong className={`kpi-value ${k.large ? "kpi-value-lg" : ""}`}>
+                {k.value}
+              </strong>
+              <small className="kpi-sub">{k.sub}</small>
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="stat-card dashboard-stat">
-          <div className="stat-icon billing-icon">BL</div>
-
-          <div>
-            <span className="stat-label">PENDING BILLS</span>
-
-            <strong>
-              {dashboardData?.pending_bills ?? 0}
-            </strong>
-
-            <small>Awaiting payment</small>
-          </div>
-        </div>
-
-        <div className="stat-card dashboard-stat">
-          <div className="stat-icon outstanding-icon">PHP</div>
-
-          <div>
-            <span className="stat-label">OUTSTANDING</span>
-
-            <strong>
-              {formatCurrency(
-                dashboardData?.outstanding_amount ?? 0
-              )}
-            </strong>
-
-            <small>Pending and overdue bills</small>
-          </div>
-        </div>
-      </section>
-
-      <section className="dashboard-section-header">
+      {/* Modules */}
+      <div className="section-header">
         <div>
           <p className="eyebrow">CORE MODULES</p>
-
-          <h3>Manage your utility operations</h3>
+          <h3 className="section-title">Manage your utility operations</h3>
         </div>
+        <p className="section-desc">Everything you need for residential billing.</p>
+      </div>
 
-        <p>Everything you need for residential billing.</p>
-      </section>
-
-      <section className="feature-grid">
-        <article className="feature-card">
-          <div className="feature-top">
-            <span className="feature-number">01</span>
-
-            <span className="feature-icon">TN</span>
-          </div>
-
-          <h3>Tenant Management</h3>
-
-          <p>
-            Manage tenant profiles, room assignments, and status.
-          </p>
-        </article>
-
-        <article className="feature-card">
-          <div className="feature-top">
-            <span className="feature-number">02</span>
-
-            <span className="feature-icon">MR</span>
-          </div>
-
-          <h3>Utility Tracking</h3>
-
-          <p>
-            Record electricity and water readings for each billing
-            period.
-          </p>
-        </article>
-
-        <article className="feature-card">
-          <div className="feature-top">
-            <span className="feature-number">03</span>
-
-            <span className="feature-icon">BL</span>
-          </div>
-
-          <h3>Automated Billing</h3>
-
-          <p>
-            Calculate utility charges using the applicable rates.
-          </p>
-        </article>
-
-        <article className="feature-card">
-          <div className="feature-top">
-            <span className="feature-number">04</span>
-
-            <span className="feature-icon">RP</span>
-          </div>
-
-          <h3>Reports</h3>
-
-          <p>
-            Search and review utility usage and billing records.
-          </p>
-        </article>
-      </section>
+      <div className="modules-grid">
+        {modules.map((m) => (
+          <article className={`module-card ${m.accent}`} key={m.num}>
+            <div className="module-card-top">
+              <span className="module-num">{m.num}</span>
+              <span className="module-icon-wrap">
+                <m.Icon />
+              </span>
+            </div>
+            <h4 className="module-card-title">{m.title}</h4>
+            <p className="module-card-desc">{m.desc}</p>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   TENANTS PAGE
+───────────────────────────────────────────── */
 function TenantsPage() {
   const [tenants, setTenants] = useState([]);
   const [rooms, setRooms] = useState([]);
-
   const [showForm, setShowForm] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
-
   const [formData, setFormData] = useState({
     full_name: "",
     contact_number: "",
@@ -320,124 +443,68 @@ function TenantsPage() {
     move_in_date: "",
     status: "Active",
   });
-
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadTenants = () => {
     fetch("/api/tenants")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setTenants(data.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to load tenants:", error);
-      });
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setTenants(data.data); })
+      .catch((e) => console.error("Failed to load tenants:", e));
   };
 
   const loadRooms = () => {
     fetch("/api/rooms")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setRooms(data.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to load rooms:", error);
-      });
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setRooms(data.data); })
+      .catch((e) => console.error("Failed to load rooms:", e));
   };
 
-  useEffect(() => {
-    loadTenants();
-    loadRooms();
-  }, []);
+  useEffect(() => { loadTenants(); loadRooms(); }, []);
 
   const resetForm = () => {
-    setFormData({
-      full_name: "",
-      contact_number: "",
-      room_id: "",
-      move_in_date: "",
-      status: "Active",
-    });
-
+    setFormData({ full_name: "", contact_number: "", room_id: "", move_in_date: "", status: "Active" });
     setFormError("");
     setFormSuccess("");
   };
 
-  const openAddForm = () => {
-    setEditingTenant(null);
-    resetForm();
-    setShowForm(true);
-  };
+  const openAddForm = () => { setEditingTenant(null); resetForm(); setShowForm(true); };
 
   const openEditForm = (tenant) => {
     setEditingTenant(tenant);
-
     setFormData({
       full_name: tenant.full_name || "",
       contact_number: tenant.contact_number || "",
       room_id: tenant.room_id ? String(tenant.room_id) : "",
-      move_in_date: tenant.move_in_date
-        ? tenant.move_in_date.substring(0, 10)
-        : "",
+      move_in_date: tenant.move_in_date ? tenant.move_in_date.substring(0, 10) : "",
       status: tenant.status || "Active",
     });
-
     setFormError("");
     setFormSuccess("");
     setShowForm(true);
   };
 
-  const closeForm = () => {
-    setShowForm(false);
-    setEditingTenant(null);
-    resetForm();
-  };
+  const closeForm = () => { setShowForm(false); setEditingTenant(null); resetForm(); };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((c) => ({ ...c, [name]: value }));
     setFormError("");
     setFormSuccess("");
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setFormError("");
     setFormSuccess("");
-
-    if (!formData.full_name.trim()) {
-      setFormError("Full name is required.");
-      return;
-    }
-
-    if (!formData.move_in_date) {
-      setFormError("Move-in date is required.");
-      return;
-    }
-
+    if (!formData.full_name.trim()) { setFormError("Full name is required."); return; }
+    if (!formData.move_in_date) { setFormError("Move-in date is required."); return; }
     setIsSubmitting(true);
-
     try {
       const isEditing = Boolean(editingTenant);
-
-      const url = isEditing
-        ? `/api/tenants/${editingTenant.id}`
-        : "/api/tenants";
-
+      const url = isEditing ? `/api/tenants/${editingTenant.id}` : "/api/tenants";
       const method = isEditing ? "PUT" : "POST";
-
       const body = {
         full_name: formData.full_name.trim(),
         contact_number: formData.contact_number.trim(),
@@ -445,40 +512,14 @@ function TenantsPage() {
         move_in_date: formData.move_in_date,
         status: formData.status,
       };
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
+      const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message ||
-            `Failed to ${isEditing ? "update" : "create"} tenant.`
-        );
-        return;
-      }
-
-      setFormSuccess(
-        isEditing
-          ? "Tenant updated successfully."
-          : "Tenant added successfully."
-      );
-
-      loadTenants();
-      loadRooms();
-
-      setTimeout(() => {
-        closeForm();
-      }, 800);
-    } catch (error) {
-      console.error("Failed to save tenant:", error);
-
+      if (!response.ok || !data.success) { setFormError(data.message || `Failed to ${isEditing ? "update" : "create"} tenant.`); return; }
+      setFormSuccess(isEditing ? "Tenant updated successfully." : "Tenant added successfully.");
+      loadTenants(); loadRooms();
+      setTimeout(() => { closeForm(); }, 800);
+    } catch (err) {
+      console.error("Failed to save tenant:", err);
       setFormError("Unable to connect to the backend.");
     } finally {
       setIsSubmitting(false);
@@ -486,126 +527,63 @@ function TenantsPage() {
   };
 
   return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">TENANT MANAGEMENT</p>
-
-          <h2>Tenants</h2>
-
-          <p>
-            Manage tenant profiles, room assignments, and account status.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="primary-button"
-          onClick={openAddForm}
-        >
-          + Add Tenant
-        </button>
-      </div>
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="TENANT MANAGEMENT"
+        title="Tenants"
+        description="Manage tenant profiles, room assignments, and account status."
+        action={
+          <button type="button" className="btn-primary" onClick={openAddForm}>
+            <Icons.Plus /> Add Tenant
+          </button>
+        }
+      />
 
       {showForm && (
-        <div className="tenant-form-card">
-          <div className="form-header">
+        <div className="form-panel">
+          <div className="form-panel-header">
             <div>
-              <h3>
-                {editingTenant ? "Edit Tenant" : "Add Tenant"}
-              </h3>
+              <p className="eyebrow">{editingTenant ? "EDIT TENANT" : "NEW TENANT"}</p>
+              <h3>{editingTenant ? "Edit Tenant" : "Add Tenant"}</h3>
             </div>
-
-            <button
-              type="button"
-              className="close-button"
-              onClick={closeForm}
-            >
-              X
+            <button type="button" className="btn-icon" onClick={closeForm} aria-label="Close">
+              <Icons.Close />
             </button>
           </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
-              <label>
-                <span>FULL NAME</span>
-
-                <input
-                  type="text"
-                  name="full_name"
-                  value={formData.full_name}
-                  onChange={handleChange}
-                  placeholder="Enter full name"
-                />
+              <label className="field">
+                <span className="field-label">FULL NAME <span className="required">*</span></span>
+                <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} placeholder="Enter full name" className="field-input" />
               </label>
-
-              <label>
-                <span>CONTACT NUMBER</span>
-
-                <input
-                  type="text"
-                  name="contact_number"
-                  value={formData.contact_number}
-                  onChange={handleChange}
-                  placeholder="Enter contact number"
-                />
+              <label className="field">
+                <span className="field-label">CONTACT NUMBER</span>
+                <input type="text" name="contact_number" value={formData.contact_number} onChange={handleChange} placeholder="Enter contact number" className="field-input" />
               </label>
-
-              <label>
-                <span>ROOM</span>
-
-                <select
-                  name="room_id"
-                  value={formData.room_id}
-                  onChange={handleChange}
-                >
+              <label className="field">
+                <span className="field-label">ROOM</span>
+                <select name="room_id" value={formData.room_id} onChange={handleChange} className="field-input">
                   <option value="">No room assigned</option>
-
                   {rooms.map((room) => {
-                    const isCurrentRoom =
-                      editingTenant &&
-                      Number(formData.room_id) === Number(room.id);
-
-                    const isFull =
-                      Number(room.occupied_count) >=
-                        Number(room.capacity) &&
-                      !isCurrentRoom;
-
+                    const isCurrentRoom = editingTenant && Number(formData.room_id) === Number(room.id);
+                    const isFull = Number(room.occupied_count) >= Number(room.capacity) && !isCurrentRoom;
                     return (
-                      <option
-                        key={room.id}
-                        value={room.id}
-                        disabled={isFull}
-                      >
-                        Room {room.room_number} - {room.occupied_count}/
-                        {room.capacity}
-                        {isFull ? " (Full)" : ""}
+                      <option key={room.id} value={room.id} disabled={isFull}>
+                        Room {room.room_number} — {room.occupied_count}/{room.capacity}{isFull ? " (Full)" : ""}
                       </option>
                     );
                   })}
                 </select>
               </label>
-
-              <label>
-                <span>MOVE-IN DATE</span>
-
-                <input
-                  type="date"
-                  name="move_in_date"
-                  value={formData.move_in_date}
-                  onChange={handleChange}
-                />
+              <label className="field">
+                <span className="field-label">MOVE-IN DATE <span className="required">*</span></span>
+                <input type="date" name="move_in_date" value={formData.move_in_date} onChange={handleChange} className="field-input" />
               </label>
-
               {editingTenant && (
-                <label>
-                  <span>STATUS</span>
-
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleChange}
-                  >
+                <label className="field">
+                  <span className="field-label">STATUS</span>
+                  <select name="status" value={formData.status} onChange={handleChange} className="field-input">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
@@ -614,228 +592,130 @@ function TenantsPage() {
             </div>
 
             {formError && (
-              <div className="form-message error">
-                {formError}
+              <div className="form-msg form-msg-error">
+                <Icons.Alert /> {formError}
               </div>
             )}
-
             {formSuccess && (
-              <div className="form-message success">
-                {formSuccess}
+              <div className="form-msg form-msg-success">
+                <Icons.Check /> {formSuccess}
               </div>
             )}
 
             <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={closeForm}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Saving..."
-                  : editingTenant
-                    ? "Update Tenant"
-                    : "Save Tenant"}
+              <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : editingTenant ? "Update Tenant" : "Save Tenant"}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="tenant-list">
+      <div className="record-list">
         {tenants.length === 0 ? (
-          <div className="empty-state">
-            <h3>No tenant records found</h3>
-
-            <p>
-              Tenant records will appear here once they are added.
-            </p>
-          </div>
+          <EmptyState
+            icon={<Icons.Tenants />}
+            title="No tenant records found"
+            description="Tenant records will appear here once they are added."
+          />
         ) : (
           tenants.map((tenant) => (
-            <article className="tenant-card" key={tenant.id}>
-              <div className="tenant-main">
-                <div className="tenant-avatar">
+            <article className="record-card" key={tenant.id}>
+              <div className="record-main">
+                <div className="avatar">
                   {tenant.full_name.charAt(0).toUpperCase()}
                 </div>
-
                 <div>
-                  <strong>{tenant.full_name}</strong>
-
-                  <p>
-                    {tenant.contact_number || "No contact number"}
-                  </p>
+                  <strong className="record-name">{tenant.full_name}</strong>
+                  <p className="record-sub">{tenant.contact_number || "No contact number"}</p>
                 </div>
               </div>
 
-              <div className="tenant-details">
-                <div>
-                  <span>ROOM</span>
-
-                  <strong>
-                    {tenant.room_number || "Unassigned"}
-                  </strong>
+              <div className="record-meta">
+                <div className="meta-item">
+                  <span className="meta-label">ROOM</span>
+                  <strong className="meta-value">{tenant.room_number || "Unassigned"}</strong>
                 </div>
-
-                <div>
-                  <span>MOVE-IN DATE</span>
-
-                  <strong>
-                    {tenant.move_in_date.substring(0, 10)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label">MOVE-IN DATE</span>
+                  <strong className="meta-value">{tenant.move_in_date.substring(0, 10)}</strong>
                 </div>
-
-                <div>
-                  <span>STATUS</span>
-
-                  <strong
-                    className={`tenant-status ${
-                      tenant.status === "Active"
-                        ? "active"
-                        : "inactive"
-                    }`}
-                  >
-                    {tenant.status}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label">STATUS</span>
+                  <StatusBadge status={tenant.status} />
                 </div>
-
-                <button
-                  type="button"
-                  className="edit-button"
-                  onClick={() => openEditForm(tenant)}
-                >
-                  Edit
-                </button>
+                <div className="meta-actions">
+                  <button type="button" className="btn-edit" onClick={() => openEditForm(tenant)}>
+                    <Icons.Edit /> Edit
+                  </button>
+                </div>
               </div>
             </article>
           ))
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   ROOMS PAGE
+───────────────────────────────────────────── */
 function RoomsPage() {
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
-
-  const [formData, setFormData] = useState({
-    room_number: "",
-    capacity: "",
-  });
-
+  const [formData, setFormData] = useState({ room_number: "", capacity: "" });
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadRooms = () => {
     fetch("/api/rooms")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setRooms(data.data);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to load rooms:", error);
-      });
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setRooms(data.data); })
+      .catch((e) => console.error("Failed to load rooms:", e));
   };
 
-  useEffect(() => {
-    loadRooms();
-  }, []);
+  useEffect(() => { loadRooms(); }, []);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((c) => ({ ...c, [name]: value }));
     setFormError("");
     setFormSuccess("");
   };
 
   const closeForm = () => {
     setShowForm(false);
-
-    setFormData({
-      room_number: "",
-      capacity: "",
-    });
-
+    setFormData({ room_number: "", capacity: "" });
     setFormError("");
     setFormSuccess("");
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setFormError("");
     setFormSuccess("");
-
     const roomNumber = formData.room_number.trim();
     const capacity = Number(formData.capacity);
-
-    if (!roomNumber) {
-      setFormError("Room number is required.");
-      return;
-    }
-
-    if (!Number.isInteger(capacity) || capacity <= 0) {
-      setFormError(
-        "Capacity must be a positive whole number."
-      );
-      return;
-    }
-
+    if (!roomNumber) { setFormError("Room number is required."); return; }
+    if (!Number.isInteger(capacity) || capacity <= 0) { setFormError("Capacity must be a positive whole number."); return; }
     setIsSubmitting(true);
-
     try {
       const response = await fetch("/api/rooms", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          room_number: roomNumber,
-          capacity,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ room_number: roomNumber, capacity }),
       });
-
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message || "Failed to create room."
-        );
-        return;
-      }
-
+      if (!response.ok || !data.success) { setFormError(data.message || "Failed to create room."); return; }
       setFormSuccess("Room added successfully.");
-
-      setFormData({
-        room_number: "",
-        capacity: "",
-      });
-
+      setFormData({ room_number: "", capacity: "" });
       loadRooms();
-
-      setTimeout(() => {
-        closeForm();
-      }, 800);
-    } catch (error) {
-      console.error("Failed to create room:", error);
-
+      setTimeout(() => { closeForm(); }, 800);
+    } catch (err) {
+      console.error("Failed to create room:", err);
       setFormError("Unable to connect to the backend.");
     } finally {
       setIsSubmitting(false);
@@ -843,180 +723,96 @@ function RoomsPage() {
   };
 
   return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">ROOM MANAGEMENT</p>
-
-          <h2>Rooms</h2>
-
-          <p>
-            Manage residential rooms and monitor current occupancy.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="primary-button"
-          onClick={() => {
-            setShowForm(true);
-            setFormError("");
-            setFormSuccess("");
-          }}
-        >
-          + Add Room
-        </button>
-      </div>
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="ROOM MANAGEMENT"
+        title="Rooms"
+        description="Manage residential rooms and monitor current occupancy."
+        action={
+          <button type="button" className="btn-primary" onClick={() => { setShowForm(true); setFormError(""); setFormSuccess(""); }}>
+            <Icons.Plus /> Add Room
+          </button>
+        }
+      />
 
       {showForm && (
-        <div className="tenant-form-card">
-          <div className="form-header">
+        <div className="form-panel">
+          <div className="form-panel-header">
             <div>
               <p className="eyebrow">NEW ROOM</p>
-
               <h3>Add Room</h3>
             </div>
-
-            <button
-              type="button"
-              className="close-button"
-              onClick={closeForm}
-            >
-              X
+            <button type="button" className="btn-icon" onClick={closeForm} aria-label="Close">
+              <Icons.Close />
             </button>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <label>
-                <span>ROOM NUMBER</span>
-
-                <input
-                  type="text"
-                  name="room_number"
-                  value={formData.room_number}
-                  onChange={handleChange}
-                  placeholder="e.g. 102"
-                />
+            <div className="form-grid form-grid-2">
+              <label className="field">
+                <span className="field-label">ROOM NUMBER <span className="required">*</span></span>
+                <input type="text" name="room_number" value={formData.room_number} onChange={handleChange} placeholder="e.g. 102" className="field-input" />
               </label>
-
-              <label>
-                <span>CAPACITY</span>
-
-                <input
-                  type="number"
-                  name="capacity"
-                  min="1"
-                  step="1"
-                  value={formData.capacity}
-                  onChange={handleChange}
-                  placeholder="e.g. 2"
-                />
+              <label className="field">
+                <span className="field-label">CAPACITY <span className="required">*</span></span>
+                <input type="number" name="capacity" min="1" step="1" value={formData.capacity} onChange={handleChange} placeholder="e.g. 2" className="field-input" />
               </label>
             </div>
 
-            {formError && (
-              <div className="form-message error">
-                {formError}
-              </div>
-            )}
-
-            {formSuccess && (
-              <div className="form-message success">
-                {formSuccess}
-              </div>
-            )}
+            {formError && <div className="form-msg form-msg-error"><Icons.Alert /> {formError}</div>}
+            {formSuccess && <div className="form-msg form-msg-success"><Icons.Check /> {formSuccess}</div>}
 
             <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={closeForm}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Saving..." : "Save Room"}
+              <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : "Save Room"}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="tenant-list">
+      <div className="rooms-grid">
         {rooms.length === 0 ? (
-          <div className="empty-state">
-            <h3>No room records found</h3>
-
-            <p>
-              Room records will appear here once they are added.
-            </p>
-          </div>
+          <EmptyState icon={<Icons.Rooms />} title="No room records found" description="Room records will appear here once they are added." />
         ) : (
           rooms.map((room) => {
             const occupied = Number(room.occupied_count);
             const capacity = Number(room.capacity);
-            const available = Math.max(
-              capacity - occupied,
-              0
-            );
+            const available = Math.max(capacity - occupied, 0);
             const isFull = occupied >= capacity;
+            const fillPct = capacity > 0 ? Math.round((occupied / capacity) * 100) : 0;
 
             return (
-              <article className="tenant-card" key={room.id}>
-                <div className="tenant-main">
-                  <div className="tenant-avatar">R</div>
-
-                  <div>
-                    <strong>Room {room.room_number}</strong>
-
-                    <p>Residential room</p>
+              <article className={`room-card ${isFull ? "room-full" : "room-available"}`} key={room.id}>
+                <div className="room-card-top">
+                  <div className="room-avatar">
+                    <Icons.Rooms />
                   </div>
+                  <StatusBadge status={isFull ? "Full" : "Available"} />
+                </div>
+                <h3 className="room-number">Room {room.room_number}</h3>
+                <p className="room-type">Residential</p>
+
+                {/* Occupancy bar */}
+                <div className="occupancy-bar-wrap">
+                  <div className="occupancy-bar">
+                    <div
+                      className="occupancy-fill"
+                      style={{ width: `${fillPct}%` }}
+                    />
+                  </div>
+                  <span className="occupancy-text">{occupied}/{capacity} occupied</span>
                 </div>
 
-                <div className="tenant-details">
-                  <div>
-                    <span>CAPACITY</span>
-
-                    <strong>
-                      {capacity} tenant
-                      {capacity !== 1 ? "s" : ""}
-                    </strong>
+                <div className="room-meta-row">
+                  <div className="room-meta-item">
+                    <span className="meta-label">CAPACITY</span>
+                    <strong>{capacity} {capacity !== 1 ? "tenants" : "tenant"}</strong>
                   </div>
-
-                  <div>
-                    <span>OCCUPIED</span>
-
-                    <strong>
-                      {occupied} / {capacity}
-                    </strong>
-                  </div>
-
-                  <div>
-                    <span>AVAILABLE</span>
-
-                    <strong
-                      className={`tenant-status ${isFull ? "inactive" : "active"
-                        }`}
-                    >
-                      {available}
-                    </strong>
-                  </div>
-
-                  <div>
-                    <span>STATUS</span>
-
-                    <strong
-                      className={`tenant-status ${isFull ? "inactive" : "active"
-                        }`}
-                    >
-                      {isFull ? "Full" : "Available"}
-                    </strong>
+                  <div className="room-meta-item">
+                    <span className="meta-label">AVAILABLE</span>
+                    <strong className={available > 0 ? "text-success" : "text-danger"}>{available} slots</strong>
                   </div>
                 </div>
               </article>
@@ -1024,17 +820,18 @@ function RoomsPage() {
           })
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   METER READINGS PAGE
+───────────────────────────────────────────── */
 function MeterReadingsPage() {
   const [readings, setReadings] = useState([]);
   const [tenants, setTenants] = useState([]);
-
   const [showForm, setShowForm] = useState(false);
   const [editingReading, setEditingReading] = useState(null);
-
   const [formData, setFormData] = useState({
     tenant_id: "",
     billing_month: "",
@@ -1043,207 +840,92 @@ function MeterReadingsPage() {
     water_previous: "",
     water_current: "",
   });
-
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadReadings = () => {
     fetch("/api/meter-readings")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setReadings(data.data);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          "Failed to load meter readings:",
-          error
-        );
-      });
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setReadings(data.data); })
+      .catch((e) => console.error("Failed to load meter readings:", e));
   };
 
   const loadTenants = () => {
     fetch("/api/tenants")
-      .then((response) => response.json())
+      .then((r) => r.json())
       .then((data) => {
-        if (data.success) {
-          setTenants(
-            data.data.filter(
-              (tenant) => tenant.status === "Active"
-            )
-          );
-        }
+        if (data.success) setTenants(data.data.filter((t) => t.status === "Active"));
       })
-      .catch((error) => {
-        console.error(
-          "Failed to load tenants:",
-          error
-        );
-      });
+      .catch((e) => console.error("Failed to load tenants:", e));
   };
 
-  useEffect(() => {
-    loadReadings();
-    loadTenants();
-  }, []);
+  useEffect(() => { loadReadings(); loadTenants(); }, []);
 
   const resetForm = () => {
-    setFormData({
-      tenant_id: "",
-      billing_month: "",
-      electricity_previous: "",
-      electricity_current: "",
-      water_previous: "",
-      water_current: "",
-    });
-
+    setFormData({ tenant_id: "", billing_month: "", electricity_previous: "", electricity_current: "", water_previous: "", water_current: "" });
     setFormError("");
     setFormSuccess("");
   };
 
-  const openAddForm = () => {
-    setEditingReading(null);
-    resetForm();
-    setShowForm(true);
-  };
+  const openAddForm = () => { setEditingReading(null); resetForm(); setShowForm(true); };
 
   const openEditForm = (reading) => {
     setEditingReading(reading);
-
     setFormData({
       tenant_id: String(reading.tenant_id),
-      billing_month: reading.billing_month
-        ? reading.billing_month.substring(0, 10)
-        : "",
-      electricity_previous:
-        reading.electricity_previous ?? "",
-      electricity_current:
-        reading.electricity_current ?? "",
-      water_previous:
-        reading.water_previous ?? "",
-      water_current:
-        reading.water_current ?? "",
+      billing_month: reading.billing_month ? reading.billing_month.substring(0, 10) : "",
+      electricity_previous: reading.electricity_previous ?? "",
+      electricity_current: reading.electricity_current ?? "",
+      water_previous: reading.water_previous ?? "",
+      water_current: reading.water_current ?? "",
     });
-
     setFormError("");
     setFormSuccess("");
     setShowForm(true);
   };
 
-  const closeForm = () => {
-    setShowForm(false);
-    setEditingReading(null);
-    resetForm();
-  };
+  const closeForm = () => { setShowForm(false); setEditingReading(null); resetForm(); };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((c) => ({ ...c, [name]: value }));
     setFormError("");
     setFormSuccess("");
   };
 
   const electricityConsumption =
-    formData.electricity_previous !== "" &&
-      formData.electricity_current !== ""
-      ? Number(formData.electricity_current) -
-      Number(formData.electricity_previous)
+    formData.electricity_previous !== "" && formData.electricity_current !== ""
+      ? Number(formData.electricity_current) - Number(formData.electricity_previous)
       : null;
 
   const waterConsumption =
-    formData.water_previous !== "" &&
-      formData.water_current !== ""
-      ? Number(formData.water_current) -
-      Number(formData.water_previous)
+    formData.water_previous !== "" && formData.water_current !== ""
+      ? Number(formData.water_current) - Number(formData.water_previous)
       : null;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setFormError("");
     setFormSuccess("");
-
-    if (!formData.tenant_id) {
-      setFormError("Tenant is required.");
-      return;
-    }
-
-    if (!formData.billing_month) {
-      setFormError("Billing month is required.");
-      return;
-    }
-
-    const electricityPrevious = Number(
-      formData.electricity_previous
-    );
-
-    const electricityCurrent = Number(
-      formData.electricity_current
-    );
-
-    const waterPrevious = Number(
-      formData.water_previous
-    );
-
-    const waterCurrent = Number(
-      formData.water_current
-    );
-
-    const values = [
-      electricityPrevious,
-      electricityCurrent,
-      waterPrevious,
-      waterCurrent,
-    ];
-
-    if (
-      values.some(
-        (value) => Number.isNaN(value) || value < 0
-      )
-    ) {
-      setFormError(
-        "All meter readings must be non-negative numbers."
-      );
-      return;
-    }
-
-    if (electricityCurrent < electricityPrevious) {
-      setFormError(
-        "Current electricity reading cannot be lower than the previous reading."
-      );
-      return;
-    }
-
-    if (waterCurrent < waterPrevious) {
-      setFormError(
-        "Current water reading cannot be lower than the previous reading."
-      );
-      return;
-    }
-
+    if (!formData.tenant_id) { setFormError("Tenant is required."); return; }
+    if (!formData.billing_month) { setFormError("Billing month is required."); return; }
+    const electricityPrevious = Number(formData.electricity_previous);
+    const electricityCurrent = Number(formData.electricity_current);
+    const waterPrevious = Number(formData.water_previous);
+    const waterCurrent = Number(formData.water_current);
+    const values = [electricityPrevious, electricityCurrent, waterPrevious, waterCurrent];
+    if (values.some((v) => Number.isNaN(v) || v < 0)) { setFormError("All meter readings must be non-negative numbers."); return; }
+    if (electricityCurrent < electricityPrevious) { setFormError("Current electricity reading cannot be lower than the previous reading."); return; }
+    if (waterCurrent < waterPrevious) { setFormError("Current water reading cannot be lower than the previous reading."); return; }
     setIsSubmitting(true);
-
     try {
       const isEditing = Boolean(editingReading);
-
-      const url = isEditing
-        ? `/api/meter-readings/${editingReading.id}`
-        : "/api/meter-readings";
-
+      const url = isEditing ? `/api/meter-readings/${editingReading.id}` : "/api/meter-readings";
       const method = isEditing ? "PUT" : "POST";
-
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tenant_id: Number(formData.tenant_id),
           billing_month: formData.billing_month,
@@ -1253,38 +935,14 @@ function MeterReadingsPage() {
           water_current: waterCurrent,
         }),
       });
-
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message ||
-          `Failed to ${isEditing ? "update" : "record"
-          } meter reading.`
-        );
-        return;
-      }
-
-      setFormSuccess(
-        isEditing
-          ? "Meter reading updated successfully."
-          : "Meter reading recorded successfully."
-      );
-
+      if (!response.ok || !data.success) { setFormError(data.message || `Failed to ${isEditing ? "update" : "record"} meter reading.`); return; }
+      setFormSuccess(isEditing ? "Meter reading updated successfully." : "Meter reading recorded successfully.");
       loadReadings();
-
-      setTimeout(() => {
-        closeForm();
-      }, 800);
-    } catch (error) {
-      console.error(
-        "Failed to save meter reading:",
-        error
-      );
-
-      setFormError(
-        "Unable to connect to the backend."
-      );
+      setTimeout(() => { closeForm(); }, 800);
+    } catch (err) {
+      console.error("Failed to save meter reading:", err);
+      setFormError("Unable to connect to the backend.");
     } finally {
       setIsSubmitting(false);
     }
@@ -1292,364 +950,176 @@ function MeterReadingsPage() {
 
   const handleDelete = async (reading) => {
     const confirmed = window.confirm(
-      `Delete the meter reading for ${reading.full_name} for ${reading.billing_month.substring(
-        0,
-        7
-      )}?`
+      `Delete the meter reading for ${reading.full_name} for ${reading.billing_month.substring(0, 7)}?`
     );
-
-    if (!confirmed) {
-      return;
-    }
-
+    if (!confirmed) return;
     try {
-      const response = await fetch(
-        `/api/meter-readings/${reading.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
+      const response = await fetch(`/api/meter-readings/${reading.id}`, { method: "DELETE" });
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        window.alert(
-          data.message || "Failed to delete meter reading."
-        );
-        return;
-      }
-
+      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete meter reading."); return; }
       loadReadings();
-    } catch (error) {
-      console.error(
-        "Failed to delete meter reading:",
-        error
-      );
-
-      window.alert(
-        "Unable to connect to the backend."
-      );
+    } catch (err) {
+      console.error("Failed to delete meter reading:", err);
+      window.alert("Unable to connect to the backend.");
     }
   };
 
   return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">UTILITY TRACKING</p>
-
-          <h2>Meter Readings</h2>
-
-          <p>
-            Record electricity and water readings for each billing
-            period.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="primary-button"
-          onClick={openAddForm}
-        >
-          + Add Reading
-        </button>
-      </div>
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="UTILITY TRACKING"
+        title="Meter Readings"
+        description="Record electricity and water readings for each billing period."
+        action={
+          <button type="button" className="btn-primary" onClick={openAddForm}>
+            <Icons.Plus /> Add Reading
+          </button>
+        }
+      />
 
       {showForm && (
-        <div className="tenant-form-card">
-          <div className="form-header">
+        <div className="form-panel">
+          <div className="form-panel-header">
             <div>
-              <p className="eyebrow">
-                {editingReading
-                  ? "EDIT METER READING"
-                  : "NEW METER READING"}
-              </p>
-
-              <h3>
-                {editingReading
-                  ? "Edit Meter Reading"
-                  : "Add Meter Reading"}
-              </h3>
+              <p className="eyebrow">{editingReading ? "EDIT METER READING" : "NEW METER READING"}</p>
+              <h3>{editingReading ? "Edit Meter Reading" : "Add Meter Reading"}</h3>
             </div>
-
-            <button
-              type="button"
-              className="close-button"
-              onClick={closeForm}
-            >
-              +
+            <button type="button" className="btn-icon" onClick={closeForm} aria-label="Close">
+              <Icons.Close />
             </button>
           </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-grid">
-              <label>
-                <span>TENANT</span>
-
-                <select
-                  name="tenant_id"
-                  value={formData.tenant_id}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    Select active tenant
-                  </option>
-
-                  {tenants.map((tenant) => (
-                    <option
-                      key={tenant.id}
-                      value={tenant.id}
-                    >
-                      {tenant.full_name}
-                      {tenant.room_number
-                        ? ` - Room ${tenant.room_number}`
-                        : ""}
+              <label className="field">
+                <span className="field-label">TENANT <span className="required">*</span></span>
+                <select name="tenant_id" value={formData.tenant_id} onChange={handleChange} className="field-input">
+                  <option value="">Select active tenant</option>
+                  {tenants.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
               </label>
 
-              <label>
-                <span>BILLING MONTH</span>
-
+              <label className="field">
+                <span className="field-label">BILLING MONTH <span className="required">*</span></span>
                 <input
                   type="month"
                   name="billing_month"
-                  value={
-                    formData.billing_month
-                      ? formData.billing_month.substring(0, 7)
-                      : ""
-                  }
-                  onChange={(event) => {
-                    const value = event.target.value;
-
-                    setFormData((current) => ({
-                      ...current,
-                      billing_month: value
-                        ? `${value}-01`
-                        : "",
-                    }));
-
+                  value={formData.billing_month ? formData.billing_month.substring(0, 7) : ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData((c) => ({ ...c, billing_month: value ? `${value}-01` : "" }));
                     setFormError("");
                     setFormSuccess("");
                   }}
-                />
-              </label>
-
-              <label>
-                <span>ELECTRICITY PREVIOUS</span>
-
-                <input
-                  type="number"
-                  name="electricity_previous"
-                  min="0"
-                  step="0.001"
-                  value={formData.electricity_previous}
-                  onChange={handleChange}
-                  placeholder="e.g. 1250"
-                />
-              </label>
-
-              <label>
-                <span>ELECTRICITY CURRENT</span>
-
-                <input
-                  type="number"
-                  name="electricity_current"
-                  min="0"
-                  step="0.001"
-                  value={formData.electricity_current}
-                  onChange={handleChange}
-                  placeholder="e.g. 1375"
-                />
-              </label>
-
-              <label>
-                <span>WATER PREVIOUS</span>
-
-                <input
-                  type="number"
-                  name="water_previous"
-                  min="0"
-                  step="0.001"
-                  value={formData.water_previous}
-                  onChange={handleChange}
-                  placeholder="e.g. 500"
-                />
-              </label>
-
-              <label>
-                <span>WATER CURRENT</span>
-
-                <input
-                  type="number"
-                  name="water_current"
-                  min="0"
-                  step="0.001"
-                  value={formData.water_current}
-                  onChange={handleChange}
-                  placeholder="e.g. 520"
+                  className="field-input"
                 />
               </label>
             </div>
 
-            <div className="form-grid">
-              <div className="stat-card">
-                <span className="stat-label">
-                  ELECTRICITY CONSUMPTION
+            {/* Electricity section */}
+            <div className="utility-section utility-section-electric">
+              <div className="utility-section-header">
+                <span className="utility-badge electric-badge">
+                  <Icons.Electricity /> Electricity
                 </span>
-
-                <strong>
-                  {electricityConsumption !== null &&
-                    !Number.isNaN(electricityConsumption)
-                    ? `${electricityConsumption.toFixed(3)} kWh`
-                    : "-"}
-                </strong>
-
-                <small>
-                  Current minus previous reading
-                </small>
+                {electricityConsumption !== null && !Number.isNaN(electricityConsumption) && (
+                  <span className="consumption-preview">
+                    {electricityConsumption.toFixed(3)} kWh consumed
+                  </span>
+                )}
               </div>
-
-              <div className="stat-card">
-                <span className="stat-label">
-                  WATER CONSUMPTION
-                </span>
-
-                <strong>
-                  {waterConsumption !== null &&
-                    !Number.isNaN(waterConsumption)
-                    ? `${waterConsumption.toFixed(3)} m3`
-                    : "-"}
-                </strong>
-
-                <small>
-                  Current minus previous reading
-                </small>
+              <div className="form-grid form-grid-2">
+                <label className="field">
+                  <span className="field-label">PREVIOUS READING</span>
+                  <input type="number" name="electricity_previous" min="0" step="0.001" value={formData.electricity_previous} onChange={handleChange} placeholder="e.g. 1250" className="field-input" />
+                </label>
+                <label className="field">
+                  <span className="field-label">CURRENT READING</span>
+                  <input type="number" name="electricity_current" min="0" step="0.001" value={formData.electricity_current} onChange={handleChange} placeholder="e.g. 1375" className="field-input" />
+                </label>
               </div>
             </div>
 
-            {formError && (
-              <div className="form-message error">
-                {formError}
+            {/* Water section */}
+            <div className="utility-section utility-section-water">
+              <div className="utility-section-header">
+                <span className="utility-badge water-badge">
+                  <Icons.Water /> Water
+                </span>
+                {waterConsumption !== null && !Number.isNaN(waterConsumption) && (
+                  <span className="consumption-preview">
+                    {waterConsumption.toFixed(3)} m³ consumed
+                  </span>
+                )}
               </div>
-            )}
+              <div className="form-grid form-grid-2">
+                <label className="field">
+                  <span className="field-label">PREVIOUS READING</span>
+                  <input type="number" name="water_previous" min="0" step="0.001" value={formData.water_previous} onChange={handleChange} placeholder="e.g. 500" className="field-input" />
+                </label>
+                <label className="field">
+                  <span className="field-label">CURRENT READING</span>
+                  <input type="number" name="water_current" min="0" step="0.001" value={formData.water_current} onChange={handleChange} placeholder="e.g. 520" className="field-input" />
+                </label>
+              </div>
+            </div>
 
-            {formSuccess && (
-              <div className="form-message success">
-                {formSuccess}
-              </div>
-            )}
+            {formError && <div className="form-msg form-msg-error"><Icons.Alert /> {formError}</div>}
+            {formSuccess && <div className="form-msg form-msg-success"><Icons.Check /> {formSuccess}</div>}
 
             <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={closeForm}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Saving..."
-                  : editingReading
-                    ? "Update Reading"
-                    : "Save Reading"}
+              <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : editingReading ? "Update Reading" : "Save Reading"}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="tenant-list">
+      <div className="record-list">
         {readings.length === 0 ? (
-          <div className="empty-state">
-            <h3>No meter readings found</h3>
-
-            <p>
-              Meter readings will appear here once they are
-              recorded.
-            </p>
-          </div>
+          <EmptyState icon={<Icons.Meters />} title="No meter readings found" description="Meter readings will appear here once they are recorded." />
         ) : (
           readings.map((reading) => (
-            <article
-              className="tenant-card"
-              key={reading.id}
-            >
-              <div className="tenant-main">
-                <div className="tenant-avatar">
-                  {reading.full_name
-                    .charAt(0)
-                    .toUpperCase()}
+            <article className="record-card meter-record-card" key={reading.id}>
+              <div className="record-main">
+                <div className="avatar">
+                  {reading.full_name.charAt(0).toUpperCase()}
                 </div>
-
                 <div>
-                  <strong>{reading.full_name}</strong>
-
-                  <p>
-                    {reading.room_number
-                      ? `Room ${reading.room_number}`
-                      : "Unassigned"}
-                  </p>
+                  <strong className="record-name">{reading.full_name}</strong>
+                  <p className="record-sub">{reading.room_number ? `Room ${reading.room_number}` : "Unassigned"}</p>
                 </div>
               </div>
 
-              <div className="tenant-details">
-                <div>
-                  <span>BILLING MONTH</span>
-
-                  <strong>
-                    {reading.billing_month.substring(0, 7)}
-                  </strong>
+              <div className="record-meta">
+                <div className="meta-item">
+                  <span className="meta-label">BILLING MONTH</span>
+                  <strong className="meta-value">{reading.billing_month.substring(0, 7)}</strong>
                 </div>
-
-                <div>
-                  <span>ELECTRICITY</span>
-
-                  <strong>
-                    {Number(
-                      reading.electricity_consumption
-                    ).toFixed(3)}{" "}
-                    kWh
-                  </strong>
+                <div className="meta-item utility-meta electric-meta">
+                  <span className="meta-label">
+                    <Icons.Electricity /> ELECTRICITY
+                  </span>
+                  <strong className="meta-value">{Number(reading.electricity_consumption).toFixed(3)} kWh</strong>
                 </div>
-
-                <div>
-                  <span>WATER</span>
-
-                  <strong>
-                    {Number(
-                      reading.water_consumption
-                    ).toFixed(3)}{" "}
-                    m3
-                  </strong>
+                <div className="meta-item utility-meta water-meta">
+                  <span className="meta-label">
+                    <Icons.Water /> WATER
+                  </span>
+                  <strong className="meta-value">{Number(reading.water_consumption).toFixed(3)} m³</strong>
                 </div>
-
-                <div className="tenant-actions">
-                  <button
-                    type="button"
-                    className="edit-button"
-                    onClick={() =>
-                      openEditForm(reading)
-                    }
-                  >
-                    Edit
+                <div className="meta-actions">
+                  <button type="button" className="btn-edit" onClick={() => openEditForm(reading)}>
+                    <Icons.Edit /> Edit
                   </button>
-
-                  <button
-                    type="button"
-                    className="delete-button"
-                    onClick={() =>
-                      handleDelete(reading)
-                    }
-                  >
-                    Delete
+                  <button type="button" className="btn-delete" onClick={() => handleDelete(reading)}>
+                    <Icons.Delete /> Delete
                   </button>
                 </div>
               </div>
@@ -1657,156 +1127,291 @@ function MeterReadingsPage() {
           ))
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
+/* ─────────────────────────────────────────────
+   UTILITY RATES PAGE
+───────────────────────────────────────────── */
+function UtilityRatesPage() {
+  const [rates, setRates] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingRate, setEditingRate] = useState(null);
+  const [formData, setFormData] = useState({ utility_type: "", rate_per_unit: "", effective_from: "" });
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const loadRates = async () => {
+    try {
+      const response = await fetch("/api/utility-rates");
+      const data = await response.json();
+      if (!response.ok || !data.success) { setFormError(data.message || "Failed to load utility rates."); return; }
+      setRates(data.data);
+    } catch (err) {
+      console.error("Failed to load utility rates:", err);
+      setFormError("Unable to connect to the backend.");
+    }
+  };
 
+  useEffect(() => { loadRates(); }, []);
+
+  const resetForm = () => {
+    setFormData({ utility_type: "", rate_per_unit: "", effective_from: "" });
+    setFormError("");
+    setFormSuccess("");
+    setEditingRate(null);
+  };
+
+  const openAddForm = () => { resetForm(); setShowForm(true); };
+
+  const openEditForm = (rate) => {
+    setFormData({ utility_type: rate.utility_type, rate_per_unit: rate.rate_per_unit, effective_from: rate.effective_from.substring(0, 10) });
+    setFormError("");
+    setFormSuccess("");
+    setEditingRate(rate);
+    setShowForm(true);
+  };
+
+  const closeForm = () => { setShowForm(false); resetForm(); };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((c) => ({ ...c, [name]: value }));
+    setFormError("");
+    setFormSuccess("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormError("");
+    setFormSuccess("");
+    if (!formData.utility_type) { setFormError("Utility type is required."); return; }
+    if (formData.rate_per_unit === "") { setFormError("Rate per unit is required."); return; }
+    const rate = Number(formData.rate_per_unit);
+    if (!Number.isFinite(rate) || rate < 0) { setFormError("Rate per unit must be a valid non-negative number."); return; }
+    if (!formData.effective_from) { setFormError("Effective date is required."); return; }
+    setIsSubmitting(true);
+    try {
+      const url = editingRate ? `/api/utility-rates/${editingRate.id}` : "/api/utility-rates";
+      const method = editingRate ? "PUT" : "POST";
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ utility_type: formData.utility_type, rate_per_unit: rate, effective_from: formData.effective_from }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) { setFormError(data.message || "Failed to save utility rate."); return; }
+      setFormSuccess(editingRate ? "Utility rate updated successfully." : "Utility rate added successfully.");
+      await loadRates();
+      setTimeout(() => { closeForm(); }, 800);
+    } catch (err) {
+      console.error("Failed to save utility rate:", err);
+      setFormError("Unable to connect to the backend.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (rate) => {
+    const confirmed = window.confirm(`Delete the ${rate.utility_type} rate effective ${rate.effective_from.substring(0, 10)}?`);
+    if (!confirmed) return;
+    try {
+      const response = await fetch(`/api/utility-rates/${rate.id}`, { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete utility rate."); return; }
+      loadRates();
+    } catch (err) {
+      console.error("Failed to delete utility rate:", err);
+      window.alert("Unable to connect to the backend.");
+    }
+  };
+
+  return (
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="UTILITY RATE MANAGEMENT"
+        title="Utility Rates"
+        description="Manage electricity and water rates used for automated billing calculations."
+        action={
+          <button type="button" className="btn-primary" onClick={openAddForm}>
+            <Icons.Plus /> Add Rate
+          </button>
+        }
+      />
+
+      {showForm && (
+        <div className="form-panel">
+          <div className="form-panel-header">
+            <div>
+              <p className="eyebrow">{editingRate ? "EDIT UTILITY RATE" : "NEW UTILITY RATE"}</p>
+              <h3>{editingRate ? "Edit Utility Rate" : "Add Utility Rate"}</h3>
+            </div>
+            <button type="button" className="btn-icon" onClick={closeForm} aria-label="Close">
+              <Icons.Close />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="form-grid">
+              <label className="field">
+                <span className="field-label">UTILITY TYPE <span className="required">*</span></span>
+                <select name="utility_type" value={formData.utility_type} onChange={handleChange} className="field-input">
+                  <option value="">Select utility</option>
+                  <option value="Electricity">Electricity</option>
+                  <option value="Water">Water</option>
+                </select>
+              </label>
+              <label className="field">
+                <span className="field-label">RATE PER UNIT (₱) <span className="required">*</span></span>
+                <input type="number" name="rate_per_unit" value={formData.rate_per_unit} onChange={handleChange} min="0" step="0.01" placeholder="Enter rate" className="field-input" />
+              </label>
+              <label className="field">
+                <span className="field-label">EFFECTIVE FROM <span className="required">*</span></span>
+                <input type="date" name="effective_from" value={formData.effective_from} onChange={handleChange} className="field-input" />
+              </label>
+            </div>
+
+            <div className="form-info-banner">
+              <Icons.Alert />
+              This rate will be used when generating bills for billing months covered by the effective date.
+            </div>
+
+            {formError && <div className="form-msg form-msg-error"><Icons.Alert /> {formError}</div>}
+            {formSuccess && <div className="form-msg form-msg-success"><Icons.Check /> {formSuccess}</div>}
+
+            <div className="form-actions">
+              <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Saving…" : editingRate ? "Save Changes" : "Add Rate"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="record-list">
+        {rates.length === 0 ? (
+          <EmptyState icon={<Icons.Rates />} title="No utility rates found" description="Add an electricity or water rate to enable automated billing calculations." />
+        ) : (
+          rates.map((rate) => {
+            const isElectric = rate.utility_type === "Electricity";
+            return (
+              <article className={`record-card rate-card ${isElectric ? "rate-electric" : "rate-water"}`} key={rate.id}>
+                <div className="record-main">
+                  <div className={`avatar ${isElectric ? "avatar-electric" : "avatar-water"}`}>
+                    {isElectric ? <Icons.Electricity /> : <Icons.Water />}
+                  </div>
+                  <div>
+                    <strong className="record-name">{rate.utility_type}</strong>
+                    <p className="record-sub">Effective from {rate.effective_from.substring(0, 10)}</p>
+                  </div>
+                </div>
+
+                <div className="record-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">UTILITY</span>
+                    <span className={`utility-pill ${isElectric ? "pill-electric" : "pill-water"}`}>
+                      {isElectric ? <Icons.Electricity /> : <Icons.Water />}
+                      {rate.utility_type}
+                    </span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">RATE PER UNIT</span>
+                    <strong className={`meta-value rate-value ${isElectric ? "electric-value" : "water-value"}`}>
+                      {formatCurrency(rate.rate_per_unit)}
+                    </strong>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">EFFECTIVE FROM</span>
+                    <strong className="meta-value">{rate.effective_from.substring(0, 10)}</strong>
+                  </div>
+                  <div className="meta-actions">
+                    <button type="button" className="btn-edit" onClick={() => openEditForm(rate)}>
+                      <Icons.Edit /> Edit
+                    </button>
+                    <button type="button" className="btn-delete" onClick={() => handleDelete(rate)}>
+                      <Icons.Delete /> Delete
+                    </button>
+                  </div>
+                </div>
+              </article>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   BILLING PAGE
+───────────────────────────────────────────── */
 function BillingPage() {
   const [billingRecords, setBillingRecords] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [showForm, setShowForm] = useState(false);
-
-  const [formData, setFormData] = useState({
-    tenant_id: "",
-    billing_month: "",
-  });
-
+  const [formData, setFormData] = useState({ tenant_id: "", billing_month: "" });
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadBillingRecords = () => {
     fetch("/api/billing")
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setBillingRecords(data.data);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          "Failed to load billing records:",
-          error
-        );
-      });
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setBillingRecords(data.data); })
+      .catch((e) => console.error("Failed to load billing records:", e));
   };
 
   const loadTenants = () => {
     fetch("/api/tenants")
-      .then((response) => response.json())
+      .then((r) => r.json())
       .then((data) => {
-        if (data.success) {
-          setTenants(
-            data.data.filter(
-              (tenant) => tenant.status === "Active"
-            )
-          );
-        }
+        if (data.success) setTenants(data.data.filter((t) => t.status === "Active"));
       })
-      .catch((error) => {
-        console.error(
-          "Failed to load tenants:",
-          error
-        );
-      });
+      .catch((e) => console.error("Failed to load tenants:", e));
   };
 
-  useEffect(() => {
-    loadBillingRecords();
-    loadTenants();
-  }, []);
+  useEffect(() => { loadBillingRecords(); loadTenants(); }, []);
 
   const resetForm = () => {
-    setFormData({
-      tenant_id: "",
-      billing_month: "",
-    });
-
+    setFormData({ tenant_id: "", billing_month: "" });
     setFormError("");
     setFormSuccess("");
   };
 
-  const openAddForm = () => {
-    resetForm();
-    setShowForm(true);
-  };
+  const openAddForm = () => { resetForm(); setShowForm(true); };
+  const closeForm = () => { setShowForm(false); resetForm(); };
 
-  const closeForm = () => {
-    setShowForm(false);
-    resetForm();
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((c) => ({ ...c, [name]: value }));
     setFormError("");
     setFormSuccess("");
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setFormError("");
     setFormSuccess("");
-
-    if (!formData.tenant_id) {
-      setFormError("Tenant is required.");
-      return;
-    }
-
-    if (!formData.billing_month) {
-      setFormError("Billing month is required.");
-      return;
-    }
-
+    if (!formData.tenant_id) { setFormError("Tenant is required."); return; }
+    if (!formData.billing_month) { setFormError("Billing month is required."); return; }
     setIsSubmitting(true);
-
     try {
       const response = await fetch("/api/billing", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tenant_id: Number(formData.tenant_id),
-          billing_month: `${formData.billing_month}-01`,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant_id: Number(formData.tenant_id), billing_month: `${formData.billing_month}-01` }),
       });
-
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message || "Failed to generate bill."
-        );
-        return;
-      }
-
-      setFormSuccess(
-        "Billing record generated successfully."
-      );
-
+      if (!response.ok || !data.success) { setFormError(data.message || "Failed to generate bill."); return; }
+      setFormSuccess("Billing record generated successfully.");
       loadBillingRecords();
-
-      setTimeout(() => {
-        closeForm();
-      }, 800);
-    } catch (error) {
-      console.error(
-        "Failed to generate billing record:",
-        error
-      );
-
-      setFormError(
-        "Unable to connect to the backend."
-      );
+      setTimeout(() => { closeForm(); }, 800);
+    } catch (err) {
+      console.error("Failed to generate billing record:", err);
+      setFormError("Unable to connect to the backend.");
     } finally {
       setIsSubmitting(false);
     }
@@ -1814,309 +1419,144 @@ function BillingPage() {
 
   const handleStatusChange = async (billing, status) => {
     try {
-      const response = await fetch(
-        `/api/billing/${billing.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status,
-          }),
-        }
-      );
-
+      const response = await fetch(`/api/billing/${billing.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        window.alert(
-          data.message ||
-          "Failed to update billing status."
-        );
-        return;
-      }
-
+      if (!response.ok || !data.success) { window.alert(data.message || "Failed to update billing status."); return; }
       loadBillingRecords();
-    } catch (error) {
-      console.error(
-        "Failed to update billing status:",
-        error
-      );
-
-      window.alert(
-        "Unable to connect to the backend."
-      );
+    } catch (err) {
+      console.error("Failed to update billing status:", err);
+      window.alert("Unable to connect to the backend.");
     }
   };
 
   const handleDelete = async (billing) => {
-    const confirmed = window.confirm(
-      `Delete the billing record for ${billing.full_name} for ${billing.billing_month.substring(
-        0,
-        7
-      )}?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
+    const confirmed = window.confirm(`Delete the billing record for ${billing.full_name} for ${billing.billing_month.substring(0, 7)}?`);
+    if (!confirmed) return;
     try {
-      const response = await fetch(
-        `/api/billing/${billing.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
+      const response = await fetch(`/api/billing/${billing.id}`, { method: "DELETE" });
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        window.alert(
-          data.message ||
-          "Failed to delete billing record."
-        );
-        return;
-      }
-
+      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete billing record."); return; }
       loadBillingRecords();
-    } catch (error) {
-      console.error(
-        "Failed to delete billing record:",
-        error
-      );
-
-      window.alert(
-        "Unable to connect to the backend."
-      );
+    } catch (err) {
+      console.error("Failed to delete billing record:", err);
+      window.alert("Unable to connect to the backend.");
     }
   };
 
   return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">BILLING MANAGEMENT</p>
-
-          <h2>Billing</h2>
-
-          <p>
-            Generate bills from meter readings and manage
-            payment status.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="primary-button"
-          onClick={openAddForm}
-        >
-          + Generate Bill
-        </button>
-      </div>
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="BILLING MANAGEMENT"
+        title="Billing"
+        description="Generate bills from meter readings and manage payment status."
+        action={
+          <button type="button" className="btn-primary" onClick={openAddForm}>
+            <Icons.Plus /> Generate Bill
+          </button>
+        }
+      />
 
       {showForm && (
-        <div className="tenant-form-card">
-          <div className="form-header">
+        <div className="form-panel">
+          <div className="form-panel-header">
             <div>
               <p className="eyebrow">NEW BILLING RECORD</p>
-
               <h3>Generate Bill</h3>
             </div>
-
-            <button
-              type="button"
-              className="close-button"
-              onClick={closeForm}
-            >
-		X
+            <button type="button" className="btn-icon" onClick={closeForm} aria-label="Close">
+              <Icons.Close />
             </button>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <label>
-                <span>TENANT</span>
-
-                <select
-                  name="tenant_id"
-                  value={formData.tenant_id}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    Select active tenant
-                  </option>
-
-                  {tenants.map((tenant) => (
-                    <option
-                      key={tenant.id}
-                      value={tenant.id}
-                    >
-                      {tenant.full_name}
-                      {tenant.room_number
-                        ? ` - Room ${tenant.room_number}`
-                        : ""}
+            <div className="form-grid form-grid-2">
+              <label className="field">
+                <span className="field-label">TENANT <span className="required">*</span></span>
+                <select name="tenant_id" value={formData.tenant_id} onChange={handleChange} className="field-input">
+                  <option value="">Select active tenant</option>
+                  {tenants.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
               </label>
-
-              <label>
-                <span>BILLING MONTH</span>
-
-                <input
-                  type="month"
-                  name="billing_month"
-                  value={formData.billing_month}
-                  onChange={handleChange}
-                />
+              <label className="field">
+                <span className="field-label">BILLING MONTH <span className="required">*</span></span>
+                <input type="month" name="billing_month" value={formData.billing_month} onChange={handleChange} className="field-input" />
               </label>
             </div>
 
-            <div className="form-message">
-              The system will calculate electricity and
-              water charges using the meter reading and
-              applicable utility rates.
+            <div className="form-info-banner">
+              <Icons.Alert />
+              The system will calculate electricity and water charges using the meter reading and applicable utility rates.
             </div>
 
-            {formError && (
-              <div className="form-message error">
-                {formError}
-              </div>
-            )}
-
-            {formSuccess && (
-              <div className="form-message success">
-                {formSuccess}
-              </div>
-            )}
+            {formError && <div className="form-msg form-msg-error"><Icons.Alert /> {formError}</div>}
+            {formSuccess && <div className="form-msg form-msg-success"><Icons.Check /> {formSuccess}</div>}
 
             <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={closeForm}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Generating..."
-                  : "Generate Bill"}
+              <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={isSubmitting}>
+                {isSubmitting ? "Generating…" : "Generate Bill"}
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="tenant-list">
+      <div className="record-list">
         {billingRecords.length === 0 ? (
-          <div className="empty-state">
-            <h3>No billing records found</h3>
-
-            <p>
-              Billing records will appear here once bills
-              are generated.
-            </p>
-          </div>
+          <EmptyState icon={<Icons.Billing />} title="No billing records found" description="Billing records will appear here once bills are generated." />
         ) : (
           billingRecords.map((billing) => (
-            <article
-              className="tenant-card"
-              key={billing.id}
-            >
-              <div className="tenant-main">
-                <div className="tenant-avatar">
-                  {billing.full_name
-                    .charAt(0)
-                    .toUpperCase()}
+            <article className="record-card billing-record-card" key={billing.id}>
+              <div className="record-main">
+                <div className="avatar">
+                  {billing.full_name.charAt(0).toUpperCase()}
                 </div>
-
                 <div>
-                  <strong>{billing.full_name}</strong>
-
-                  <p>
-                    {billing.room_number
-                      ? `Room ${billing.room_number}`
-                      : "Unassigned"}
-                  </p>
+                  <strong className="record-name">{billing.full_name}</strong>
+                  <p className="record-sub">{billing.room_number ? `Room ${billing.room_number}` : "Unassigned"}</p>
                 </div>
               </div>
 
-              <div className="tenant-details">
-                <div>
-                  <span>BILLING MONTH</span>
-
-                  <strong>
-                    {billing.billing_month.substring(0, 7)}
-                  </strong>
+              <div className="record-meta billing-meta">
+                <div className="meta-item">
+                  <span className="meta-label">BILLING MONTH</span>
+                  <strong className="meta-value">{billing.billing_month.substring(0, 7)}</strong>
                 </div>
-
-                <div>
-                  <span>ELECTRICITY</span>
-
-                  <strong>
-                      {formatCurrency(billing.electricity_charge)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label electric-label"><Icons.Electricity /> ELECTRICITY</span>
+                  <strong className="meta-value electric-value">{formatCurrency(billing.electricity_charge)}</strong>
                 </div>
-
-                <div>
-                  <span>WATER</span>
-
-                  <strong>
-                     {formatCurrency(billing.water_charge)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label water-label"><Icons.Water /> WATER</span>
+                  <strong className="meta-value water-value">{formatCurrency(billing.water_charge)}</strong>
                 </div>
-
-                <div>
-                  <span>TOTAL</span>
-
-                  <strong>
-                    {formatCurrency(billing.total_amount)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label">TOTAL</span>
+                  <strong className="meta-value total-value">{formatCurrency(billing.total_amount)}</strong>
                 </div>
-
-                <div>
-                  <span>STATUS</span>
-
+                <div className="meta-item">
+                  <span className="meta-label">STATUS</span>
                   <select
+                    className="status-select"
                     value={billing.status}
-                    onChange={(event) =>
-                      handleStatusChange(
-                        billing,
-                        event.target.value
-                      )
-                    }
+                    onChange={(e) => handleStatusChange(billing, e.target.value)}
                   >
-                    <option value="Pending">
-                      Pending
-                    </option>
-
-                    <option value="Paid">
-                      Paid
-                    </option>
-
-                    <option value="Overdue">
-                      Overdue
-                    </option>
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Overdue">Overdue</option>
                   </select>
                 </div>
-
-                <div className="tenant-actions">
-                  <button
-                    type="button"
-                    className="delete-button"
-                    onClick={() =>
-                      handleDelete(billing)
-                    }
-                  >
-                    Delete
+                <div className="meta-actions">
+                  <button type="button" className="btn-delete" onClick={() => handleDelete(billing)}>
+                    <Icons.Delete /> Delete
                   </button>
                 </div>
               </div>
@@ -2124,21 +1564,16 @@ function BillingPage() {
           ))
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
-
-
+/* ─────────────────────────────────────────────
+   REPORTS PAGE
+───────────────────────────────────────────── */
 function ReportsPage() {
   const [reports, setReports] = useState([]);
-  const [filters, setFilters] = useState({
-    billing_month: "",
-    tenant_id: "",
-    room_id: "",
-    status: "",
-  });
-
+  const [filters, setFilters] = useState({ billing_month: "", tenant_id: "", room_id: "", status: "" });
   const [tenants, setTenants] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -2146,17 +1581,9 @@ function ReportsPage() {
 
   const getBillingMonth = (value) => {
     if (!value) return "";
-
     const text = String(value);
-
-    // MySQL DATE normally starts with YYYY-MM-DD.
-    // Using the original date text avoids timezone/month shifting.
     const match = text.match(/^(\d{4}-\d{2})/);
-
-    if (match) {
-      return match[1];
-    }
-
+    if (match) return match[1];
     return "";
   };
 
@@ -2164,41 +1591,16 @@ function ReportsPage() {
     try {
       setLoading(true);
       setError("");
-
       const response = await fetch("/api/billing");
-
-      if (!response.ok) {
-        throw new Error(
-          `Billing API returned ${response.status}`
-        );
-      }
-
+      if (!response.ok) throw new Error(`Billing API returned ${response.status}`);
       const data = await response.json();
-
       console.log("TARIPA REPORTS:", data);
-
-      if (!data.success) {
-        throw new Error(
-          data.message || "Failed to load billing reports."
-        );
-      }
-
-      const billingData = Array.isArray(data.data)
-        ? data.data
-        : [];
-
-      setReports(billingData);
-    } catch (requestError) {
-      console.error(
-        "Failed to load reports:",
-        requestError
-      );
-
+      if (!data.success) throw new Error(data.message || "Failed to load billing reports.");
+      setReports(Array.isArray(data.data) ? data.data : []);
+    } catch (err) {
+      console.error("Failed to load reports:", err);
       setReports([]);
-      setError(
-        requestError.message ||
-        "Unable to connect to the backend."
-      );
+      setError(err.message || "Unable to connect to the backend.");
     } finally {
       setLoading(false);
     }
@@ -2208,961 +1610,211 @@ function ReportsPage() {
     try {
       const response = await fetch("/api/tenants");
       const data = await response.json();
-
-      if (response.ok && data.success) {
-        setTenants(
-          Array.isArray(data.data)
-            ? data.data
-            : []
-        );
-      }
-    } catch (requestError) {
-      console.error(
-        "Failed to load tenants:",
-        requestError
-      );
-    }
+      if (response.ok && data.success) setTenants(Array.isArray(data.data) ? data.data : []);
+    } catch (err) { console.error("Failed to load tenants:", err); }
   };
 
   const loadRooms = async () => {
     try {
       const response = await fetch("/api/rooms");
       const data = await response.json();
-
-      if (response.ok && data.success) {
-        setRooms(
-          Array.isArray(data.data)
-            ? data.data
-            : []
-        );
-      }
-    } catch (requestError) {
-      console.error(
-        "Failed to load rooms:",
-        requestError
-      );
-    }
+      if (response.ok && data.success) setRooms(Array.isArray(data.data) ? data.data : []);
+    } catch (err) { console.error("Failed to load rooms:", err); }
   };
 
-  useEffect(() => {
-    loadReports();
-    loadTenants();
-    loadRooms();
-  }, []);
+  useEffect(() => { loadReports(); loadTenants(); loadRooms(); }, []);
 
-  const handleFilterChange = (event) => {
-    const { name, value } = event.target;
-
-    setFilters((current) => ({
-      ...current,
-      [name]: value,
-    }));
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((c) => ({ ...c, [name]: value }));
   };
 
-  const clearFilters = () => {
-    setFilters({
-      billing_month: "",
-      tenant_id: "",
-      room_id: "",
-      status: "",
-    });
-  };
+  const clearFilters = () => setFilters({ billing_month: "", tenant_id: "", room_id: "", status: "" });
 
   const filteredReports = reports.filter((report) => {
-    const reportMonth = getBillingMonth(
-      report.billing_month
-    );
-
-    const matchesMonth =
-      !filters.billing_month ||
-      reportMonth === filters.billing_month;
-
-    const matchesTenant =
-      !filters.tenant_id ||
-      String(report.tenant_id) ===
-      String(filters.tenant_id);
-
-    const matchesRoom =
-      !filters.room_id ||
-      String(report.room_id) ===
-      String(filters.room_id);
-
-    const matchesStatus =
-      !filters.status ||
-      String(report.status) ===
-      String(filters.status);
-
-    return (
-      matchesMonth &&
-      matchesTenant &&
-      matchesRoom &&
-      matchesStatus
-    );
+    const reportMonth = getBillingMonth(report.billing_month);
+    const matchesMonth = !filters.billing_month || reportMonth === filters.billing_month;
+    const matchesTenant = !filters.tenant_id || String(report.tenant_id) === String(filters.tenant_id);
+    const matchesRoom = !filters.room_id || String(report.room_id) === String(filters.room_id);
+    const matchesStatus = !filters.status || String(report.status) === String(filters.status);
+    return matchesMonth && matchesTenant && matchesRoom && matchesStatus;
   });
 
   const totalBills = filteredReports.length;
+  const totalAmount = filteredReports.reduce((s, r) => s + Number(r.total_amount || 0), 0);
+  const totalElectricity = filteredReports.reduce((s, r) => s + Number(r.electricity_consumption || 0), 0);
+  const totalWater = filteredReports.reduce((s, r) => s + Number(r.water_consumption || 0), 0);
+  const pendingAmount = filteredReports.filter((r) => String(r.status) === "Pending").reduce((s, r) => s + Number(r.total_amount || 0), 0);
+  const paidAmount = filteredReports.filter((r) => String(r.status) === "Paid").reduce((s, r) => s + Number(r.total_amount || 0), 0);
+  const overdueAmount = filteredReports.filter((r) => String(r.status) === "Overdue").reduce((s, r) => s + Number(r.total_amount || 0), 0);
 
-  const totalAmount = filteredReports.reduce(
-    (sum, report) =>
-      sum + Number(report.total_amount || 0),
-    0
-  );
-
-  const totalElectricity = filteredReports.reduce(
-    (sum, report) =>
-      sum +
-      Number(
-        report.electricity_consumption || 0
-      ),
-    0
-  );
-
-  const totalWater = filteredReports.reduce(
-    (sum, report) =>
-      sum +
-      Number(
-        report.water_consumption || 0
-      ),
-    0
-  );
-
-  const pendingAmount = filteredReports
-    .filter(
-      (report) =>
-        String(report.status) === "Pending"
-    )
-    .reduce(
-      (sum, report) =>
-        sum + Number(report.total_amount || 0),
-      0
-    );
-
-  const paidAmount = filteredReports
-    .filter(
-      (report) =>
-        String(report.status) === "Paid"
-    )
-    .reduce(
-      (sum, report) =>
-        sum + Number(report.total_amount || 0),
-      0
-    );
-
-  const overdueAmount = filteredReports
-    .filter(
-      (report) =>
-        String(report.status) === "Overdue"
-    )
-    .reduce(
-      (sum, report) =>
-        sum + Number(report.total_amount || 0),
-      0
-    );
+  const hasActiveFilters = Object.values(filters).some(Boolean);
 
   return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">
-            REPORTS & DATA RETRIEVAL
-          </p>
-
-          <h2>Reports</h2>
-
-          <p>
-            Search and filter billing records to review
-            utility usage and payment information.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={loadReports}
-        >
-          Refresh
-        </button>
-      </div>
-
-      <div className="tenant-form-card">
-        <div className="form-header">
-          <div>
-            <p className="eyebrow">
-              REPORT FILTERS
-            </p>
-
-            <h3>Search Billing Records</h3>
-          </div>
-
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={clearFilters}
-          >
-            Clear Filters
+    <div className="page-wrap">
+      <PageHeader
+        eyebrow="REPORTS & DATA RETRIEVAL"
+        title="Reports"
+        description="Search and filter billing records to review utility usage and payment information."
+        action={
+          <button type="button" className="btn-secondary" onClick={loadReports}>
+            <Icons.Refresh /> Refresh
           </button>
+        }
+      />
+
+      {/* Filter panel */}
+      <div className="form-panel filter-panel">
+        <div className="form-panel-header">
+          <div className="filter-panel-title">
+            <Icons.Filter />
+            <div>
+              <p className="eyebrow">REPORT FILTERS</p>
+              <h3>Search Billing Records</h3>
+            </div>
+          </div>
+          {hasActiveFilters && (
+            <button type="button" className="btn-secondary btn-sm" onClick={clearFilters}>
+              Clear Filters
+            </button>
+          )}
         </div>
 
         <div className="form-grid">
-          <label>
-            <span>BILLING MONTH</span>
-
-            <input
-              type="month"
-              name="billing_month"
-              value={filters.billing_month}
-              onChange={handleFilterChange}
-            />
+          <label className="field">
+            <span className="field-label">BILLING MONTH</span>
+            <input type="month" name="billing_month" value={filters.billing_month} onChange={handleFilterChange} className="field-input" />
           </label>
-
-          <label>
-            <span>TENANT</span>
-
-            <select
-              name="tenant_id"
-              value={filters.tenant_id}
-              onChange={handleFilterChange}
-            >
-              <option value="">
-                All tenants
-              </option>
-
-              {tenants.map((tenant) => (
-                <option
-                  key={tenant.id}
-                  value={tenant.id}
-                >
-                  {tenant.full_name}
-                </option>
-              ))}
+          <label className="field">
+            <span className="field-label">TENANT</span>
+            <select name="tenant_id" value={filters.tenant_id} onChange={handleFilterChange} className="field-input">
+              <option value="">All tenants</option>
+              {tenants.map((t) => <option key={t.id} value={t.id}>{t.full_name}</option>)}
             </select>
           </label>
-
-          <label>
-            <span>ROOM</span>
-
-            <select
-              name="room_id"
-              value={filters.room_id}
-              onChange={handleFilterChange}
-            >
-              <option value="">
-                All rooms
-              </option>
-
-              {rooms.map((room) => (
-                <option
-                  key={room.id}
-                  value={room.id}
-                >
-                  Room {room.room_number}
-                </option>
-              ))}
+          <label className="field">
+            <span className="field-label">ROOM</span>
+            <select name="room_id" value={filters.room_id} onChange={handleFilterChange} className="field-input">
+              <option value="">All rooms</option>
+              {rooms.map((r) => <option key={r.id} value={r.id}>Room {r.room_number}</option>)}
             </select>
           </label>
-
-          <label>
-            <span>STATUS</span>
-
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-            >
-              <option value="">
-                All statuses
-              </option>
-
-              <option value="Pending">
-                Pending
-              </option>
-
-              <option value="Paid">
-                Paid
-              </option>
-
-              <option value="Overdue">
-                Overdue
-              </option>
+          <label className="field">
+            <span className="field-label">STATUS</span>
+            <select name="status" value={filters.status} onChange={handleFilterChange} className="field-input">
+              <option value="">All statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Paid">Paid</option>
+              <option value="Overdue">Overdue</option>
             </select>
           </label>
         </div>
       </div>
 
-      {error && (
-        <div className="form-message error">
-          {error}
+      {error && <div className="form-msg form-msg-error"><Icons.Alert /> {error}</div>}
+
+      {/* Summary rows */}
+      <div className="report-summary-row">
+        <div className="report-summary-card summary-neutral">
+          <span className="report-summary-label">TOTAL BILLS</span>
+          <strong className="report-summary-value">{totalBills}</strong>
+          <small>Matching records</small>
         </div>
-      )}
-
-      <div className="stat-grid">
-        <div className="stat-card">
-          <span className="stat-label">
-            TOTAL BILLS
-          </span>
-
-          <strong>{totalBills}</strong>
-
-          <small>
-            Matching records
-          </small>
+        <div className="report-summary-card summary-neutral">
+          <span className="report-summary-label">TOTAL BILLING</span>
+          <strong className="report-summary-value">{formatCurrency(totalAmount)}</strong>
+          <small>Filtered bill amount</small>
         </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            TOTAL BILLING
-          </span>
-
-          <strong>
-            {formatCurrency(totalAmount)}
-          </strong>
-
-          <small>
-            Filtered bill amount
-          </small>
+        <div className="report-summary-card summary-electric">
+          <span className="report-summary-label"><Icons.Electricity /> ELECTRICITY</span>
+          <strong className="report-summary-value">{totalElectricity.toFixed(3)}</strong>
+          <small>kWh consumption</small>
         </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            ELECTRICITY
-          </span>
-
-          <strong>
-            {totalElectricity.toFixed(3)}
-          </strong>
-
-          <small>
-            Total consumption
-          </small>
-        </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            WATER
-          </span>
-
-          <strong>
-            {totalWater.toFixed(3)}
-          </strong>
-
-          <small>
-            Total consumption
-          </small>
+        <div className="report-summary-card summary-water">
+          <span className="report-summary-label"><Icons.Water /> WATER</span>
+          <strong className="report-summary-value">{totalWater.toFixed(3)}</strong>
+          <small>m³ consumption</small>
         </div>
       </div>
 
-      <div className="stat-grid">
-        <div className="stat-card">
-          <span className="stat-label">
-            PENDING
-          </span>
-
-          <strong>
-           {formatCurrency(pendingAmount)}
-          </strong>
-
-          <small>
-            Unpaid pending bills
-          </small>
+      <div className="report-summary-row">
+        <div className="report-summary-card summary-pending">
+          <span className="report-summary-label">PENDING</span>
+          <strong className="report-summary-value">{formatCurrency(pendingAmount)}</strong>
+          <small>Unpaid pending bills</small>
         </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            PAID
-          </span>
-
-          <strong>
-           {formatCurrency(paidAmount)}
-          </strong>
-
-          <small>
-            Completed payments
-          </small>
+        <div className="report-summary-card summary-paid">
+          <span className="report-summary-label">PAID</span>
+          <strong className="report-summary-value">{formatCurrency(paidAmount)}</strong>
+          <small>Completed payments</small>
         </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            OVERDUE
-          </span>
-
-          <strong>
-           {formatCurrency(overdueAmount)}
-          </strong>
-
-          <small>
-            Outstanding overdue bills
-          </small>
+        <div className="report-summary-card summary-overdue">
+          <span className="report-summary-label">OVERDUE</span>
+          <strong className="report-summary-value">{formatCurrency(overdueAmount)}</strong>
+          <small>Outstanding overdue bills</small>
         </div>
-
-        <div className="stat-card">
-          <span className="stat-label">
-            RESULTS
-          </span>
-
-          <strong>
-            {filteredReports.length}
-          </strong>
-
-          <small>
-            Records after filtering
-          </small>
+        <div className="report-summary-card summary-neutral">
+          <span className="report-summary-label">RESULTS</span>
+          <strong className="report-summary-value">{filteredReports.length}</strong>
+          <small>Records after filtering</small>
         </div>
       </div>
 
-      <div className="tenant-list">
+      {/* Results */}
+      <div className="record-list">
         {loading ? (
-          <div className="empty-state">
-            <h3>Loading reports...</h3>
-
-            <p>
-              Retrieving billing records from the database.
-            </p>
+          <div className="empty-state loading-state">
+            <div className="loading-spinner" />
+            <h3>Loading reports…</h3>
+            <p>Retrieving billing records from the database.</p>
           </div>
         ) : filteredReports.length === 0 ? (
-          <div className="empty-state">
-            <h3>No matching records</h3>
-
-            <p>
-              There are no billing records matching
-              the current filters.
-            </p>
-          </div>
+          <EmptyState
+            icon={<Icons.Reports />}
+            title="No matching records"
+            description="There are no billing records matching the current filters."
+          />
         ) : (
           filteredReports.map((report) => (
-            <article
-              className="tenant-card"
-              key={report.id}
-            >
-              <div className="tenant-main">
-                <div className="tenant-avatar">
-                  {String(
-                    report.full_name || "?"
-                  )
-                    .charAt(0)
-                    .toUpperCase()}
+            <article className="record-card report-record-card" key={report.id}>
+              <div className="record-main">
+                <div className="avatar">
+                  {String(report.full_name || "?").charAt(0).toUpperCase()}
                 </div>
-
                 <div>
-                  <strong>
-                    {report.full_name ||
-                      "Unknown tenant"}
-                  </strong>
-
-                  <p>
-                    {report.room_number
-                      ? `Room ${report.room_number}`
-                      : "Unassigned"}
-                  </p>
+                  <strong className="record-name">{report.full_name || "Unknown tenant"}</strong>
+                  <p className="record-sub">{report.room_number ? `Room ${report.room_number}` : "Unassigned"}</p>
                 </div>
               </div>
 
-              <div className="tenant-details">
-                <div>
-                  <span>BILLING MONTH</span>
-
-                  <strong>
-                    {getBillingMonth(
-                      report.billing_month
-                    )}
-                  </strong>
+              <div className="record-meta billing-meta">
+                <div className="meta-item">
+                  <span className="meta-label">BILLING MONTH</span>
+                  <strong className="meta-value">{getBillingMonth(report.billing_month)}</strong>
                 </div>
-
-                                <div>
-                  <span>ELECTRICITY</span>
-
-                  <strong>
-                    {formatCurrency(report.electricity_charge)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label electric-label"><Icons.Electricity /> ELECTRICITY</span>
+                  <strong className="meta-value electric-value">{formatCurrency(report.electricity_charge)}</strong>
                 </div>
-                <div>
-                  <span>WATER</span>
-
-                  <strong>
-                    {formatCurrency(report.water_charge)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label water-label"><Icons.Water /> WATER</span>
+                  <strong className="meta-value water-value">{formatCurrency(report.water_charge)}</strong>
                 </div>
-                <div>
-                  <span>TOTAL</span>
-
-                  <strong>
-                    {formatCurrency(report.total_amount)}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label">TOTAL</span>
+                  <strong className="meta-value total-value">{formatCurrency(report.total_amount)}</strong>
                 </div>
-<div>
-                  <span>STATUS</span>
-
-                  <strong
-                    className={`tenant-status ${report.status === "Paid"
-                        ? "active"
-                        : report.status === "Overdue"
-                          ? "inactive"
-                          : ""
-                      }`}
-                  >
-                    {report.status}
-                  </strong>
+                <div className="meta-item">
+                  <span className="meta-label">STATUS</span>
+                  <StatusBadge status={report.status} />
                 </div>
               </div>
             </article>
           ))
         )}
       </div>
-    </section>
-  );
-}
-
-function UtilityRatesPage() {
-  const [rates, setRates] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingRate, setEditingRate] = useState(null);
-
-  const [formData, setFormData] = useState({
-    utility_type: "",
-    rate_per_unit: "",
-    effective_from: "",
-  });
-
-  const [formError, setFormError] = useState("");
-  const [formSuccess, setFormSuccess] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const loadRates = async () => {
-    try {
-      const response = await fetch("/api/utility-rates");
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message || "Failed to load utility rates."
-        );
-        return;
-      }
-
-      setRates(data.data);
-    } catch (error) {
-      console.error(
-        "Failed to load utility rates:",
-        error
-      );
-
-      setFormError("Unable to connect to the backend.");
-    }
-  };
-
-  useEffect(() => {
-    loadRates();
-  }, []);
-
-  const resetForm = () => {
-    setFormData({
-      utility_type: "",
-      rate_per_unit: "",
-      effective_from: "",
-    });
-
-    setFormError("");
-    setFormSuccess("");
-    setEditingRate(null);
-  };
-
-  const openAddForm = () => {
-    resetForm();
-    setShowForm(true);
-  };
-
-  const openEditForm = (rate) => {
-    setFormData({
-      utility_type: rate.utility_type,
-      rate_per_unit: rate.rate_per_unit,
-      effective_from: rate.effective_from.substring(0, 10),
-    });
-
-    setFormError("");
-    setFormSuccess("");
-    setEditingRate(rate);
-    setShowForm(true);
-  };
-
-  const closeForm = () => {
-    setShowForm(false);
-    resetForm();
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((current) => ({
-      ...current,
-      [name]: value,
-    }));
-
-    setFormError("");
-    setFormSuccess("");
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    setFormError("");
-    setFormSuccess("");
-
-    if (!formData.utility_type) {
-      setFormError("Utility type is required.");
-      return;
-    }
-
-    if (formData.rate_per_unit === "") {
-      setFormError("Rate per unit is required.");
-      return;
-    }
-
-    const rate = Number(formData.rate_per_unit);
-
-    if (!Number.isFinite(rate) || rate < 0) {
-      setFormError(
-        "Rate per unit must be a valid non-negative number."
-      );
-      return;
-    }
-
-    if (!formData.effective_from) {
-      setFormError("Effective date is required.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const url = editingRate
-        ? `/api/utility-rates/${editingRate.id}`
-        : "/api/utility-rates";
-
-      const method = editingRate ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          utility_type: formData.utility_type,
-          rate_per_unit: rate,
-          effective_from: formData.effective_from,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        setFormError(
-          data.message || "Failed to save utility rate."
-        );
-        return;
-      }
-
-      setFormSuccess(
-        editingRate
-          ? "Utility rate updated successfully."
-          : "Utility rate added successfully."
-      );
-
-      await loadRates();
-
-      setTimeout(() => {
-        closeForm();
-      }, 800);
-    } catch (error) {
-      console.error(
-        "Failed to save utility rate:",
-        error
-      );
-
-      setFormError("Unable to connect to the backend.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (rate) => {
-    const confirmed = window.confirm(
-      `Delete the ${rate.utility_type} rate effective ${rate.effective_from.substring(
-        0,
-        10
-      )}?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `/api/utility-rates/${rate.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        window.alert(
-          data.message || "Failed to delete utility rate."
-        );
-        return;
-      }
-
-      loadRates();
-    } catch (error) {
-      console.error(
-        "Failed to delete utility rate:",
-        error
-      );
-
-      window.alert("Unable to connect to the backend.");
-    }
-  };
-
-  return (
-    <section className="tenants-page">
-      <div className="module-header">
-        <div>
-          <p className="eyebrow">UTILITY RATE MANAGEMENT</p>
-
-          <h2>Utility Rates</h2>
-
-          <p>
-            Manage electricity and water rates used for
-            automated billing calculations.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          className="primary-button"
-          onClick={openAddForm}
-        >
-          + Add Rate
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="tenant-form-card">
-          <div className="form-header">
-            <div>
-              <p className="eyebrow">
-                {editingRate
-                  ? "EDIT UTILITY RATE"
-                  : "NEW UTILITY RATE"}
-              </p>
-
-              <h3>
-                {editingRate
-                  ? "Edit Utility Rate"
-                  : "Add Utility Rate"}
-              </h3>
-            </div>
-
-            <button
-              type="button"
-              className="close-button"
-              onClick={closeForm}
-            >
-        	X
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-grid">
-              <label>
-                <span>UTILITY TYPE</span>
-
-                <select
-                  name="utility_type"
-                  value={formData.utility_type}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    Select utility
-                  </option>
-
-                  <option value="Electricity">
-                    Electricity
-                  </option>
-
-                  <option value="Water">
-                    Water
-                  </option>
-                </select>
-              </label>
-
-              <label>
-                <span>RATE PER UNIT</span>
-
-                <input
-                  type="number"
-                  name="rate_per_unit"
-                  value={formData.rate_per_unit}
-                  onChange={handleChange}
-                  min="0"
-                  step="0.01"
-                  placeholder="Enter rate"
-                />
-              </label>
-
-              <label>
-                <span>EFFECTIVE FROM</span>
-
-                <input
-                  type="date"
-                  name="effective_from"
-                  value={formData.effective_from}
-                  onChange={handleChange}
-                />
-              </label>
-            </div>
-
-            <div className="form-message">
-              This rate will be used when generating bills for
-              billing months covered by the effective date.
-            </div>
-
-            {formError && (
-              <div className="form-message error">
-                {formError}
-              </div>
-            )}
-
-            {formSuccess && (
-              <div className="form-message success">
-                {formSuccess}
-              </div>
-            )}
-
-            <div className="form-actions">
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={closeForm}
-              >
-                Cancel
-              </button>
-
-              <button
-                type="submit"
-                className="primary-button"
-                disabled={isSubmitting}
-              >
-                {isSubmitting
-                  ? "Saving..."
-                  : editingRate
-                    ? "Save Changes"
-                    : "Add Rate"}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      <div className="tenant-list">
-        {rates.length === 0 ? (
-          <div className="empty-state">
-            <h3>No utility rates found</h3>
-
-            <p>
-              Add an electricity or water rate to enable
-              automated billing calculations.
-            </p>
-          </div>
-        ) : (
-          rates.map((rate) => (
-            <article
-              className="tenant-card"
-              key={rate.id}
-            >
-              <div className="tenant-main">
-                <div className="tenant-avatar">
-                  {rate.utility_type === "Electricity"
-                    ? "E"
-                    : "W"}
-                </div>
-
-                <div>
-                  <strong>{rate.utility_type}</strong>
-
-                  <p>
-                    Effective from{" "}
-                    {rate.effective_from.substring(0, 10)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="tenant-details">
-                <div>
-                  <span>UTILITY</span>
-
-                  <strong>
-                    {rate.utility_type}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>RATE PER UNIT</span>
-
-                  <strong>
-              		{formatCurrency(rate.rate_per_unit)}
-                  </strong>
-                </div>
-
-                <div>
-                  <span>EFFECTIVE FROM</span>
-
-                  <strong>
-                    {rate.effective_from.substring(0, 10)}
-                  </strong>
-                </div>
-
-                <div className="tenant-actions">
-                  <button
-                    type="button"
-                    className="edit-button"
-                    onClick={() => openEditForm(rate)}
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    className="delete-button"
-                    onClick={() => handleDelete(rate)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))
-        )}
-      </div>
-    </section>
+    </div>
   );
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
