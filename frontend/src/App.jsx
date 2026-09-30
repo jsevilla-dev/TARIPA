@@ -157,64 +157,100 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <section className="welcome-card">
-        <p className="eyebrow">Overview</p>
+      <section className="welcome-card dashboard-hero">
+        <div>
+          <p className="eyebrow">DASHBOARD OVERVIEW</p>
 
-        <h2>Welcome to TARIPA</h2>
+          <h2>Welcome to TARIPA</h2>
 
-        <p>
-          Automated residential utility tracking and billing
-          management.
-        </p>
+          <p>
+            Automated residential utility tracking and billing
+            management.
+          </p>
+        </div>
+
+        <div className="dashboard-hero-mark">T</div>
       </section>
 
       <section className="stat-grid">
-        <div className="stat-card">
-          <span className="stat-label">TENANTS</span>
+        <div className="stat-card dashboard-stat">
+          <div className="stat-icon tenants-icon">TN</div>
 
-          <strong>
-       {dashboardData?.total_tenants ?? 0}
-          </strong>
+          <div>
+            <span className="stat-label">TENANTS</span>
 
-          <small>Active tenants</small>
+            <strong>
+              {dashboardData?.total_tenants ?? 0}
+            </strong>
+
+            <small>Active tenants</small>
+          </div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-label">ROOMS</span>
+        <div className="stat-card dashboard-stat">
+          <div className="stat-icon rooms-icon">RM</div>
 
-          <strong>
-        {dashboardData?.total_rooms ?? 0}
-          </strong>
+          <div>
+            <span className="stat-label">ROOMS</span>
 
-          <small>
-      	{dashboardData?.available_rooms ?? 0} room available
-          </small>
+            <strong>
+              {dashboardData?.total_rooms ?? 0}
+            </strong>
+
+            <small>
+              {dashboardData?.available_rooms ?? 0} room available
+            </small>
+          </div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-label">PENDING BILLS</span>
+        <div className="stat-card dashboard-stat">
+          <div className="stat-icon billing-icon">BL</div>
 
-          <strong>
-       	{dashboardData?.pending_bills ?? 0}
-          </strong>
+          <div>
+            <span className="stat-label">PENDING BILLS</span>
 
-          <small>Awaiting payment</small>
+            <strong>
+              {dashboardData?.pending_bills ?? 0}
+            </strong>
+
+            <small>Awaiting payment</small>
+          </div>
         </div>
 
-        <div className="stat-card">
-          <span className="stat-label">OUTSTANDING</span>
+        <div className="stat-card dashboard-stat">
+          <div className="stat-icon outstanding-icon">PHP</div>
 
-          <strong>
-           {formatCurrency(dashboardData?.outstanding_amount ?? 0)}
-          </strong>
+          <div>
+            <span className="stat-label">OUTSTANDING</span>
 
-          <small>Pending and overdue bills</small>
+            <strong>
+              {formatCurrency(
+                dashboardData?.outstanding_amount ?? 0
+              )}
+            </strong>
+
+            <small>Pending and overdue bills</small>
+          </div>
         </div>
+      </section>
+
+      <section className="dashboard-section-header">
+        <div>
+          <p className="eyebrow">CORE MODULES</p>
+
+          <h3>Manage your utility operations</h3>
+        </div>
+
+        <p>Everything you need for residential billing.</p>
       </section>
 
       <section className="feature-grid">
         <article className="feature-card">
-          <span className="feature-number">01</span>
+          <div className="feature-top">
+            <span className="feature-number">01</span>
+
+            <span className="feature-icon">TN</span>
+          </div>
 
           <h3>Tenant Management</h3>
 
@@ -224,7 +260,11 @@ function Dashboard() {
         </article>
 
         <article className="feature-card">
-          <span className="feature-number">02</span>
+          <div className="feature-top">
+            <span className="feature-number">02</span>
+
+            <span className="feature-icon">MR</span>
+          </div>
 
           <h3>Utility Tracking</h3>
 
@@ -235,7 +275,11 @@ function Dashboard() {
         </article>
 
         <article className="feature-card">
-          <span className="feature-number">03</span>
+          <div className="feature-top">
+            <span className="feature-number">03</span>
+
+            <span className="feature-icon">BL</span>
+          </div>
 
           <h3>Automated Billing</h3>
 
@@ -245,7 +289,11 @@ function Dashboard() {
         </article>
 
         <article className="feature-card">
-          <span className="feature-number">04</span>
+          <div className="feature-top">
+            <span className="feature-number">04</span>
+
+            <span className="feature-icon">RP</span>
+          </div>
 
           <h3>Reports</h3>
 
