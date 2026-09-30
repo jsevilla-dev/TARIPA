@@ -242,7 +242,7 @@
   transition: width 0.25s ease, margin-left 0.25s ease;
 }
 
-.sidebar.collapsed ~ .main-content {
+.sidebar.collapsed~.main-content {
   width: calc(100% - 72px);
   margin-left: 72px;
 }
@@ -519,7 +519,7 @@
   color: #6C6FEF;
 }
 
-.filter-panel-title > svg {
+.filter-panel-title>svg {
   margin-top: 18px;
   flex-shrink: 0;
 }
@@ -828,13 +828,34 @@
 
 /* ─── Utility Value Colors ───────────────────────────── */
 
-.electric-label { color: #A07000; }
-.water-label { color: #4558D0; }
-.electric-value { color: #A07000; }
-.water-value { color: #4558D0; }
-.total-value { color: #202431; font-size: 14.5px; }
-.text-success { color: #239A52; }
-.text-danger { color: #D63E3B; }
+.electric-label {
+  color: #A07000;
+}
+
+.water-label {
+  color: #4558D0;
+}
+
+.electric-value {
+  color: #A07000;
+}
+
+.water-value {
+  color: #4558D0;
+}
+
+.total-value {
+  color: #202431;
+  font-size: 14.5px;
+}
+
+.text-success {
+  color: #239A52;
+}
+
+.text-danger {
+  color: #D63E3B;
+}
 
 /* Rate card utility pills */
 .utility-pill {
@@ -944,14 +965,12 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── DASHBOARD ──────────────────────────────────────── */
-
-.dashboard-page {
-  /* wrapper for dashboard */
-}
 
 /* Hero card */
 .dashboard-hero {
@@ -1192,10 +1211,25 @@
   border-radius: 10px;
 }
 
-.mod-indigo .module-icon-wrap { background: #EEF0FF; color: #6C6FEF; }
-.mod-electric .module-icon-wrap { background: rgba(255, 181, 46, 0.15); color: #A07000; }
-.mod-water .module-icon-wrap { background: rgba(101, 117, 245, 0.14); color: #4558D0; }
-.mod-success .module-icon-wrap { background: #E8F8EE; color: #239A52; }
+.mod-indigo .module-icon-wrap {
+  background: #EEF0FF;
+  color: #6C6FEF;
+}
+
+.mod-electric .module-icon-wrap {
+  background: rgba(255, 181, 46, 0.15);
+  color: #A07000;
+}
+
+.mod-water .module-icon-wrap {
+  background: rgba(101, 117, 245, 0.14);
+  color: #4558D0;
+}
+
+.mod-success .module-icon-wrap {
+  background: #E8F8EE;
+  color: #239A52;
+}
 
 .module-card-title {
   margin: 0 0 8px;
@@ -1364,22 +1398,53 @@
   color: #969BAB;
 }
 
-.summary-pending .report-summary-value { color: #C07B00; }
-.summary-pending { border-left: 3px solid #F5AD3D; }
+.summary-pending .report-summary-value {
+  color: #C07B00;
+}
 
-.summary-paid .report-summary-value { color: #239A52; }
-.summary-paid { border-left: 3px solid #50C878; }
+.summary-pending {
+  border-left: 3px solid #F5AD3D;
+}
 
-.summary-overdue .report-summary-value { color: #D63E3B; }
-.summary-overdue { border-left: 3px solid #FF625F; }
+.summary-paid .report-summary-value {
+  color: #239A52;
+}
 
-.summary-electric { border-left: 3px solid #FFB52E; }
-.summary-electric .report-summary-label { color: #A07000; }
-.summary-electric .report-summary-value { color: #A07000; }
+.summary-paid {
+  border-left: 3px solid #50C878;
+}
 
-.summary-water { border-left: 3px solid #6575F5; }
-.summary-water .report-summary-label { color: #4558D0; }
-.summary-water .report-summary-value { color: #4558D0; }
+.summary-overdue .report-summary-value {
+  color: #D63E3B;
+}
+
+.summary-overdue {
+  border-left: 3px solid #FF625F;
+}
+
+.summary-electric {
+  border-left: 3px solid #FFB52E;
+}
+
+.summary-electric .report-summary-label {
+  color: #A07000;
+}
+
+.summary-electric .report-summary-value {
+  color: #A07000;
+}
+
+.summary-water {
+  border-left: 3px solid #6575F5;
+}
+
+.summary-water .report-summary-label {
+  color: #4558D0;
+}
+
+.summary-water .report-summary-value {
+  color: #4558D0;
+}
 
 /* Billing meta row */
 .billing-meta {
@@ -1415,7 +1480,7 @@
     padding: 24px 28px;
   }
 
-  .sidebar.collapsed ~ .main-content {
+  .sidebar.collapsed~.main-content {
     width: calc(100% - 72px);
     margin-left: 72px;
   }
@@ -1504,7 +1569,7 @@
     padding: 20px 16px;
   }
 
-  .sidebar.collapsed ~ .main-content {
+  .sidebar.collapsed~.main-content {
     width: 100%;
     margin-left: 0;
   }
@@ -1536,6 +1601,7 @@
 }
 
 @media (max-width: 540px) {
+
   .kpi-grid,
   .modules-grid,
   .report-summary-row {
