@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
 const navigationItems = [
-  { id: "dashboard", label: "Dashboard" },
-  { id: "tenants", label: "Tenants" },
-  { id: "rooms", label: "Rooms" },
-  { id: "meters", label: "Meter Readings" },
-  { id: "rates", label: "Utility Rates" },
-  { id: "billing", label: "Billing" },
-  { id: "reports", label: "Reports" },
+  { id: "dashboard", label: "Dashboard", icon: "DB" },
+  { id: "tenants", label: "Tenants", icon: "TN" },
+  { id: "rooms", label: "Rooms", icon: "RM" },
+  { id: "meters", label: "Meter Readings", icon: "MR" },
+  { id: "rates", label: "Utility Rates", icon: "UR" },
+  { id: "billing", label: "Billing", icon: "BL" },
+  { id: "reports", label: "Reports", icon: "RP" },
 ];
 
 function App() {
@@ -44,7 +51,7 @@ function App() {
           onClick={() => setSidebarCollapsed((current) => !current)}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {sidebarCollapsed ? "�" : "�"}
+          {sidebarCollapsed ? "-" : "+"}
         </button>
 
         <div className="brand">
@@ -92,19 +99,9 @@ function App() {
       <main className="main-content">
         <header className="topbar">
           <div>
-            <p className="eyebrow">TARIPA</p>
-            <h1>{activeItem?.label}</h1>
           </div>
 
 
-          <div className="status-card">
-            <span
-              className={`status-dot ${backendStatus === "Connected" ? "online" : ""
-                }`}
-            ></span>
-
-            <span>{backendStatus}</span>
-          </div>
         </header>
 
         {activePage === "dashboard" ? (
@@ -176,7 +173,7 @@ function Dashboard() {
           <span className="stat-label">TENANTS</span>
 
           <strong>
-            {dashboardData?.total_tenants ?? "—"}
+       {dashboardData?.total_tenants ?? 0}
           </strong>
 
           <small>Active tenants</small>
@@ -186,11 +183,11 @@ function Dashboard() {
           <span className="stat-label">ROOMS</span>
 
           <strong>
-            {dashboardData?.total_rooms ?? "—"}
+        {dashboardData?.total_rooms ?? 0}
           </strong>
 
           <small>
-            {dashboardData?.available_rooms ?? "—"} room available
+      	{dashboardData?.available_rooms ?? 0} room available
           </small>
         </div>
 
@@ -198,7 +195,7 @@ function Dashboard() {
           <span className="stat-label">PENDING BILLS</span>
 
           <strong>
-            {dashboardData?.pending_bills ?? "—"}
+       	{dashboardData?.pending_bills ?? 0}
           </strong>
 
           <small>Awaiting payment</small>
@@ -208,11 +205,7 @@ function Dashboard() {
           <span className="stat-label">OUTSTANDING</span>
 
           <strong>
-            {dashboardData
-              ? `₱${Number(
-                dashboardData.outstanding_amount
-              ).toFixed(2)}`
-              : "—"}
+           {formatCurrency(dashboardData?.outstanding_amount ?? 0)}
           </strong>
 
           <small>Pending and overdue bills</small>
@@ -486,7 +479,7 @@ function TenantsPage() {
               className="close-button"
               onClick={closeForm}
             >
-              ×
+              X
             </button>
           </div>
 
@@ -542,7 +535,7 @@ function TenantsPage() {
                         value={room.id}
                         disabled={isFull}
                       >
-                        Room {room.room_number} —{" "}
+                        Room {room.room_number}
                         {room.occupied_count}/{room.capacity}
                         {isFull ? " (Full)" : ""}
                       </option>
@@ -846,7 +839,7 @@ function RoomsPage() {
               className="close-button"
               onClick={closeForm}
             >
-              ×
+              X
             </button>
           </div>
 
@@ -1341,7 +1334,7 @@ function MeterReadingsPage() {
               className="close-button"
               onClick={closeForm}
             >
-              ×
+              +ù
             </button>
           </div>
 
@@ -1366,7 +1359,7 @@ function MeterReadingsPage() {
                     >
                       {tenant.full_name}
                       {tenant.room_number
-                        ? ` — Room ${tenant.room_number}`
+                        ? ` GÇö Room ${tenant.room_number}`
                         : ""}
                     </option>
                   ))}
@@ -1467,7 +1460,7 @@ function MeterReadingsPage() {
                   {electricityConsumption !== null &&
                     !Number.isNaN(electricityConsumption)
                     ? `${electricityConsumption.toFixed(3)} kWh`
-                    : "—"}
+                    : "GÇö"}
                 </strong>
 
                 <small>
@@ -1483,8 +1476,8 @@ function MeterReadingsPage() {
                 <strong>
                   {waterConsumption !== null &&
                     !Number.isNaN(waterConsumption)
-                    ? `${waterConsumption.toFixed(3)} m³`
-                    : "—"}
+                    ? `${waterConsumption.toFixed(3)} m-¦`
+                    : "GÇö"}
                 </strong>
 
                 <small>
@@ -1591,7 +1584,7 @@ function MeterReadingsPage() {
                     {Number(
                       reading.water_consumption
                     ).toFixed(3)}{" "}
-                    m³
+                    m-¦
                   </strong>
                 </div>
 
@@ -1624,6 +1617,8 @@ function MeterReadingsPage() {
     </section>
   );
 }
+
+
 
 function BillingPage() {
   const [billingRecords, setBillingRecords] = useState([]);
@@ -1892,7 +1887,7 @@ function BillingPage() {
               className="close-button"
               onClick={closeForm}
             >
-              ×
+		X
             </button>
           </div>
 
@@ -1917,7 +1912,7 @@ function BillingPage() {
                     >
                       {tenant.full_name}
                       {tenant.room_number
-                        ? ` — Room ${tenant.room_number}`
+                        ? ` - Room ${tenant.room_number}`
                         : ""}
                     </option>
                   ))}
@@ -2024,10 +2019,7 @@ function BillingPage() {
                   <span>ELECTRICITY</span>
 
                   <strong>
-                    ₱
-                    {Number(
-                      billing.electricity_charge
-                    ).toFixed(2)}
+                      {formatCurrency(billing.electricity_charge)}
                   </strong>
                 </div>
 
@@ -2035,10 +2027,7 @@ function BillingPage() {
                   <span>WATER</span>
 
                   <strong>
-                    ₱
-                    {Number(
-                      billing.water_charge
-                    ).toFixed(2)}
+                     {formatCurrency(billing.water_charge)}
                   </strong>
                 </div>
 
@@ -2046,10 +2035,7 @@ function BillingPage() {
                   <span>TOTAL</span>
 
                   <strong>
-                    ₱
-                    {Number(
-                      billing.total_amount
-                    ).toFixed(2)}
+                    {formatCurrency(billing.total_amount)}
                   </strong>
                 </div>
 
@@ -2098,6 +2084,8 @@ function BillingPage() {
     </section>
   );
 }
+
+
 
 function ReportsPage() {
   const [reports, setReports] = useState([]);
@@ -2483,7 +2471,7 @@ function ReportsPage() {
           </span>
 
           <strong>
-            ₱{totalAmount.toFixed(2)}
+            {formatCurrency(totalAmount)}
           </strong>
 
           <small>
@@ -2527,7 +2515,7 @@ function ReportsPage() {
           </span>
 
           <strong>
-            ₱{pendingAmount.toFixed(2)}
+           {formatCurrency(pendingAmount)}
           </strong>
 
           <small>
@@ -2541,7 +2529,7 @@ function ReportsPage() {
           </span>
 
           <strong>
-            ₱{paidAmount.toFixed(2)}
+           {formatCurrency(paidAmount)}
           </strong>
 
           <small>
@@ -2555,7 +2543,7 @@ function ReportsPage() {
           </span>
 
           <strong>
-            ₱{overdueAmount.toFixed(2)}
+           {formatCurrency(overdueAmount)}
           </strong>
 
           <small>
@@ -2636,40 +2624,28 @@ function ReportsPage() {
                   </strong>
                 </div>
 
-                <div>
+                                <div>
                   <span>ELECTRICITY</span>
 
                   <strong>
-                    {Number(
-                      report.electricity_consumption ||
-                      0
-                    ).toFixed(3)}
+                    {formatCurrency(report.electricity_charge)}
                   </strong>
                 </div>
-
                 <div>
                   <span>WATER</span>
 
                   <strong>
-                    {Number(
-                      report.water_consumption ||
-                      0
-                    ).toFixed(3)}
+                    {formatCurrency(report.water_charge)}
                   </strong>
                 </div>
-
                 <div>
                   <span>TOTAL</span>
 
                   <strong>
-                    ₱
-                    {Number(
-                      report.total_amount || 0
-                    ).toFixed(2)}
+                    {formatCurrency(report.total_amount)}
                   </strong>
                 </div>
-
-                <div>
+<div>
                   <span>STATUS</span>
 
                   <strong
@@ -2949,7 +2925,7 @@ function UtilityRatesPage() {
               className="close-button"
               onClick={closeForm}
             >
-              ×
+        	X
             </button>
           </div>
 
@@ -3091,10 +3067,7 @@ function UtilityRatesPage() {
                   <span>RATE PER UNIT</span>
 
                   <strong>
-                    ₱
-                    {Number(
-                      rate.rate_per_unit
-                    ).toFixed(2)}
+              		{formatCurrency(rate.rate_per_unit)}
                   </strong>
                 </div>
 
@@ -3133,6 +3106,14 @@ function UtilityRatesPage() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
 
 
 
