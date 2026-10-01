@@ -110,3 +110,19 @@ CREATE TABLE billing_records (
 
     UNIQUE KEY uq_billing_tenant_month (tenant_id, billing_month)
 );
+
+CREATE TABLE tenant_accounts (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT UNSIGNED NOT NULL UNIQUE,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_ta_tenant
+        FOREIGN KEY (tenant_id)
+        REFERENCES tenants(id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);

@@ -9,6 +9,10 @@ const tenantsRouter = require("./routes/tenants");
 const utilityRatesRouter = require("./routes/utilityRates");
 const meterReadingsRouter = require("./routes/meterReadings");
 const billingRouter = require("./routes/billing");
+const clientAuthRouter = require("./routes/clientAuth");
+const clientPortalRouter = require("./routes/clientPortal");
+const clientAuth = require("./middleware/clientAuth");
+
 
 const app = express();
 const PORT = 5000;
@@ -20,6 +24,11 @@ app.use("/api/tenants", tenantsRouter);
 app.use("/api/utility-rates", utilityRatesRouter);
 app.use("/api/meter-readings", meterReadingsRouter);
 app.use("/api/billing", billingRouter);
+
+// ── Client / Tenant Portal (new — does not affect admin routes) ──
+app.use("/api/client", clientAuthRouter);
+app.use("/api/client", clientAuth, clientPortalRouter);
+
 
 app.get("/api/dashboard", async (req, res) => {
     try {
