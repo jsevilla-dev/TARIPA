@@ -242,4 +242,76 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+router.delete("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Verify the tenant exists first
+        const [tenantRows] = await db.query(
+            `SELECT id, full_name FROM tenants WHERE id = ?`,
+            [id]
+        );
+
+        if (tenantRows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Tenant not found",
+            });
+        }
+
+        // Check for meter readings (ON DELETE RESTRICT — would fail at DB level)
+        const [meterRows] = await db.query(
+            `SELECT COUNT(*) AS cnt FROM meter_readings WHERE tenant_id = ?`,
+            [id]
+        );
+        const meterCount = Number(meterRows[0].cnt);
+
+        if (meterCount > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Cannot delete tenant "${tenantRows[0].full_name}" — they have ${meterCount} meter reading${meterCount !== 1 ? "s" : ""} on record. Delete the meter readings first.`,
+            });
+        }
+
+        // Check for billing records (ON DELETE RESTRICT — would fail at DB level)
+        const [billingRows] = await db.query(
+            `SELECT COUNT(*) AS cnt FROM billing_records WHERE tenant_id = ?`,
+            [id]
+        );
+        const billingCount = Number(billingRows[0].cnt);
+
+        if (billingCount > 0) {
+            return res.status(409).json({
+                success: false,
+                message: `Cannot delete tenant "${tenantRows[0].full_name}" — they have ${billingCount} billing record${billingCount !== 1 ? "s" : ""} on record. Delete the billing records first.`,
+            });
+        }
+
+        // Safe to delete — tenant_accounts row cascades automatically
+        const [result] = await db.query(
+            `DELETE FROM tenants WHERE id = ?`,
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Tenant not found",
+            });
+        }
+
+        res.json({
+            success: true,
+            message: `Tenant "${tenantRows[0].full_name}" deleted successfully`,
+        });
+    } catch (error) {
+        console.error("Failed to delete tenant:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete tenant",
+        });
+    }
+});
+
 module.exports = router;

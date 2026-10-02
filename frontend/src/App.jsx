@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "./App.css";
 
 /* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -839,6 +839,8 @@ function TenantsPage() {
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null); // inline two-step confirm
+  const [deleteError, setDeleteError] = useState("");           // inline error on the card
 
   const loadTenants = () => {
     authFetch("/api/tenants")
@@ -916,6 +918,32 @@ function TenantsPage() {
       setFormError("Unable to connect to the backend.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteTenant = async (tenant) => {
+    // First click: arm the confirmation
+    if (confirmDeleteId !== tenant.id) {
+      setConfirmDeleteId(tenant.id);
+      setDeleteError("");
+      return;
+    }
+    // Second click: fire the DELETE
+    setConfirmDeleteId(null);
+    setDeleteError("");
+    try {
+      const response = await authFetch(`/api/tenants/${tenant.id}`, { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setDeleteError(data.message || "Failed to delete tenant.");
+        return;
+      }
+      // Remove from local list immediately for snappy UX, then reload
+      loadTenants();
+      loadRooms();
+    } catch (err) {
+      console.error("Failed to delete tenant:", err);
+      setDeleteError("Unable to connect to the backend.");
     }
   };
 
@@ -1042,12 +1070,52 @@ function TenantsPage() {
                   <button type="button" className="btn-edit" onClick={() => openEditForm(tenant)}>
                     <Icons.Edit /> Edit
                   </button>
+                  {confirmDeleteId === tenant.id ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn-delete"
+                        onClick={() => handleDeleteTenant(tenant)}
+                      >
+                        <Icons.Check /> Confirm
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        style={{ fontSize: "0.75rem", padding: "4px 10px" }}
+                        onClick={() => { setConfirmDeleteId(null); setDeleteError(""); }}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn-delete"
+                      onClick={() => handleDeleteTenant(tenant)}
+                    >
+                      <Icons.Delete /> Delete
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
           ))
         )}
       </div>
+
+      {deleteError && (
+        <div className="form-msg form-msg-error" style={{ marginTop: "12px" }}>
+          <Icons.Alert /> {deleteError}
+          <button
+            type="button"
+            style={{ marginLeft: "12px", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", color: "inherit" }}
+            onClick={() => setDeleteError("")}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }
