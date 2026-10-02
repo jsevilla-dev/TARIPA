@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState, useCallback } from "react";
 import "./App.css";
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    HELPERS
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -12,9 +12,51 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 2,
   }).format(Number(value || 0));
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ADMIN AUTH HELPERS
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+const ADMIN_TOKEN_KEY = "taripa_admin_token";
+const ADMIN_USER_KEY  = "taripa_admin_user";
+
+const getAdminToken = () => localStorage.getItem(ADMIN_TOKEN_KEY);
+const getAdminUser  = () => {
+  try { return JSON.parse(localStorage.getItem(ADMIN_USER_KEY)); } catch { return null; }
+};
+const clearAdminAuth = () => {
+  localStorage.removeItem(ADMIN_TOKEN_KEY);
+  localStorage.removeItem(ADMIN_USER_KEY);
+};
+const saveAdminAuth = (token, admin) => {
+  localStorage.setItem(ADMIN_TOKEN_KEY, token);
+  localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(admin));
+};
+
+/**
+ * authFetch â€” drop-in replacement for fetch() that attaches
+ * the admin Bearer token to every request. If the server
+ * responds 401 (expired / revoked token), clears auth and
+ * reloads so the login screen appears.
+ */
+const authFetch = async (url, options = {}) => {
+  const token = getAdminToken();
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  const response = await fetch(url, { ...options, headers });
+  if (response.status === 401) {
+    clearAdminAuth();
+    window.location.reload();
+    // Return a never-resolving promise so callers don't see partial data
+    return new Promise(() => {});
+  }
+  return response;
+};
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    SVG ICONS
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const Icons = {
   Dashboard: () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -139,15 +181,150 @@ const navigationItems = [
   { id: "reports", label: "Reports", Icon: Icons.Reports },
 ];
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   ADMIN LOGIN COMPONENT
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function AdminLogin({ onLoginSuccess }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!username.trim() || !password) {
+      setError("Username and password are required.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ username: username.trim(), password }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Login failed. Please try again.");
+        return;
+      }
+      saveAdminAuth(data.data.token, data.data.admin);
+      onLoginSuccess(data.data.token, data.data.admin);
+    } catch {
+      setError("Unable to reach the server. Check your connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="admin-login-screen">
+      <div className="admin-login-card">
+        {/* Brand mark */}
+        <div className="admin-login-brand">
+          <div className="admin-login-brand-mark">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </div>
+          <div className="admin-login-brand-text">
+            <strong>TARIPA</strong>
+            <span>Admin Portal</span>
+          </div>
+        </div>
+
+        <div className="admin-login-header">
+          <h1 className="admin-login-title">Welcome back</h1>
+          <p className="admin-login-subtitle">Sign in to your admin account to continue.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="admin-login-fields">
+            <label className="field">
+              <span className="field-label">USERNAME</span>
+              <input
+                type="text"
+                className="field-input"
+                value={username}
+                onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                placeholder="Enter your username"
+                autoComplete="username"
+                autoFocus
+                disabled={loading}
+              />
+            </label>
+            <label className="field">
+              <span className="field-label">PASSWORD</span>
+              <input
+                type="password"
+                className="field-input"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                placeholder="Enter your password"
+                autoComplete="current-password"
+                disabled={loading}
+              />
+            </label>
+          </div>
+
+          {error && (
+            <div className="form-msg form-msg-error" role="alert">
+              <Icons.Alert />
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="btn-primary admin-login-btn"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="admin-login-spinner" />
+                Signing inâ€¦
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+        </form>
+
+        <p className="admin-login-note">
+          TARIPA Â· Residential Utility Tracking & Billing System
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    APP SHELL
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function App() {
+  // â”€â”€ Admin auth state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const [adminToken, setAdminToken] = useState(() => getAdminToken());
+  const [adminUser,  setAdminUser]  = useState(() => getAdminUser());
+
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  const handleLoginSuccess = useCallback((token, admin) => {
+    setAdminToken(token);
+    setAdminUser(admin);
+  }, []);
+
+  const handleLogout = useCallback(() => {
+    clearAdminAuth();
+    setAdminToken(null);
+    setAdminUser(null);
+  }, []);
+
   useEffect(() => {
+    // Only poll health when authenticated
+    if (!adminToken) return;
     fetch("/api/health")
       .then((response) => response.json())
       .then((data) => {
@@ -160,13 +337,18 @@ function App() {
       .catch(() => {
         setBackendStatus("Backend unavailable");
       });
-  }, []);
+  }, [adminToken]);
+
+  // â”€â”€ Auth gate: show login if no token â”€â”€â”€â”€â”€
+  if (!adminToken) {
+    return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
+  }
 
   const isOnline = backendStatus === "Connected";
 
   return (
     <div className="app-shell">
-      {/* ── SIDEBAR ── */}
+      {/* â”€â”€ SIDEBAR â”€â”€ */}
       <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
         <button
           type="button"
@@ -208,6 +390,30 @@ function App() {
           ))}
         </nav>
 
+        {/* Admin user + logout */}
+        <div className="sidebar-admin-user">
+          <div className="sidebar-admin-avatar">
+            {String(adminUser?.username ?? "A").charAt(0).toUpperCase()}
+          </div>
+          <div className="sidebar-admin-info">
+            <strong>{adminUser?.username ?? "Admin"}</strong>
+            <span>Administrator</span>
+          </div>
+          <button
+            type="button"
+            className="sidebar-logout-btn"
+            onClick={handleLogout}
+            title="Sign out"
+            aria-label="Sign out"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
+
         {/* Footer status */}
         <div className="sidebar-footer">
           <div className={`status-dot ${isOnline ? "online" : "offline"}`} />
@@ -218,10 +424,10 @@ function App() {
         </div>
       </aside>
 
-      {/* ── MAIN CONTENT ── */}
+      {/* â”€â”€ MAIN CONTENT â”€â”€ */}
       <main className="main-content">
         {activePage === "dashboard" ? (
-          <Dashboard />
+          <Dashboard onNavigate={setActivePage} />
         ) : activePage === "tenants" ? (
           <TenantsPage />
         ) : activePage === "rooms" ? (
@@ -240,9 +446,9 @@ function App() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    PAGE HEADER (reusable)
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function PageHeader({ eyebrow, title, description, action }) {
   return (
     <div className="page-header">
@@ -256,9 +462,9 @@ function PageHeader({ eyebrow, title, description, action }) {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    EMPTY STATE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function EmptyState({ icon, title, description }) {
   return (
     <div className="empty-state">
@@ -269,9 +475,9 @@ function EmptyState({ icon, title, description }) {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    STATUS BADGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function StatusBadge({ status }) {
   const map = {
     Active: "badge-active",
@@ -289,148 +495,335 @@ function StatusBadge({ status }) {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    DASHBOARD
-───────────────────────────────────────────── */
-function Dashboard() {
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function Dashboard({ onNavigate }) {
   const [dashboardData, setDashboardData] = useState(null);
+  const [recentMeters, setRecentMeters] = useState(null);   // null = loading, [] = empty
+  const [recentBills, setRecentBills] = useState(null);
 
   useEffect(() => {
-    fetch("/api/dashboard")
+    authFetch("/api/dashboard")
       .then((r) => r.json())
-      .then((data) => {
-        if (data.success) setDashboardData(data.data);
-      })
+      .then((data) => { if (data.success) setDashboardData(data.data); })
       .catch((e) => console.error("Failed to load dashboard data:", e));
+
+    authFetch("/api/meter-readings")
+      .then((r) => r.json())
+      .then((data) => { setRecentMeters(data.success ? data.data.slice(0, 5) : []); })
+      .catch(() => setRecentMeters([]));
+
+    authFetch("/api/billing")
+      .then((r) => r.json())
+      .then((data) => { setRecentBills(data.success ? data.data.slice(0, 5) : []); })
+      .catch(() => setRecentBills([]));
   }, []);
 
+  const formatMonth = (dateStr) => {
+    if (!dateStr) return "â€”";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-PH", { year: "numeric", month: "short" });
+  };
+
+  /* â”€â”€ KPI definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   const kpis = [
     {
       label: "Active Tenants",
-      value: dashboardData?.total_tenants ?? 0,
+      value: dashboardData?.total_tenants ?? "â€”",
       sub: "Registered residents",
-      icon: <Icons.Tenants />,
+      Icon: Icons.Tenants,
       accent: "kpi-indigo",
     },
     {
       label: "Total Rooms",
-      value: dashboardData?.total_rooms ?? 0,
+      value: dashboardData?.total_rooms ?? "â€”",
       sub: `${dashboardData?.available_rooms ?? 0} available`,
-      icon: <Icons.Rooms />,
+      Icon: Icons.Rooms,
       accent: "kpi-blue",
     },
     {
+      label: "Available Rooms",
+      value: dashboardData?.available_rooms ?? "â€”",
+      sub: "Ready for occupancy",
+      Icon: Icons.Rooms,
+      accent: "kpi-success",
+    },
+    {
       label: "Pending Bills",
-      value: dashboardData?.pending_bills ?? 0,
+      value: dashboardData?.pending_bills ?? "â€”",
       sub: "Awaiting payment",
-      icon: <Icons.Billing />,
+      Icon: Icons.Billing,
       accent: "kpi-warning",
     },
     {
       label: "Outstanding",
-      value: formatCurrency(dashboardData?.outstanding_amount ?? 0),
+      value: dashboardData !== null ? formatCurrency(dashboardData.outstanding_amount) : "â€”",
       sub: "Pending & overdue",
-      icon: <Icons.Rates />,
+      Icon: Icons.Rates,
       accent: "kpi-danger",
       large: true,
     },
   ];
 
-  const modules = [
-    {
-      num: "01",
-      Icon: Icons.Tenants,
-      title: "Tenant Management",
-      desc: "Manage tenant profiles, room assignments, and account status.",
-      accent: "mod-indigo",
-    },
-    {
-      num: "02",
-      Icon: Icons.Meters,
-      title: "Utility Tracking",
-      desc: "Record electricity and water meter readings for each billing period.",
-      accent: "mod-electric",
-    },
-    {
-      num: "03",
-      Icon: Icons.Billing,
-      title: "Automated Billing",
-      desc: "Calculate utility charges automatically using the applicable rates.",
-      accent: "mod-water",
-    },
-    {
-      num: "04",
-      Icon: Icons.Reports,
-      title: "Reports",
-      desc: "Search and review utility usage and billing records at a glance.",
-      accent: "mod-success",
-    },
+  /* â”€â”€ Quick actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  const quickActions = [
+    { label: "Add Meter Reading", Icon: Icons.Meters,  page: "meters",  accent: "qa-electric" },
+    { label: "Add Tenant",        Icon: Icons.Tenants, page: "tenants", accent: "qa-indigo"   },
+    { label: "Create Bill",       Icon: Icons.Billing, page: "billing", accent: "qa-blue"     },
+    { label: "View Reports",      Icon: Icons.Reports, page: "reports", accent: "qa-success"  },
   ];
 
   return (
     <div className="page-wrap dashboard-page">
-      {/* Hero */}
-      <div className="dashboard-hero">
-        <div className="dashboard-hero-body">
-          <p className="eyebrow">DASHBOARD OVERVIEW</p>
-          <h1 className="dashboard-title">Welcome to TARIPA</h1>
-          <p className="dashboard-subtitle">
-            Automated residential utility tracking and billing management system.
+
+      {/* â”€â”€ 1. WORKSPACE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="dash-header">
+        <div className="dash-header-body">
+          <p className="eyebrow">ADMIN WORKSPACE</p>
+          <h1 className="dash-heading">Welcome to TARIPA</h1>
+          <p className="dash-subheading">
+            Residential utility tracking and billing â€” manage tenants, meter readings, and billing records from one place.
           </p>
         </div>
-        <div className="dashboard-hero-emblem">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <div className="dash-header-emblem" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
           </svg>
         </div>
       </div>
 
-      {/* KPI Row */}
-      <div className="kpi-grid">
+      {/* â”€â”€ 2. KPI CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="dash-kpi-grid">
         {kpis.map((k) => (
-          <div className={`kpi-card ${k.accent}`} key={k.label}>
-            <div className="kpi-icon">{k.icon}</div>
-            <div className="kpi-body">
-              <span className="kpi-label">{k.label}</span>
-              <strong className={`kpi-value ${k.large ? "kpi-value-lg" : ""}`}>
-                {k.value}
+          <div className={`dash-kpi-card ${k.accent}`} key={k.label}>
+            <div className="dash-kpi-icon">
+              <k.Icon />
+            </div>
+            <div className="dash-kpi-body">
+              <span className="dash-kpi-label">{k.label}</span>
+              <strong className={`dash-kpi-value${k.large ? " dash-kpi-value-lg" : ""}`}>
+                {dashboardData === null ? (
+                  <span className="dash-kpi-skeleton" />
+                ) : k.value}
               </strong>
-              <small className="kpi-sub">{k.sub}</small>
+              <small className="dash-kpi-sub">{k.sub}</small>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Modules */}
-      <div className="section-header">
-        <div>
-          <p className="eyebrow">CORE MODULES</p>
-          <h3 className="section-title">Manage your utility operations</h3>
-        </div>
-        <p className="section-desc">Everything you need for residential billing.</p>
+      {/* â”€â”€ 3. BILLING OVERVIEW + QUICK ACTIONS row â”€â”€ */}
+      <div className="dash-mid-row">
+
+        {/* Billing Overview */}
+        <section className="dash-panel dash-billing-panel">
+          <div className="dash-panel-header">
+            <div>
+              <p className="eyebrow">BILLING & PAYMENTS</p>
+              <h3 className="dash-panel-title">Overview</h3>
+            </div>
+          </div>
+
+          {dashboardData === null ? (
+            <div className="dash-panel-loading">
+              <div className="loading-spinner" />
+              <span>Loadingâ€¦</span>
+            </div>
+          ) : (
+            <div className="dash-billing-stats">
+              <div className="dash-billing-stat dash-bs-outstanding">
+                <span className="dash-bs-label">Outstanding Balance</span>
+                <strong className="dash-bs-value">
+                  {formatCurrency(dashboardData.outstanding_amount)}
+                </strong>
+                <span className="dash-bs-detail">
+                  {dashboardData.pending_bills} bill{dashboardData.pending_bills !== 1 ? "s" : ""} pending
+                </span>
+              </div>
+              <div className="dash-billing-stat dash-bs-rooms">
+                <span className="dash-bs-label">Room Occupancy</span>
+                <strong className="dash-bs-value">
+                  {dashboardData.total_rooms > 0
+                    ? `${Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)}%`
+                    : "â€”"}
+                </strong>
+                <span className="dash-bs-detail">
+                  {dashboardData.total_rooms - dashboardData.available_rooms} of {dashboardData.total_rooms} rooms occupied
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="dash-billing-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            Collection-rate trends and historical charts will appear here when additional reporting data becomes available.
+          </div>
+        </section>
+
+        {/* Quick Actions */}
+        <section className="dash-panel dash-actions-panel">
+          <div className="dash-panel-header">
+            <div>
+              <p className="eyebrow">SHORTCUTS</p>
+              <h3 className="dash-panel-title">Quick Actions</h3>
+            </div>
+          </div>
+          <div className="dash-qa-grid">
+            {quickActions.map(({ label, Icon, page, accent }) => (
+              <button
+                key={page}
+                type="button"
+                className={`dash-qa-btn ${accent}`}
+                onClick={() => onNavigate?.(page)}
+              >
+                <span className="dash-qa-icon"><Icon /></span>
+                <span className="dash-qa-label">{label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
       </div>
 
-      <div className="modules-grid">
-        {modules.map((m) => (
-          <article className={`module-card ${m.accent}`} key={m.num}>
-            <div className="module-card-top">
-              <span className="module-num">{m.num}</span>
-              <span className="module-icon-wrap">
-                <m.Icon />
-              </span>
-            </div>
-            <h4 className="module-card-title">{m.title}</h4>
-            <p className="module-card-desc">{m.desc}</p>
-          </article>
-        ))}
-      </div>
+      {/* â”€â”€ 4. RECENT METER READINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <section className="dash-panel">
+        <div className="dash-panel-header">
+          <div>
+            <p className="eyebrow">UTILITY USAGE</p>
+            <h3 className="dash-panel-title">Recent Meter Readings</h3>
+          </div>
+          <button type="button" className="btn-secondary btn-sm" onClick={() => onNavigate?.("meters")}>
+            View All
+          </button>
+        </div>
+
+        {recentMeters === null ? (
+          <div className="dash-panel-loading">
+            <div className="loading-spinner" />
+            <span>Loading readingsâ€¦</span>
+          </div>
+        ) : recentMeters.length === 0 ? (
+          <div className="empty-state" style={{ padding: "36px 24px" }}>
+            <div className="empty-icon"><Icons.Meters /></div>
+            <h3>No meter readings yet</h3>
+            <p>Meter readings will appear here once they are recorded.</p>
+          </div>
+        ) : (
+          <div className="dash-table-wrap">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Tenant</th>
+                  <th>Room</th>
+                  <th>Billing Month</th>
+                  <th>
+                    <span className="dash-th-icon dash-electric-color">
+                      <Icons.Electricity />
+                    </span>
+                    Electricity
+                  </th>
+                  <th>
+                    <span className="dash-th-icon dash-water-color">
+                      <Icons.Water />
+                    </span>
+                    Water
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentMeters.map((r) => (
+                  <tr key={r.id}>
+                    <td>
+                      <div className="dash-cell-name">
+                        <div className="dash-cell-avatar">{r.full_name?.charAt(0).toUpperCase()}</div>
+                        <span>{r.full_name}</span>
+                      </div>
+                    </td>
+                    <td className="dash-cell-muted">{r.room_number ?? "â€”"}</td>
+                    <td className="dash-cell-muted">{formatMonth(r.billing_month)}</td>
+                    <td>
+                      <span className="dash-reading-chip dash-electric-chip">
+                        {Number(r.electricity_consumption).toFixed(1)} kWh
+                      </span>
+                    </td>
+                    <td>
+                      <span className="dash-reading-chip dash-water-chip">
+                        {Number(r.water_consumption).toFixed(1)} mÂ³
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* â”€â”€ 5. RECENT BILLING ACTIVITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <section className="dash-panel">
+        <div className="dash-panel-header">
+          <div>
+            <p className="eyebrow">RECENT ACTIVITY</p>
+            <h3 className="dash-panel-title">Billing Records</h3>
+          </div>
+          <button type="button" className="btn-secondary btn-sm" onClick={() => onNavigate?.("billing")}>
+            View All
+          </button>
+        </div>
+
+        {recentBills === null ? (
+          <div className="dash-panel-loading">
+            <div className="loading-spinner" />
+            <span>Loading recordsâ€¦</span>
+          </div>
+        ) : recentBills.length === 0 ? (
+          <div className="empty-state" style={{ padding: "36px 24px" }}>
+            <div className="empty-icon"><Icons.Billing /></div>
+            <h3>No billing records yet</h3>
+            <p>Billing records will appear here once bills are created.</p>
+          </div>
+        ) : (
+          <div className="dash-table-wrap">
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Tenant</th>
+                  <th>Room</th>
+                  <th>Billing Month</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentBills.map((b) => (
+                  <tr key={b.id}>
+                    <td>
+                      <div className="dash-cell-name">
+                        <div className="dash-cell-avatar">{b.full_name?.charAt(0).toUpperCase()}</div>
+                        <span>{b.full_name}</span>
+                      </div>
+                    </td>
+                    <td className="dash-cell-muted">{b.room_number ?? "â€”"}</td>
+                    <td className="dash-cell-muted">{formatMonth(b.billing_month)}</td>
+                    <td><strong>{formatCurrency(b.total_amount)}</strong></td>
+                    <td><StatusBadge status={b.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    TENANTS PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function TenantsPage() {
   const [tenants, setTenants] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -448,14 +841,14 @@ function TenantsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadTenants = () => {
-    fetch("/api/tenants")
+    authFetch("/api/tenants")
       .then((r) => r.json())
       .then((data) => { if (data.success) setTenants(data.data); })
       .catch((e) => console.error("Failed to load tenants:", e));
   };
 
   const loadRooms = () => {
-    fetch("/api/rooms")
+    authFetch("/api/rooms")
       .then((r) => r.json())
       .then((data) => { if (data.success) setRooms(data.data); })
       .catch((e) => console.error("Failed to load rooms:", e));
@@ -512,7 +905,7 @@ function TenantsPage() {
         move_in_date: formData.move_in_date,
         status: formData.status,
       };
-      const response = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const response = await authFetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await response.json();
       if (!response.ok || !data.success) { setFormError(data.message || `Failed to ${isEditing ? "update" : "create"} tenant.`); return; }
       setFormSuccess(isEditing ? "Tenant updated successfully." : "Tenant added successfully.");
@@ -570,7 +963,7 @@ function TenantsPage() {
                     const isFull = Number(room.occupied_count) >= Number(room.capacity) && !isCurrentRoom;
                     return (
                       <option key={room.id} value={room.id} disabled={isFull}>
-                        Room {room.room_number} — {room.occupied_count}/{room.capacity}{isFull ? " (Full)" : ""}
+                        Room {room.room_number} â€” {room.occupied_count}/{room.capacity}{isFull ? " (Full)" : ""}
                       </option>
                     );
                   })}
@@ -605,7 +998,7 @@ function TenantsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Saving…" : editingTenant ? "Update Tenant" : "Save Tenant"}
+                {isSubmitting ? "Savingâ€¦" : editingTenant ? "Update Tenant" : "Save Tenant"}
               </button>
             </div>
           </form>
@@ -659,9 +1052,9 @@ function TenantsPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    ROOMS PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function RoomsPage() {
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -671,7 +1064,7 @@ function RoomsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadRooms = () => {
-    fetch("/api/rooms")
+    authFetch("/api/rooms")
       .then((r) => r.json())
       .then((data) => { if (data.success) setRooms(data.data); })
       .catch((e) => console.error("Failed to load rooms:", e));
@@ -703,7 +1096,7 @@ function RoomsPage() {
     if (!Number.isInteger(capacity) || capacity <= 0) { setFormError("Capacity must be a positive whole number."); return; }
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/rooms", {
+      const response = await authFetch("/api/rooms", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ room_number: roomNumber, capacity }),
@@ -765,7 +1158,7 @@ function RoomsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Saving…" : "Save Room"}
+                {isSubmitting ? "Savingâ€¦" : "Save Room"}
               </button>
             </div>
           </form>
@@ -824,9 +1217,9 @@ function RoomsPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    METER READINGS PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function MeterReadingsPage() {
   const [readings, setReadings] = useState([]);
   const [tenants, setTenants] = useState([]);
@@ -845,14 +1238,14 @@ function MeterReadingsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadReadings = () => {
-    fetch("/api/meter-readings")
+    authFetch("/api/meter-readings")
       .then((r) => r.json())
       .then((data) => { if (data.success) setReadings(data.data); })
       .catch((e) => console.error("Failed to load meter readings:", e));
   };
 
   const loadTenants = () => {
-    fetch("/api/tenants")
+    authFetch("/api/tenants")
       .then((r) => r.json())
       .then((data) => {
         if (data.success) setTenants(data.data.filter((t) => t.status === "Active"));
@@ -923,7 +1316,7 @@ function MeterReadingsPage() {
       const isEditing = Boolean(editingReading);
       const url = isEditing ? `/api/meter-readings/${editingReading.id}` : "/api/meter-readings";
       const method = isEditing ? "PUT" : "POST";
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -954,7 +1347,7 @@ function MeterReadingsPage() {
     );
     if (!confirmed) return;
     try {
-      const response = await fetch(`/api/meter-readings/${reading.id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/meter-readings/${reading.id}`, { method: "DELETE" });
       const data = await response.json();
       if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete meter reading."); return; }
       loadReadings();
@@ -997,7 +1390,7 @@ function MeterReadingsPage() {
                   <option value="">Select active tenant</option>
                   {tenants.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
+                      {t.full_name}{t.room_number ? ` â€” Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
@@ -1052,7 +1445,7 @@ function MeterReadingsPage() {
                 </span>
                 {waterConsumption !== null && !Number.isNaN(waterConsumption) && (
                   <span className="consumption-preview">
-                    {waterConsumption.toFixed(3)} m³ consumed
+                    {waterConsumption.toFixed(3)} mÂ³ consumed
                   </span>
                 )}
               </div>
@@ -1074,7 +1467,7 @@ function MeterReadingsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Saving…" : editingReading ? "Update Reading" : "Save Reading"}
+                {isSubmitting ? "Savingâ€¦" : editingReading ? "Update Reading" : "Save Reading"}
               </button>
             </div>
           </form>
@@ -1112,7 +1505,7 @@ function MeterReadingsPage() {
                   <span className="meta-label">
                     <Icons.Water /> WATER
                   </span>
-                  <strong className="meta-value">{Number(reading.water_consumption).toFixed(3)} m³</strong>
+                  <strong className="meta-value">{Number(reading.water_consumption).toFixed(3)} mÂ³</strong>
                 </div>
                 <div className="meta-actions">
                   <button type="button" className="btn-edit" onClick={() => openEditForm(reading)}>
@@ -1131,9 +1524,9 @@ function MeterReadingsPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    UTILITY RATES PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function UtilityRatesPage() {
   const [rates, setRates] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -1145,7 +1538,7 @@ function UtilityRatesPage() {
 
   const loadRates = async () => {
     try {
-      const response = await fetch("/api/utility-rates");
+      const response = await authFetch("/api/utility-rates");
       const data = await response.json();
       if (!response.ok || !data.success) { setFormError(data.message || "Failed to load utility rates."); return; }
       setRates(data.data);
@@ -1196,7 +1589,7 @@ function UtilityRatesPage() {
     try {
       const url = editingRate ? `/api/utility-rates/${editingRate.id}` : "/api/utility-rates";
       const method = editingRate ? "PUT" : "POST";
-      const response = await fetch(url, {
+      const response = await authFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ utility_type: formData.utility_type, rate_per_unit: rate, effective_from: formData.effective_from }),
@@ -1218,7 +1611,7 @@ function UtilityRatesPage() {
     const confirmed = window.confirm(`Delete the ${rate.utility_type} rate effective ${rate.effective_from.substring(0, 10)}?`);
     if (!confirmed) return;
     try {
-      const response = await fetch(`/api/utility-rates/${rate.id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/utility-rates/${rate.id}`, { method: "DELETE" });
       const data = await response.json();
       if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete utility rate."); return; }
       loadRates();
@@ -1264,7 +1657,7 @@ function UtilityRatesPage() {
                 </select>
               </label>
               <label className="field">
-                <span className="field-label">RATE PER UNIT (₱) <span className="required">*</span></span>
+                <span className="field-label">RATE PER UNIT (â‚±) <span className="required">*</span></span>
                 <input type="number" name="rate_per_unit" value={formData.rate_per_unit} onChange={handleChange} min="0" step="0.01" placeholder="Enter rate" className="field-input" />
               </label>
               <label className="field">
@@ -1284,7 +1677,7 @@ function UtilityRatesPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Saving…" : editingRate ? "Save Changes" : "Add Rate"}
+                {isSubmitting ? "Savingâ€¦" : editingRate ? "Save Changes" : "Add Rate"}
               </button>
             </div>
           </form>
@@ -1345,9 +1738,9 @@ function UtilityRatesPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    BILLING PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function BillingPage() {
   const [billingRecords, setBillingRecords] = useState([]);
   const [tenants, setTenants] = useState([]);
@@ -1358,14 +1751,14 @@ function BillingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const loadBillingRecords = () => {
-    fetch("/api/billing")
+    authFetch("/api/billing")
       .then((r) => r.json())
       .then((data) => { if (data.success) setBillingRecords(data.data); })
       .catch((e) => console.error("Failed to load billing records:", e));
   };
 
   const loadTenants = () => {
-    fetch("/api/tenants")
+    authFetch("/api/tenants")
       .then((r) => r.json())
       .then((data) => {
         if (data.success) setTenants(data.data.filter((t) => t.status === "Active"));
@@ -1399,7 +1792,7 @@ function BillingPage() {
     if (!formData.billing_month) { setFormError("Billing month is required."); return; }
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/billing", {
+      const response = await authFetch("/api/billing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tenant_id: Number(formData.tenant_id), billing_month: `${formData.billing_month}-01` }),
@@ -1419,7 +1812,7 @@ function BillingPage() {
 
   const handleStatusChange = async (billing, status) => {
     try {
-      const response = await fetch(`/api/billing/${billing.id}`, {
+      const response = await authFetch(`/api/billing/${billing.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
@@ -1437,7 +1830,7 @@ function BillingPage() {
     const confirmed = window.confirm(`Delete the billing record for ${billing.full_name} for ${billing.billing_month.substring(0, 7)}?`);
     if (!confirmed) return;
     try {
-      const response = await fetch(`/api/billing/${billing.id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/billing/${billing.id}`, { method: "DELETE" });
       const data = await response.json();
       if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete billing record."); return; }
       loadBillingRecords();
@@ -1480,7 +1873,7 @@ function BillingPage() {
                   <option value="">Select active tenant</option>
                   {tenants.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
+                      {t.full_name}{t.room_number ? ` â€” Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
@@ -1502,7 +1895,7 @@ function BillingPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Generating…" : "Generate Bill"}
+                {isSubmitting ? "Generatingâ€¦" : "Generate Bill"}
               </button>
             </div>
           </form>
@@ -1568,9 +1961,9 @@ function BillingPage() {
   );
 }
 
-/* ─────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    REPORTS PAGE
-───────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function ReportsPage() {
   const [reports, setReports] = useState([]);
   const [filters, setFilters] = useState({ billing_month: "", tenant_id: "", room_id: "", status: "" });
@@ -1591,7 +1984,7 @@ function ReportsPage() {
     try {
       setLoading(true);
       setError("");
-      const response = await fetch("/api/billing");
+      const response = await authFetch("/api/billing");
       if (!response.ok) throw new Error(`Billing API returned ${response.status}`);
       const data = await response.json();
       console.log("TARIPA REPORTS:", data);
@@ -1608,7 +2001,7 @@ function ReportsPage() {
 
   const loadTenants = async () => {
     try {
-      const response = await fetch("/api/tenants");
+      const response = await authFetch("/api/tenants");
       const data = await response.json();
       if (response.ok && data.success) setTenants(Array.isArray(data.data) ? data.data : []);
     } catch (err) { console.error("Failed to load tenants:", err); }
@@ -1616,7 +2009,7 @@ function ReportsPage() {
 
   const loadRooms = async () => {
     try {
-      const response = await fetch("/api/rooms");
+      const response = await authFetch("/api/rooms");
       const data = await response.json();
       if (response.ok && data.success) setRooms(Array.isArray(data.data) ? data.data : []);
     } catch (err) { console.error("Failed to load rooms:", err); }
@@ -1733,7 +2126,7 @@ function ReportsPage() {
         <div className="report-summary-card summary-water">
           <span className="report-summary-label"><Icons.Water /> WATER</span>
           <strong className="report-summary-value">{totalWater.toFixed(3)}</strong>
-          <small>m³ consumption</small>
+          <small>mÂ³ consumption</small>
         </div>
       </div>
 
@@ -1765,7 +2158,7 @@ function ReportsPage() {
         {loading ? (
           <div className="empty-state loading-state">
             <div className="loading-spinner" />
-            <h3>Loading reports…</h3>
+            <h3>Loading reportsâ€¦</h3>
             <p>Retrieving billing records from the database.</p>
           </div>
         ) : filteredReports.length === 0 ? (

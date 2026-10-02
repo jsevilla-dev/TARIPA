@@ -9,9 +9,11 @@ const tenantsRouter = require("./routes/tenants");
 const utilityRatesRouter = require("./routes/utilityRates");
 const meterReadingsRouter = require("./routes/meterReadings");
 const billingRouter = require("./routes/billing");
-const clientAuthRouter = require("./routes/clientAuth");
+const clientAuthRouter  = require("./routes/clientAuth");
 const clientPortalRouter = require("./routes/clientPortal");
-const clientAuth = require("./middleware/clientAuth");
+const clientAuth        = require("./middleware/clientAuth");
+const adminAuthRouter   = require("./routes/adminAuth");
+const adminAuth         = require("./middleware/adminAuth");
 
 
 const app = express();
@@ -19,18 +21,22 @@ const PORT = 5000;
 
 app.use(express.json());
 
-app.use("/api/rooms", roomsRouter);
-app.use("/api/tenants", tenantsRouter);
-app.use("/api/utility-rates", utilityRatesRouter);
-app.use("/api/meter-readings", meterReadingsRouter);
-app.use("/api/billing", billingRouter);
+// ── Admin Auth (login — public endpoint) ──
+app.use("/api/admin", adminAuthRouter);
 
-// ── Client / Tenant Portal (new — does not affect admin routes) ──
+// ── Admin-protected CRUD routes ──
+app.use("/api/rooms",          adminAuth, roomsRouter);
+app.use("/api/tenants",        adminAuth, tenantsRouter);
+app.use("/api/utility-rates",  adminAuth, utilityRatesRouter);
+app.use("/api/meter-readings", adminAuth, meterReadingsRouter);
+app.use("/api/billing",        adminAuth, billingRouter);
+
+// ── Client / Tenant Portal (unchanged) ──
 app.use("/api/client", clientAuthRouter);
 app.use("/api/client", clientAuth, clientPortalRouter);
 
 
-app.get("/api/dashboard", async (req, res) => {
+app.get("/api/dashboard", adminAuth, async (req, res) => {
     try {
         const [tenantRows] = await db.query(`
             SELECT COUNT(*) AS total_tenants
