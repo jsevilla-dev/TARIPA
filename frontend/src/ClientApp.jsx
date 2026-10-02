@@ -1,14 +1,61 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import "./ClientApp.css";
 
 /* ─────────────────────────────────────────────
-   CONSTANTS
+   CLIENT AUTH CONSTANTS
+   Keys are isolated from admin auth keys:
+     admin uses: taripa_admin_token / taripa_admin_user
+     client uses: taripa_client_token / taripa_client_tenant
 ───────────────────────────────────────────── */
-const TOKEN_KEY = "taripa_client_token";
+const TOKEN_KEY  = "taripa_client_token";
 const TENANT_KEY = "taripa_client_tenant";
 
 /* ─────────────────────────────────────────────
-   HELPERS
+   CLIENT AUTH HELPERS
+───────────────────────────────────────────── */
+const getToken  = () => localStorage.getItem(TOKEN_KEY);
+const getTenant = () => {
+  try { return JSON.parse(localStorage.getItem(TENANT_KEY)); } catch { return null; }
+};
+const saveAuth  = (token, tenant) => {
+  localStorage.setItem(TOKEN_KEY,  token);
+  localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));
+};
+/** Clears ONLY client auth — admin keys are intentionally untouched */
+const clearAuth = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TENANT_KEY);
+};
+
+/**
+ * clientFetch — authenticated fetch for all client portal API calls.
+ * • Attaches the client Bearer token.
+ * • On 401, clears CLIENT auth only and redirects to /client/login.
+ *   Admin auth (taripa_admin_token) is never touched here.
+ */
+const clientFetch = async (url, options = {}) => {
+  const token = getToken();
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (res.status === 401) {
+    clearAuth();
+    // Replace history so back button doesn't loop
+    window.history.replaceState(null, "", "/client/login");
+    window.location.reload();
+    // Return a never-resolving promise so callers don't process partial state
+    return new Promise(() => {});
+  }
+  return res;
+};
+
+/* ─────────────────────────────────────────────
+   FORMATTERS
 ───────────────────────────────────────────── */
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-PH", {
@@ -21,11 +68,7 @@ const formatCurrency = (value) =>
 const formatDate = (dateStr) => {
   if (!dateStr) return "—";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-PH", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return d.toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" });
 };
 
 const formatMonthYear = (dateStr) => {
@@ -34,34 +77,8 @@ const formatMonthYear = (dateStr) => {
   return d.toLocaleDateString("en-PH", { year: "numeric", month: "long" });
 };
 
-const getToken = () => localStorage.getItem(TOKEN_KEY);
-const getTenant = () => {
-  try {
-    return JSON.parse(localStorage.getItem(TENANT_KEY));
-  } catch {
-    return null;
-  }
-};
-const clearAuth = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(TENANT_KEY);
-};
-
-const authFetch = async (url, options = {}) => {
-  const token = getToken();
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-  });
-  return res;
-};
-
 /* ─────────────────────────────────────────────
-   SVG ICONS (client portal set)
+   SVG ICONS
 ───────────────────────────────────────────── */
 const Icons = {
   Home: () => (
@@ -88,7 +105,7 @@ const Icons = {
     </svg>
   ),
   Logout: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
@@ -125,9 +142,28 @@ const Icons = {
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12 19.79 19.79 0 0 1 1.07 3.38 2 2 0 0 1 3.04 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z" />
     </svg>
   ),
+  Eye: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  EyeOff: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  ),
   ChevronDown: () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="6 9 12 15 18 9" />
+    </svg>
+  ),
+  Menu: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
     </svg>
   ),
 };
@@ -137,11 +173,11 @@ const Icons = {
 ───────────────────────────────────────────── */
 function StatusBadge({ status }) {
   const map = {
-    Active: "cb-badge-active",
+    Active:   "cb-badge-active",
     Inactive: "cb-badge-inactive",
-    Paid: "cb-badge-paid",
-    Pending: "cb-badge-pending",
-    Overdue: "cb-badge-overdue",
+    Paid:     "cb-badge-paid",
+    Pending:  "cb-badge-pending",
+    Overdue:  "cb-badge-overdue",
   };
   return (
     <span className={`cb-status-badge ${map[status] ?? "cb-badge-default"}`}>
@@ -163,7 +199,7 @@ function Spinner({ message = "Loading…" }) {
 }
 
 /* ─────────────────────────────────────────────
-   ERROR MESSAGE
+   ERROR STATE
 ───────────────────────────────────────────── */
 function ErrorMessage({ message, onRetry }) {
   return (
@@ -180,29 +216,43 @@ function ErrorMessage({ message, onRetry }) {
 }
 
 /* ─────────────────────────────────────────────
+   SESSION INIT SCREEN
+   Shown briefly while validating the stored token.
+───────────────────────────────────────────── */
+function SessionInitScreen() {
+  return (
+    <div className="cb-session-init">
+      <div className="cb-session-init-inner">
+        <div className="cb-session-spinner" />
+        <p>Verifying session…</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
    LOGIN PAGE
 ───────────────────────────────────────────── */
 function LoginPage({ onLogin }) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [username,    setUsername]    = useState("");
+  const [password,    setPassword]    = useState("");
+  const [showPass,    setShowPass]    = useState(false);
+  const [error,       setError]       = useState("");
+  const [isLoading,   setIsLoading]   = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!username.trim() || !password) {
-      setError("Please enter your username and password.");
-      return;
-    }
+    if (!username.trim()) { setError("Please enter your username."); return; }
+    if (!password)        { setError("Please enter your password."); return; }
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/client/login", {
-        method: "POST",
+      const res  = await fetch("/api/client/login", {
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username.trim(), password }),
+        body:    JSON.stringify({ username: username.trim(), password }),
       });
       const data = await res.json();
 
@@ -211,8 +261,7 @@ function LoginPage({ onLogin }) {
         return;
       }
 
-      localStorage.setItem(TOKEN_KEY, data.data.token);
-      localStorage.setItem(TENANT_KEY, JSON.stringify(data.data.tenant));
+      saveAuth(data.data.token, data.data.tenant);
       onLogin(data.data.tenant);
     } catch {
       setError("Unable to connect to the server. Please try again.");
@@ -224,64 +273,91 @@ function LoginPage({ onLogin }) {
   return (
     <div className="cb-login-page">
       <div className="cb-login-card">
+
         {/* Brand */}
         <div className="cb-login-brand">
           <div className="cb-login-brand-mark">
-            <Icons.Meter />
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
           </div>
-          <div>
-            <strong className="cb-login-brand-name">TARIPA</strong>
-            <span className="cb-login-brand-sub">Tenant Portal</span>
+          <div className="cb-login-brand-text">
+            <strong>TARIPA</strong>
+            <span>Tenant Portal</span>
           </div>
         </div>
 
+        {/* Header */}
         <div className="cb-login-header">
           <h1 className="cb-login-title">Welcome back</h1>
-          <p className="cb-login-subtitle">
-            Sign in to view your bills and utility usage.
-          </p>
+          <p className="cb-login-subtitle">Sign in to view your bills and utility usage.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="cb-login-form" noValidate>
-          <label className="cb-field">
-            <span className="cb-field-label">USERNAME</span>
-            <input
-              type="text"
-              className="cb-field-input"
-              value={username}
-              onChange={(e) => { setUsername(e.target.value); setError(""); }}
-              placeholder="Enter your username"
-              autoComplete="username"
-              autoFocus
-              disabled={isLoading}
-            />
-          </label>
+        {/* Form */}
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="cb-login-fields">
 
-          <label className="cb-field">
-            <span className="cb-field-label">PASSWORD</span>
-            <input
-              type="password"
-              className="cb-field-input"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
-              placeholder="Enter your password"
-              autoComplete="current-password"
-              disabled={isLoading}
-            />
-          </label>
+            {/* Username */}
+            <label className="cb-field">
+              <span className="cb-field-label">USERNAME</span>
+              <input
+                type="text"
+                className="cb-field-input"
+                value={username}
+                onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                placeholder="Enter your username"
+                autoComplete="username"
+                autoFocus
+                disabled={isLoading}
+              />
+            </label>
 
+            {/* Password with show/hide toggle */}
+            <label className="cb-field">
+              <span className="cb-field-label">PASSWORD</span>
+              <div className="cb-field-input-wrap">
+                <input
+                  type={showPass ? "text" : "password"}
+                  className="cb-field-input cb-field-input-padded"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className="cb-field-eye-btn"
+                  onClick={() => setShowPass((s) => !s)}
+                  aria-label={showPass ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                  disabled={isLoading}
+                >
+                  {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
+                </button>
+              </div>
+            </label>
+          </div>
+
+          {/* Error */}
           {error && (
-            <div className="cb-login-error">
+            <div className="cb-login-error" role="alert">
               <Icons.Alert /> {error}
             </div>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
-            className="cb-btn-primary cb-btn-full"
+            className="cb-btn-primary cb-btn-full cb-login-submit"
             disabled={isLoading}
           >
-            {isLoading ? "Signing in…" : "Sign In"}
+            {isLoading ? (
+              <>
+                <span className="cb-btn-spinner" />
+                Signing in…
+              </>
+            ) : "Sign In"}
           </button>
         </form>
 
@@ -297,15 +373,15 @@ function LoginPage({ onLogin }) {
    DASHBOARD PAGE
 ───────────────────────────────────────────── */
 function DashboardPage() {
-  const [data, setData] = useState(null);
+  const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await authFetch("/api/client/dashboard");
+      const res  = await clientFetch("/api/client/dashboard");
       const json = await res.json();
       if (!res.ok || !json.success) {
         setError(json.message || "Failed to load dashboard data.");
@@ -322,8 +398,8 @@ function DashboardPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return <Spinner message="Loading dashboard…" />;
-  if (error) return <ErrorMessage message={error} onRetry={load} />;
-  if (!data) return null;
+  if (error)   return <ErrorMessage message={error} onRetry={load} />;
+  if (!data)   return null;
 
   const { tenant, latest_bill, outstanding, latest_meter, recent_bills } = data;
 
@@ -336,7 +412,8 @@ function DashboardPage() {
 
   return (
     <div className="cb-page">
-      {/* Hero greeting */}
+
+      {/* Hero */}
       <div className="cb-dashboard-hero">
         <div className="cb-dashboard-hero-body">
           <p className="cb-eyebrow">TENANT DASHBOARD</p>
@@ -344,16 +421,19 @@ function DashboardPage() {
             {greeting}, {tenant.full_name.split(" ")[0]}!
           </h2>
           <p className="cb-dashboard-sub">
-            Room {tenant.room_number} &nbsp;·&nbsp; {tenant.status}
+            Room {tenant.room_number ?? "—"}&nbsp;·&nbsp;
+            <StatusBadge status={tenant.status} />
           </p>
         </div>
-        <div className="cb-dashboard-hero-emblem">
+        <div className="cb-dashboard-hero-emblem" aria-hidden="true">
           <Icons.Meter />
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="cb-kpi-grid">
+
+        {/* Outstanding balance */}
         <div className="cb-kpi-card cb-kpi-warning">
           <div className="cb-kpi-icon"><Icons.Bills /></div>
           <div className="cb-kpi-body">
@@ -369,79 +449,76 @@ function DashboardPage() {
           </div>
         </div>
 
-        {latest_bill ? (
-          <div className="cb-kpi-card cb-kpi-indigo">
-            <div className="cb-kpi-icon"><Icons.Bills /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Latest Bill</span>
-              <strong className="cb-kpi-value cb-kpi-value-lg">
-                {formatCurrency(latest_bill.total_amount)}
-              </strong>
-              <small className="cb-kpi-sub">
-                {formatMonthYear(latest_bill.billing_month)} &nbsp;·&nbsp;{" "}
-                <StatusBadge status={latest_bill.status} />
-              </small>
-            </div>
+        {/* Latest bill */}
+        <div className="cb-kpi-card cb-kpi-indigo">
+          <div className="cb-kpi-icon"><Icons.Bills /></div>
+          <div className="cb-kpi-body">
+            <span className="cb-kpi-label">Latest Bill</span>
+            {latest_bill ? (
+              <>
+                <strong className="cb-kpi-value cb-kpi-value-lg">
+                  {formatCurrency(latest_bill.total_amount)}
+                </strong>
+                <small className="cb-kpi-sub">
+                  {formatMonthYear(latest_bill.billing_month)}&nbsp;·&nbsp;
+                  <StatusBadge status={latest_bill.status} />
+                </small>
+              </>
+            ) : (
+              <>
+                <strong className="cb-kpi-value">—</strong>
+                <small className="cb-kpi-sub">No billing records yet</small>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="cb-kpi-card cb-kpi-indigo">
-            <div className="cb-kpi-icon"><Icons.Bills /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Latest Bill</span>
-              <strong className="cb-kpi-value">—</strong>
-              <small className="cb-kpi-sub">No billing records yet</small>
-            </div>
-          </div>
-        )}
+        </div>
 
-        {latest_meter ? (
-          <div className="cb-kpi-card cb-kpi-electric">
-            <div className="cb-kpi-icon"><Icons.Electricity /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Last Electricity Usage</span>
-              <strong className="cb-kpi-value">
-                {Number(latest_meter.electricity_consumption).toFixed(1)}{" "}
-                <span className="cb-kpi-unit">kWh</span>
-              </strong>
-              <small className="cb-kpi-sub">{formatMonthYear(latest_meter.billing_month)}</small>
-            </div>
+        {/* Last electricity */}
+        <div className="cb-kpi-card cb-kpi-electric">
+          <div className="cb-kpi-icon"><Icons.Electricity /></div>
+          <div className="cb-kpi-body">
+            <span className="cb-kpi-label">Last Electricity Usage</span>
+            {latest_meter ? (
+              <>
+                <strong className="cb-kpi-value">
+                  {Number(latest_meter.electricity_consumption).toFixed(1)}
+                  <span className="cb-kpi-unit">kWh</span>
+                </strong>
+                <small className="cb-kpi-sub">{formatMonthYear(latest_meter.billing_month)}</small>
+              </>
+            ) : (
+              <>
+                <strong className="cb-kpi-value">—</strong>
+                <small className="cb-kpi-sub">No readings yet</small>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="cb-kpi-card cb-kpi-electric">
-            <div className="cb-kpi-icon"><Icons.Electricity /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Last Electricity Usage</span>
-              <strong className="cb-kpi-value">—</strong>
-              <small className="cb-kpi-sub">No readings yet</small>
-            </div>
-          </div>
-        )}
+        </div>
 
-        {latest_meter ? (
-          <div className="cb-kpi-card cb-kpi-water">
-            <div className="cb-kpi-icon"><Icons.Water /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Last Water Usage</span>
-              <strong className="cb-kpi-value">
-                {Number(latest_meter.water_consumption).toFixed(1)}{" "}
-                <span className="cb-kpi-unit">m³</span>
-              </strong>
-              <small className="cb-kpi-sub">{formatMonthYear(latest_meter.billing_month)}</small>
-            </div>
+        {/* Last water */}
+        <div className="cb-kpi-card cb-kpi-water">
+          <div className="cb-kpi-icon"><Icons.Water /></div>
+          <div className="cb-kpi-body">
+            <span className="cb-kpi-label">Last Water Usage</span>
+            {latest_meter ? (
+              <>
+                <strong className="cb-kpi-value">
+                  {Number(latest_meter.water_consumption).toFixed(1)}
+                  <span className="cb-kpi-unit">m³</span>
+                </strong>
+                <small className="cb-kpi-sub">{formatMonthYear(latest_meter.billing_month)}</small>
+              </>
+            ) : (
+              <>
+                <strong className="cb-kpi-value">—</strong>
+                <small className="cb-kpi-sub">No readings yet</small>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="cb-kpi-card cb-kpi-water">
-            <div className="cb-kpi-icon"><Icons.Water /></div>
-            <div className="cb-kpi-body">
-              <span className="cb-kpi-label">Last Water Usage</span>
-              <strong className="cb-kpi-value">—</strong>
-              <small className="cb-kpi-sub">No readings yet</small>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
 
-      {/* Recent Bills */}
+      {/* Recent Bills table */}
       {recent_bills.length > 0 && (
         <div className="cb-section">
           <div className="cb-section-header">
@@ -476,6 +553,14 @@ function DashboardPage() {
           </div>
         </div>
       )}
+
+      {recent_bills.length === 0 && (
+        <div className="cb-empty-state">
+          <div className="cb-empty-icon"><Icons.Bills /></div>
+          <h3>No billing records yet</h3>
+          <p>Your billing history will appear here once records are created.</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -484,16 +569,16 @@ function DashboardPage() {
    BILLS PAGE
 ───────────────────────────────────────────── */
 function BillsPage() {
-  const [bills, setBills] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [bills,    setBills]    = useState([]);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState("");
   const [expanded, setExpanded] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await authFetch("/api/client/bills");
+      const res  = await clientFetch("/api/client/bills");
       const json = await res.json();
       if (!res.ok || !json.success) {
         setError(json.message || "Failed to load billing records.");
@@ -510,16 +595,14 @@ function BillsPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return <Spinner message="Loading bills…" />;
-  if (error) return <ErrorMessage message={error} onRetry={load} />;
+  if (error)   return <ErrorMessage message={error} onRetry={load} />;
 
   return (
     <div className="cb-page">
       <div className="cb-page-header">
-        <div>
-          <p className="cb-eyebrow">BILLING HISTORY</p>
-          <h2 className="cb-page-title">My Bills</h2>
-          <p className="cb-page-desc">Your complete billing history with itemized charges.</p>
-        </div>
+        <p className="cb-eyebrow">BILLING HISTORY</p>
+        <h2 className="cb-page-title">My Bills</h2>
+        <p className="cb-page-desc">Your complete billing history with itemized charges.</p>
       </div>
 
       {bills.length === 0 ? (
@@ -530,7 +613,7 @@ function BillsPage() {
         </div>
       ) : (
         <>
-          {/* Mobile-friendly card list */}
+          {/* Mobile accordion cards */}
           <div className="cb-bills-list">
             {bills.map((bill) => (
               <div
@@ -557,27 +640,19 @@ function BillsPage() {
                   <div className="cb-bill-card-detail">
                     <div className="cb-bill-detail-grid">
                       <div className="cb-bill-detail-row">
-                        <span className="cb-bill-detail-label">
-                          <Icons.Electricity /> Electricity Usage
-                        </span>
+                        <span className="cb-bill-detail-label"><Icons.Electricity /> Electricity Usage</span>
                         <span>{Number(bill.electricity_consumption).toFixed(3)} kWh</span>
                       </div>
                       <div className="cb-bill-detail-row">
-                        <span className="cb-bill-detail-label">
-                          <Icons.Electricity /> Electricity Charge
-                        </span>
+                        <span className="cb-bill-detail-label"><Icons.Electricity /> Electricity Charge</span>
                         <span>{formatCurrency(bill.electricity_charge)}</span>
                       </div>
                       <div className="cb-bill-detail-row">
-                        <span className="cb-bill-detail-label">
-                          <Icons.Water /> Water Usage
-                        </span>
+                        <span className="cb-bill-detail-label"><Icons.Water /> Water Usage</span>
                         <span>{Number(bill.water_consumption).toFixed(3)} m³</span>
                       </div>
                       <div className="cb-bill-detail-row">
-                        <span className="cb-bill-detail-label">
-                          <Icons.Water /> Water Charge
-                        </span>
+                        <span className="cb-bill-detail-label"><Icons.Water /> Water Charge</span>
                         <span>{formatCurrency(bill.water_charge)}</span>
                       </div>
                       <div className="cb-bill-detail-row cb-bill-detail-total">
@@ -595,7 +670,7 @@ function BillsPage() {
             ))}
           </div>
 
-          {/* Desktop table (hidden on mobile) */}
+          {/* Desktop table */}
           <div className="cb-table-wrap cb-desktop-only">
             <table className="cb-table">
               <thead>
@@ -637,14 +712,14 @@ function BillsPage() {
 ───────────────────────────────────────────── */
 function MeterReadingsPage() {
   const [readings, setReadings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await authFetch("/api/client/meter-readings");
+      const res  = await clientFetch("/api/client/meter-readings");
       const json = await res.json();
       if (!res.ok || !json.success) {
         setError(json.message || "Failed to load meter readings.");
@@ -661,16 +736,14 @@ function MeterReadingsPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return <Spinner message="Loading meter readings…" />;
-  if (error) return <ErrorMessage message={error} onRetry={load} />;
+  if (error)   return <ErrorMessage message={error} onRetry={load} />;
 
   return (
     <div className="cb-page">
       <div className="cb-page-header">
-        <div>
-          <p className="cb-eyebrow">UTILITY USAGE</p>
-          <h2 className="cb-page-title">Meter Readings</h2>
-          <p className="cb-page-desc">Your electricity and water meter readings by billing period.</p>
-        </div>
+        <p className="cb-eyebrow">UTILITY USAGE</p>
+        <h2 className="cb-page-title">Meter Readings</h2>
+        <p className="cb-page-desc">Your electricity and water meter readings by billing period.</p>
       </div>
 
       {readings.length === 0 ? (
@@ -731,9 +804,11 @@ function MeterReadingsPage() {
                 </div>
               </div>
 
-              <div className="cb-reading-footer">
-                Recorded: {formatDate(r.recorded_at)}
-              </div>
+              {r.recorded_at && (
+                <div className="cb-reading-footer">
+                  Recorded: {formatDate(r.recorded_at)}
+                </div>
+              )}
             </article>
           ))}
         </div>
@@ -748,13 +823,13 @@ function MeterReadingsPage() {
 function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const res = await authFetch("/api/client/profile");
+      const res  = await clientFetch("/api/client/profile");
       const json = await res.json();
       if (!res.ok || !json.success) {
         setError(json.message || "Failed to load profile.");
@@ -771,21 +846,18 @@ function ProfilePage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return <Spinner message="Loading profile…" />;
-  if (error) return <ErrorMessage message={error} onRetry={load} />;
+  if (error)   return <ErrorMessage message={error} onRetry={load} />;
   if (!profile) return null;
 
   return (
     <div className="cb-page">
       <div className="cb-page-header">
-        <div>
-          <p className="cb-eyebrow">MY ACCOUNT</p>
-          <h2 className="cb-page-title">Profile</h2>
-          <p className="cb-page-desc">Your tenant account information.</p>
-        </div>
+        <p className="cb-eyebrow">MY ACCOUNT</p>
+        <h2 className="cb-page-title">Profile</h2>
+        <p className="cb-page-desc">Your tenant account information.</p>
       </div>
 
       <div className="cb-profile-card">
-        {/* Avatar */}
         <div className="cb-profile-avatar">
           {profile.full_name.charAt(0).toUpperCase()}
         </div>
@@ -794,46 +866,26 @@ function ProfilePage() {
 
         <div className="cb-profile-details">
           <div className="cb-profile-detail-row">
-            <span className="cb-profile-detail-label">
-              <Icons.Profile /> Username
-            </span>
+            <span className="cb-profile-detail-label"><Icons.Profile /> Username</span>
             <span className="cb-profile-detail-value">{profile.username}</span>
           </div>
-
           <div className="cb-profile-detail-row">
-            <span className="cb-profile-detail-label">
-              <Icons.Phone /> Contact Number
-            </span>
-            <span className="cb-profile-detail-value">
-              {profile.contact_number || "Not provided"}
-            </span>
+            <span className="cb-profile-detail-label"><Icons.Phone /> Contact Number</span>
+            <span className="cb-profile-detail-value">{profile.contact_number || "Not provided"}</span>
           </div>
-
           <div className="cb-profile-detail-row">
-            <span className="cb-profile-detail-label">
-              <Icons.Room /> Room
-            </span>
+            <span className="cb-profile-detail-label"><Icons.Room /> Room</span>
             <span className="cb-profile-detail-value">
               {profile.room_number ? `Room ${profile.room_number}` : "Not assigned"}
             </span>
           </div>
-
           <div className="cb-profile-detail-row">
-            <span className="cb-profile-detail-label">
-              <Icons.Calendar /> Move-in Date
-            </span>
-            <span className="cb-profile-detail-value">
-              {formatDate(profile.move_in_date)}
-            </span>
+            <span className="cb-profile-detail-label"><Icons.Calendar /> Move-in Date</span>
+            <span className="cb-profile-detail-value">{formatDate(profile.move_in_date)}</span>
           </div>
-
           <div className="cb-profile-detail-row">
-            <span className="cb-profile-detail-label">
-              <Icons.Calendar /> Member Since
-            </span>
-            <span className="cb-profile-detail-value">
-              {formatDate(profile.created_at)}
-            </span>
+            <span className="cb-profile-detail-label"><Icons.Calendar /> Member Since</span>
+            <span className="cb-profile-detail-value">{formatDate(profile.created_at)}</span>
           </div>
         </div>
 
@@ -850,29 +902,33 @@ function ProfilePage() {
    PORTAL SHELL (authenticated layout)
 ───────────────────────────────────────────── */
 const navItems = [
-  { id: "dashboard", label: "Dashboard", Icon: Icons.Home },
-  { id: "bills", label: "My Bills", Icon: Icons.Bills },
-  { id: "meters", label: "Meter Readings", Icon: Icons.Meter },
-  { id: "profile", label: "Profile", Icon: Icons.Profile },
+  { id: "dashboard", label: "Dashboard",      Icon: Icons.Home    },
+  { id: "bills",     label: "My Bills",        Icon: Icons.Bills   },
+  { id: "meters",    label: "Meter Readings",  Icon: Icons.Meter   },
+  { id: "profile",   label: "Profile",         Icon: Icons.Profile },
 ];
 
 function PortalShell({ tenant, onLogout }) {
   const [activePage, setActivePage] = useState("dashboard");
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen,   setMenuOpen]   = useState(false);
 
   const handleLogout = () => {
-    clearAuth();
+    clearAuth();   // Only clears taripa_client_token / taripa_client_tenant
     onLogout();
   };
 
   return (
     <div className="cb-shell">
+
       {/* ── SIDEBAR ── */}
       <aside className={`cb-sidebar ${menuOpen ? "cb-sidebar-open" : ""}`}>
+
         {/* Brand */}
         <div className="cb-sidebar-brand">
           <div className="cb-sidebar-brand-mark">
-            <Icons.Meter />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
           </div>
           <div className="cb-sidebar-brand-text">
             <strong>TARIPA</strong>
@@ -887,7 +943,7 @@ function PortalShell({ tenant, onLogout }) {
           </div>
           <div className="cb-sidebar-tenant-info">
             <strong>{tenant.full_name}</strong>
-            <span>Room {tenant.room_number}</span>
+            <span>{tenant.room_number ? `Room ${tenant.room_number}` : "No room assigned"}</span>
           </div>
         </div>
 
@@ -923,6 +979,7 @@ function PortalShell({ tenant, onLogout }) {
 
       {/* ── MAIN AREA ── */}
       <div className="cb-main">
+
         {/* Mobile top bar */}
         <header className="cb-topbar">
           <button
@@ -931,14 +988,12 @@ function PortalShell({ tenant, onLogout }) {
             onClick={() => setMenuOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
+            <Icons.Menu />
           </button>
           <div className="cb-topbar-brand">
-            <Icons.Meter />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
             <strong>TARIPA</strong>
           </div>
           <div className="cb-topbar-right">
@@ -951,9 +1006,9 @@ function PortalShell({ tenant, onLogout }) {
         {/* Page content */}
         <main className="cb-content">
           {activePage === "dashboard" && <DashboardPage />}
-          {activePage === "bills" && <BillsPage />}
-          {activePage === "meters" && <MeterReadingsPage />}
-          {activePage === "profile" && <ProfilePage />}
+          {activePage === "bills"     && <BillsPage />}
+          {activePage === "meters"    && <MeterReadingsPage />}
+          {activePage === "profile"   && <ProfilePage />}
         </main>
       </div>
     </div>
@@ -962,43 +1017,136 @@ function PortalShell({ tenant, onLogout }) {
 
 /* ─────────────────────────────────────────────
    ROOT CLIENT APP
+   Auth flow:
+     1. On mount, if a token exists in localStorage,
+        validate it server-side via GET /api/client/me.
+     2. If valid → enter the portal with the fresh profile.
+     3. If invalid/expired → clear auth and show login.
+     4. If no token → show login immediately.
 ───────────────────────────────────────────── */
 export default function ClientApp() {
-  const [tenant, setTenant] = useState(() => {
-    // Check if we have a stored session
-    const token = getToken();
+  // "validating" = we have a stored token and are checking it
+  // "authenticated" = token validated, portal shown
+  // "unauthenticated" = no valid token, login shown
+  const [authState, setAuthState] = useState("init"); // "init" | "validating" | "authenticated" | "unauthenticated"
+  const [tenant,    setTenant]    = useState(null);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => { isMounted.current = false; };
+  }, []);
+
+  useEffect(() => {
+    const token       = getToken();
     const storedTenant = getTenant();
-    if (token && storedTenant) return storedTenant;
-    return null;
-  });
 
-  // If path is /client/login and already logged in → redirect to /client
-  useEffect(() => {
-    if (tenant && window.location.pathname === "/client/login") {
-      window.history.replaceState(null, "", "/client");
+    if (!token) {
+      // No token at all — show login immediately
+      setAuthState("unauthenticated");
+      if (window.location.pathname !== "/client/login") {
+        window.history.replaceState(null, "", "/client/login");
+      }
+      return;
     }
-  }, [tenant]);
 
-  // If not logged in and on /client (not /client/login), update URL
-  useEffect(() => {
-    if (!tenant && window.location.pathname !== "/client/login") {
-      window.history.replaceState(null, "", "/client/login");
-    }
-  }, [tenant]);
+    // We have a stored token — validate it server-side
+    setAuthState("validating");
+
+    (async () => {
+      try {
+        const res = await fetch("/api/client/me", {
+          headers: {
+            "Content-Type":  "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (!isMounted.current) return;
+
+        if (res.status === 401) {
+          // Token expired or invalid
+          clearAuth();
+          setAuthState("unauthenticated");
+          window.history.replaceState(null, "", "/client/login");
+          return;
+        }
+
+        if (!res.ok) {
+          // Server error — use cached tenant so portal still works
+          // (individual pages will handle their own retry)
+          if (storedTenant) {
+            setTenant(storedTenant);
+            setAuthState("authenticated");
+            if (window.location.pathname === "/client/login") {
+              window.history.replaceState(null, "", "/client");
+            }
+          } else {
+            clearAuth();
+            setAuthState("unauthenticated");
+            window.history.replaceState(null, "", "/client/login");
+          }
+          return;
+        }
+
+        const json = await res.json();
+        if (!json.success) {
+          clearAuth();
+          setAuthState("unauthenticated");
+          window.history.replaceState(null, "", "/client/login");
+          return;
+        }
+
+        // Merge fresh profile data with stored tenant
+        const freshTenant = { ...(storedTenant || {}), ...json.data };
+        saveAuth(token, freshTenant);
+        setTenant(freshTenant);
+        setAuthState("authenticated");
+        if (window.location.pathname === "/client/login") {
+          window.history.replaceState(null, "", "/client");
+        }
+      } catch {
+        // Network error — fall back to stored tenant if available
+        if (!isMounted.current) return;
+        if (storedTenant) {
+          setTenant(storedTenant);
+          setAuthState("authenticated");
+          if (window.location.pathname === "/client/login") {
+            window.history.replaceState(null, "", "/client");
+          }
+        } else {
+          setAuthState("unauthenticated");
+          window.history.replaceState(null, "", "/client/login");
+        }
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = (tenantData) => {
     setTenant(tenantData);
+    setAuthState("authenticated");
     window.history.replaceState(null, "", "/client");
   };
 
   const handleLogout = () => {
+    // clearAuth() is already called inside PortalShell handleLogout
     setTenant(null);
+    setAuthState("unauthenticated");
     window.history.replaceState(null, "", "/client/login");
   };
 
-  if (!tenant) {
-    return <LoginPage onLogin={handleLogin} />;
+  // Brief init — waiting for JS to parse localStorage before deciding
+  if (authState === "init") return null;
+
+  // Validating stored token against the server
+  if (authState === "validating") return <SessionInitScreen />;
+
+  // Show portal if authenticated
+  if (authState === "authenticated" && tenant) {
+    return <PortalShell tenant={tenant} onLogout={handleLogout} />;
   }
 
-  return <PortalShell tenant={tenant} onLogout={handleLogout} />;
+  // Default: show login
+  return <LoginPage onLogin={handleLogin} />;
 }

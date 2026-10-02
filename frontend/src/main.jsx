@@ -6,8 +6,10 @@ import ClientApp from "./ClientApp.jsx";
 
 const path = window.location.pathname;
 
+// Route /client and any /client/* subpath to the ClientApp.
+// Everything else goes to the Admin App.
 const RootApp =
-  path === "/client" || path === "/client/login"
+  path === "/client" || path.startsWith("/client/")
     ? ClientApp
     : App;
 
