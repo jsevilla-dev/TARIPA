@@ -32,7 +32,7 @@ const saveAdminAuth = (token, admin) => {
 };
 
 /**
- * authFetch â€” drop-in replacement for fetch() that attaches
+ * authFetch — drop-in replacement for fetch() that attaches
  * the admin Bearer token to every request. If the server
  * responds 401 (expired / revoked token), clears auth and
  * reloads so the login screen appears.
@@ -283,7 +283,7 @@ function AdminLogin({ onLoginSuccess }) {
             {loading ? (
               <>
                 <span className="admin-login-spinner" />
-                Signing inâ€¦
+                Signing in…
               </>
             ) : (
               "Sign In"
@@ -292,7 +292,7 @@ function AdminLogin({ onLoginSuccess }) {
         </form>
 
         <p className="admin-login-note">
-          TARIPA Â· Residential Utility Tracking & Billing System
+          TARIPA · Residential Utility Tracking & Billing System
         </p>
       </div>
     </div>
@@ -521,7 +521,7 @@ function Dashboard({ onNavigate }) {
   }, []);
 
   const formatMonth = (dateStr) => {
-    if (!dateStr) return "â€”";
+    if (!dateStr) return "—";
     const d = new Date(dateStr);
     return d.toLocaleDateString("en-PH", { year: "numeric", month: "short" });
   };
@@ -530,35 +530,35 @@ function Dashboard({ onNavigate }) {
   const kpis = [
     {
       label: "Active Tenants",
-      value: dashboardData?.total_tenants ?? "â€”",
+      value: dashboardData?.total_tenants ?? "—",
       sub: "Registered residents",
       Icon: Icons.Tenants,
       accent: "kpi-indigo",
     },
     {
       label: "Total Rooms",
-      value: dashboardData?.total_rooms ?? "â€”",
+      value: dashboardData?.total_rooms ?? "—",
       sub: `${dashboardData?.available_rooms ?? 0} available`,
       Icon: Icons.Rooms,
       accent: "kpi-blue",
     },
     {
       label: "Available Rooms",
-      value: dashboardData?.available_rooms ?? "â€”",
+      value: dashboardData?.available_rooms ?? "—",
       sub: "Ready for occupancy",
       Icon: Icons.Rooms,
       accent: "kpi-success",
     },
     {
       label: "Pending Bills",
-      value: dashboardData?.pending_bills ?? "â€”",
+      value: dashboardData?.pending_bills ?? "—",
       sub: "Awaiting payment",
       Icon: Icons.Billing,
       accent: "kpi-warning",
     },
     {
       label: "Outstanding",
-      value: dashboardData !== null ? formatCurrency(dashboardData.outstanding_amount) : "â€”",
+      value: dashboardData !== null ? formatCurrency(dashboardData.outstanding_amount) : "—",
       sub: "Pending & overdue",
       Icon: Icons.Rates,
       accent: "kpi-danger",
@@ -583,7 +583,7 @@ function Dashboard({ onNavigate }) {
           <p className="eyebrow">ADMIN WORKSPACE</p>
           <h1 className="dash-heading">Welcome to TARIPA</h1>
           <p className="dash-subheading">
-            Residential utility tracking and billing â€” manage tenants, meter readings, and billing records from one place.
+            Residential utility tracking and billing — manage tenants, meter readings, and billing records from one place.
           </p>
         </div>
         <div className="dash-header-emblem" aria-hidden="true">
@@ -628,7 +628,7 @@ function Dashboard({ onNavigate }) {
           {dashboardData === null ? (
             <div className="dash-panel-loading">
               <div className="loading-spinner" />
-              <span>Loadingâ€¦</span>
+              <span>Loading…</span>
             </div>
           ) : (
             <div className="dash-billing-stats">
@@ -646,7 +646,7 @@ function Dashboard({ onNavigate }) {
                 <strong className="dash-bs-value">
                   {dashboardData.total_rooms > 0
                     ? `${Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)}%`
-                    : "â€”"}
+                    : "—"}
                 </strong>
                 <span className="dash-bs-detail">
                   {dashboardData.total_rooms - dashboardData.available_rooms} of {dashboardData.total_rooms} rooms occupied
@@ -702,7 +702,7 @@ function Dashboard({ onNavigate }) {
         {recentMeters === null ? (
           <div className="dash-panel-loading">
             <div className="loading-spinner" />
-            <span>Loading readingsâ€¦</span>
+            <span>Loading readings…</span>
           </div>
         ) : recentMeters.length === 0 ? (
           <div className="empty-state" style={{ padding: "36px 24px" }}>
@@ -741,7 +741,7 @@ function Dashboard({ onNavigate }) {
                         <span>{r.full_name}</span>
                       </div>
                     </td>
-                    <td className="dash-cell-muted">{r.room_number ?? "â€”"}</td>
+                    <td className="dash-cell-muted">{r.room_number ?? "—"}</td>
                     <td className="dash-cell-muted">{formatMonth(r.billing_month)}</td>
                     <td>
                       <span className="dash-reading-chip dash-electric-chip">
@@ -750,7 +750,7 @@ function Dashboard({ onNavigate }) {
                     </td>
                     <td>
                       <span className="dash-reading-chip dash-water-chip">
-                        {Number(r.water_consumption).toFixed(1)} mÂ³
+                        {Number(r.water_consumption).toFixed(1)} m³
                       </span>
                     </td>
                   </tr>
@@ -776,7 +776,7 @@ function Dashboard({ onNavigate }) {
         {recentBills === null ? (
           <div className="dash-panel-loading">
             <div className="loading-spinner" />
-            <span>Loading recordsâ€¦</span>
+            <span>Loading records…</span>
           </div>
         ) : recentBills.length === 0 ? (
           <div className="empty-state" style={{ padding: "36px 24px" }}>
@@ -805,7 +805,7 @@ function Dashboard({ onNavigate }) {
                         <span>{b.full_name}</span>
                       </div>
                     </td>
-                    <td className="dash-cell-muted">{b.room_number ?? "â€”"}</td>
+                    <td className="dash-cell-muted">{b.room_number ?? "—"}</td>
                     <td className="dash-cell-muted">{formatMonth(b.billing_month)}</td>
                     <td><strong>{formatCurrency(b.total_amount)}</strong></td>
                     <td><StatusBadge status={b.status} /></td>
@@ -963,7 +963,7 @@ function TenantsPage() {
                     const isFull = Number(room.occupied_count) >= Number(room.capacity) && !isCurrentRoom;
                     return (
                       <option key={room.id} value={room.id} disabled={isFull}>
-                        Room {room.room_number} â€” {room.occupied_count}/{room.capacity}{isFull ? " (Full)" : ""}
+                        Room {room.room_number} — {room.occupied_count}/{room.capacity}{isFull ? " (Full)" : ""}
                       </option>
                     );
                   })}
@@ -998,7 +998,7 @@ function TenantsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Savingâ€¦" : editingTenant ? "Update Tenant" : "Save Tenant"}
+                {isSubmitting ? "Saving…" : editingTenant ? "Update Tenant" : "Save Tenant"}
               </button>
             </div>
           </form>
@@ -1158,7 +1158,7 @@ function RoomsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Savingâ€¦" : "Save Room"}
+                {isSubmitting ? "Saving…" : "Save Room"}
               </button>
             </div>
           </form>
@@ -1390,7 +1390,7 @@ function MeterReadingsPage() {
                   <option value="">Select active tenant</option>
                   {tenants.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.full_name}{t.room_number ? ` â€” Room ${t.room_number}` : ""}
+                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
@@ -1445,7 +1445,7 @@ function MeterReadingsPage() {
                 </span>
                 {waterConsumption !== null && !Number.isNaN(waterConsumption) && (
                   <span className="consumption-preview">
-                    {waterConsumption.toFixed(3)} mÂ³ consumed
+                    {waterConsumption.toFixed(3)} m³ consumed
                   </span>
                 )}
               </div>
@@ -1467,7 +1467,7 @@ function MeterReadingsPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Savingâ€¦" : editingReading ? "Update Reading" : "Save Reading"}
+                {isSubmitting ? "Saving…" : editingReading ? "Update Reading" : "Save Reading"}
               </button>
             </div>
           </form>
@@ -1505,7 +1505,7 @@ function MeterReadingsPage() {
                   <span className="meta-label">
                     <Icons.Water /> WATER
                   </span>
-                  <strong className="meta-value">{Number(reading.water_consumption).toFixed(3)} mÂ³</strong>
+                  <strong className="meta-value">{Number(reading.water_consumption).toFixed(3)} m³</strong>
                 </div>
                 <div className="meta-actions">
                   <button type="button" className="btn-edit" onClick={() => openEditForm(reading)}>
@@ -1657,7 +1657,7 @@ function UtilityRatesPage() {
                 </select>
               </label>
               <label className="field">
-                <span className="field-label">RATE PER UNIT (â‚±) <span className="required">*</span></span>
+                <span className="field-label">RATE PER UNIT (₱) <span className="required">*</span></span>
                 <input type="number" name="rate_per_unit" value={formData.rate_per_unit} onChange={handleChange} min="0" step="0.01" placeholder="Enter rate" className="field-input" />
               </label>
               <label className="field">
@@ -1677,7 +1677,7 @@ function UtilityRatesPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Savingâ€¦" : editingRate ? "Save Changes" : "Add Rate"}
+                {isSubmitting ? "Saving…" : editingRate ? "Save Changes" : "Add Rate"}
               </button>
             </div>
           </form>
@@ -1873,7 +1873,7 @@ function BillingPage() {
                   <option value="">Select active tenant</option>
                   {tenants.map((t) => (
                     <option key={t.id} value={t.id}>
-                      {t.full_name}{t.room_number ? ` â€” Room ${t.room_number}` : ""}
+                      {t.full_name}{t.room_number ? ` — Room ${t.room_number}` : ""}
                     </option>
                   ))}
                 </select>
@@ -1895,7 +1895,7 @@ function BillingPage() {
             <div className="form-actions">
               <button type="button" className="btn-secondary" onClick={closeForm}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
-                {isSubmitting ? "Generatingâ€¦" : "Generate Bill"}
+                {isSubmitting ? "Generating…" : "Generate Bill"}
               </button>
             </div>
           </form>
@@ -2126,7 +2126,7 @@ function ReportsPage() {
         <div className="report-summary-card summary-water">
           <span className="report-summary-label"><Icons.Water /> WATER</span>
           <strong className="report-summary-value">{totalWater.toFixed(3)}</strong>
-          <small>mÂ³ consumption</small>
+          <small>m³ consumption</small>
         </div>
       </div>
 
@@ -2158,7 +2158,7 @@ function ReportsPage() {
         {loading ? (
           <div className="empty-state loading-state">
             <div className="loading-spinner" />
-            <h3>Loading reportsâ€¦</h3>
+            <h3>Loading reports…</h3>
             <p>Retrieving billing records from the database.</p>
           </div>
         ) : filteredReports.length === 0 ? (
