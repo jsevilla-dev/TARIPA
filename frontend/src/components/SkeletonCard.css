@@ -1,0 +1,39 @@
+﻿.skeleton-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.skeleton-card-line {
+    height: 12px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    animation: skeleton-card-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-card-line-title {
+    width: 42%;
+}
+
+.skeleton-card-line-value {
+    width: 68%;
+    height: 28px;
+    margin-top: 14px;
+}
+
+.skeleton-card-line-meta {
+    width: 52%;
+    margin-top: 14px;
+}
+
+@keyframes skeleton-card-pulse {
+    0%,
+    100% {
+        opacity: 0.55;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

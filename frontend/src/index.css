@@ -8,33 +8,79 @@
     "Segoe UI",
     sans-serif;
 
-  /* ── Color tokens ── */
-  --color-primary:       #6C6FEF;
-  --color-primary-dark:  #5D61E6;
-  --color-primary-light: #EEF0FF;
+  /* ── Color tokens — TARIPA Design System V1 ── */
+
+  /* Primary */
+  --color-primary:       #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-light: #EEF2FF;
   --color-primary-faint: #F5F6FF;
+  --color-primary-dark:  #3730A3;
 
-  --color-bg:      #F5F6FA;
-  --color-surface: #ffffff;
+  /* Surfaces */
+  --color-bg:            #F8FAFC;
+  --color-surface:       #FFFFFF;
+  --color-surface-muted: #F1F5F9;
 
-  --color-text-main:      #202431;
-  --color-text-secondary: #6F7485;
-  --color-text-muted:     #969BAB;
+  /* Text */
+  --color-text-main:      #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted:     #64748B;
 
-  --color-border: #E8E9F0;
+  /* Borders */
+  --color-border:        #E2E8F0;
+  --color-border-strong: #CBD5E1;
 
-  --color-success: #50C878;
-  --color-warning: #F5AD3D;
-  --color-danger:  #FF625F;
-  --color-info:    #5D8DEF;
+  /* Semantic */
+  --color-success:       #16A34A;
+  --color-success-light: #DCFCE7;
+  --color-warning:       #D97706;
+  --color-warning-light: #FEF3C7;
+  --color-danger:        #DC2626;
+  --color-danger-light:  #FEE2E2;
+  --color-info:          #2563EB;
+  --color-info-light:    #DBEAFE;
 
+  /* Utility — electricity/water (preserved for App.css consumers) */
   --color-electric: #FFB52E;
   --color-water:    #6575F5;
 
-  /* ── Shadows ── */
-  --shadow-card:  0 8px 24px rgba(50, 55, 90, 0.08);
-  --shadow-hover: 0 10px 28px rgba(50, 55, 90, 0.10);
-  --shadow-sm:    0 4px 12px rgba(50, 55, 90, 0.06);
+  /* ── Typography ── */
+  --font-weight-body:    400;
+  --font-weight-label:   500;
+  --font-weight-button:  600;
+  --font-weight-heading: 700;
+  --font-weight-brand:   800;
+
+  /* ── Spacing — 4px scale ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border radius ── */
+  --radius-sm:      6px;
+  --radius-control: 8px;
+  --radius-card:    12px;
+  --radius-modal:   16px;
+  --radius-pill:    9999px;
+
+  /* ── Shadows — subtle enterprise style ── */
+  --shadow-sm:    0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-card:  0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.10);
+  --shadow-modal: 0 20px 60px rgba(15, 23, 42, 0.12);
+
+  /* ── Transitions ── */
+  --transition-fast:   150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow:   250ms ease;
 
   color: var(--color-text-main);
   background: var(--color-bg);
@@ -62,11 +108,12 @@ body {
   min-height: 100vh;
   background: var(--color-bg);
   color: var(--color-text-main);
+  font-weight: var(--font-weight-body);
   letter-spacing: -0.005em;
   line-height: 1.5;
 }
 
-/* ── Reset ── */
+/* ── Element resets ── */
 button,
 input,
 select,
@@ -85,6 +132,7 @@ p {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
+  font-weight: var(--font-weight-heading);
   line-height: 1.2;
 }
 

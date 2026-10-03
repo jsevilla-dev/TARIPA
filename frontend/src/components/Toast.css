@@ -1,0 +1,155 @@
+/* ═══════════════════════════════════════════════════════
+   TOAST — TARIPA Design System V1
+   Uses spec tokens directly (CSS variables not available
+   in components until App.css/ClientApp.css loads, so we
+   inline the values to guarantee correctness in both apps).
+═══════════════════════════════════════════════════════ */
+
+/* ── Fixed region — bottom-right on desktop ── */
+.toast-region {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Pointer events only on individual items, not the gap */
+  pointer-events: none;
+  max-width: min(400px, calc(100vw - 48px));
+}
+
+/* ── Base toast card ── */
+.toast-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;              /* --radius-card */
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10); /* --shadow-hover */
+  pointer-events: all;
+  width: 100%;
+  animation: toast-enter 180ms ease-out forwards;
+}
+
+.toast-exiting {
+  animation: toast-exit 220ms ease-in forwards;
+}
+
+/* ── Left-border accent per variant ── */
+.toast-success { border-left: 3px solid #16A34A; }
+.toast-error   { border-left: 3px solid #DC2626; }
+.toast-warning { border-left: 3px solid #D97706; }
+.toast-info    { border-left: 3px solid #2563EB; }
+
+/* ── Icon container ── */
+.toast-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;               /* --radius-control */
+  flex-shrink: 0;
+}
+
+.toast-success .toast-icon { background: #DCFCE7; color: #16A34A; }
+.toast-error   .toast-icon { background: #FEE2E2; color: #DC2626; }
+.toast-warning .toast-icon { background: #FEF3C7; color: #D97706; }
+.toast-info    .toast-icon { background: #DBEAFE; color: #2563EB; }
+
+/* ── Message text ── */
+.toast-message {
+  flex: 1;
+  margin: 0;
+  padding-top: 4px;                 /* optical align with icon */
+  font-size: 13.5px;
+  font-weight: 500;                 /* --font-weight-label */
+  color: #0F172A;                   /* --color-text-main */
+  line-height: 1.5;
+}
+
+/* ── Dismiss button ── */
+.toast-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #64748B;                   /* --color-text-muted */
+  border-radius: 6px;               /* --radius-sm */
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,   /* --transition-fast */
+    color 150ms ease;
+}
+
+.toast-close:hover {
+  background: #F1F5F9;             /* --color-surface-muted */
+  color: #0F172A;
+}
+
+.toast-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* ── Entrance animation — slides in from the right ── */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Exit animation — slides back out to the right ── */
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+/* ── Mobile: full-width, slides up from bottom ── */
+@media (max-width: 480px) {
+  .toast-region {
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: 100%;
+  }
+
+  @keyframes toast-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toast-exit {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+}
