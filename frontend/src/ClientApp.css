@@ -10,10 +10,10 @@
 /* ── Color tokens ── */
 :root {
   /* Primary — indigo to match admin */
-  --cb-primary:        #6C6FEF;
-  --cb-primary-dark:   #5D61E6;
-  --cb-primary-light:  #EEF0FF;
-  --cb-primary-faint:  #F5F6FF;
+  --cb-primary:        #3F72AF;
+  --cb-primary-dark:   #112D4E;
+  --cb-primary-light:  #DBE2EF;
+  --cb-primary-faint:  #F9F7F7;
 
   /* Accent utilities */
   --cb-electric:       #F59E0B;
@@ -24,14 +24,14 @@
   --cb-water-dark:     #1D4ED8;
 
   /* Surfaces */
-  --cb-bg:             #F5F6FA;
+  --cb-bg:             #F9F7F7;
   --cb-surface:        #FFFFFF;
-  --cb-border:         #E8E9F0;
+  --cb-border:         #DBE2EF;
 
   /* Text */
-  --cb-text-main:      #202431;
-  --cb-text-secondary: #6F7485;
-  --cb-text-muted:     #969BAB;
+  --cb-text-main:      #112D4E;
+  --cb-text-secondary: #536273;
+  --cb-text-muted:     #718096;
 
   /* Status */
   --cb-success:        #239A52;
@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #F5F6FA 0%, #ECEEFF 100%);
+  background: linear-gradient(135deg, #F9F7F7 0%, #DBE2EF 100%);
   padding: 24px;
 }
 
@@ -195,7 +195,7 @@
 }
 
 .cb-field-input::placeholder { color: var(--cb-text-muted); }
-.cb-field-input:hover         { border-color: #c8caff; background: #fff; }
+.cb-field-input:hover         { border-color: #DBE2EF; background: #fff; }
 .cb-field-input:focus         { border-color: var(--cb-primary); background: #fff; box-shadow: 0 0 0 3px rgba(108,111,239,0.12); }
 .cb-field-input:disabled      { opacity: 0.6; cursor: not-allowed; }
 
@@ -597,7 +597,7 @@
    DASHBOARD HERO
 ═══════════════════════════════════════════════════════ */
 .cb-dashboard-hero {
-  background: linear-gradient(135deg, #5D61E6 0%, #4550D8 60%, #3B44C8 100%);
+  background: linear-gradient(135deg, #112D4E 0%, #3F72AF 60%, #112D4E 100%);
   border-radius: 18px;
   padding: 32px 36px;
   display: flex;
@@ -815,11 +815,11 @@
 }
 
 .cb-badge-active   { background: #E8F8EE; color: #239A52; }
-.cb-badge-inactive { background: #F0F1F5; color: #6F7485; }
+.cb-badge-inactive { background: #F0F1F5; color: #536273; }
 .cb-badge-paid     { background: #E8F8EE; color: #239A52; }
 .cb-badge-pending  { background: #FFF7E6; color: #C07B00; }
 .cb-badge-overdue  { background: #FFF0F0; color: #D63E3B; }
-.cb-badge-default  { background: #F0F1F5; color: #6F7485; }
+.cb-badge-default  { background: #F0F1F5; color: #536273; }
 
 /* ═══════════════════════════════════════════════════════
    BILLS — Accordion cards (mobile-first)

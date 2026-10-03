@@ -8,27 +8,27 @@
     "Segoe UI",
     sans-serif;
 
-  /* ── Color tokens — TARIPA Design System V1 ── */
+  /* TARIPA color tokens */
 
-  /* Primary */
-  --color-primary:       #4F46E5;
-  --color-primary-hover: #4338CA;
-  --color-primary-light: #EEF2FF;
-  --color-primary-faint: #F5F6FF;
-  --color-primary-dark:  #3730A3;
+  /* Brand */
+  --color-primary:       #3F72AF;
+  --color-primary-hover: #112D4E;
+  --color-primary-light: #DBE2EF;
+  --color-primary-faint: #F9F7F7;
+  --color-primary-dark:  #112D4E;
 
   /* Surfaces */
-  --color-bg:            #F8FAFC;
+  --color-bg:            #F9F7F7;
   --color-surface:       #FFFFFF;
-  --color-surface-muted: #F1F5F9;
+  --color-surface-muted: #DBE2EF;
 
   /* Text */
-  --color-text-main:      #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-muted:     #64748B;
+  --color-text-main:      #112D4E;
+  --color-text-secondary: #536273;
+  --color-text-muted:     #718096;
 
   /* Borders */
-  --color-border:        #E2E8F0;
+  --color-border:        #DBE2EF;
   --color-border-strong: #CBD5E1;
 
   /* Semantic */
@@ -41,54 +41,8 @@
   --color-info:          #2563EB;
   --color-info-light:    #DBEAFE;
 
-  /* Utility — electricity/water (preserved for App.css consumers) */
+  /* Utility */
   --color-electric: #FFB52E;
-  --color-water:    #6575F5;
-
-  /* ── Typography ── */
-  --font-weight-body:    400;
-  --font-weight-label:   500;
-  --font-weight-button:  600;
-  --font-weight-heading: 700;
-  --font-weight-brand:   800;
-
-  /* ── Spacing — 4px scale ── */
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-
-  /* ── Border radius ── */
-  --radius-sm:      6px;
-  --radius-control: 8px;
-  --radius-card:    12px;
-  --radius-modal:   16px;
-  --radius-pill:    9999px;
-
-  /* ── Shadows — subtle enterprise style ── */
-  --shadow-sm:    0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-card:  0 4px 12px rgba(15, 23, 42, 0.06);
-  --shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.10);
-  --shadow-modal: 0 20px 60px rgba(15, 23, 42, 0.12);
-
-  /* ── Transitions ── */
-  --transition-fast:   150ms ease;
-  --transition-normal: 200ms ease;
-  --transition-slow:   250ms ease;
-
-  color: var(--color-text-main);
-  background: var(--color-bg);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 *,
