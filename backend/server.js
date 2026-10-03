@@ -1,5 +1,6 @@
+﻿const path = require("path");
 require("dotenv").config({
-    path: "../.env",
+    path: path.resolve(__dirname, "../.env"),
 });
 
 const express = require("express");
@@ -21,17 +22,17 @@ const PORT = 5000;
 
 app.use(express.json());
 
-// ── Admin Auth (login — public endpoint) ──
+// â”€â”€ Admin Auth (login â€” public endpoint) â”€â”€
 app.use("/api/admin", adminAuthRouter);
 
-// ── Admin-protected CRUD routes ──
+// â”€â”€ Admin-protected CRUD routes â”€â”€
 app.use("/api/rooms",          adminAuth, roomsRouter);
 app.use("/api/tenants",        adminAuth, tenantsRouter);
 app.use("/api/utility-rates",  adminAuth, utilityRatesRouter);
 app.use("/api/meter-readings", adminAuth, meterReadingsRouter);
 app.use("/api/billing",        adminAuth, billingRouter);
 
-// ── Client / Tenant Portal (unchanged) ──
+// â”€â”€ Client / Tenant Portal (unchanged) â”€â”€
 app.use("/api/client", clientAuthRouter);
 app.use("/api/client", clientAuth, clientPortalRouter);
 

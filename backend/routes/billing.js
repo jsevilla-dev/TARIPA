@@ -13,6 +13,7 @@ router.get("/", async (req, res) => {
                 b.id,
                 b.tenant_id,
                 t.full_name,
+                t.room_id,
                 r.room_number,
                 DATE_FORMAT(b.billing_month, '%Y-%m-%d') AS billing_month,
                 b.electricity_consumption,

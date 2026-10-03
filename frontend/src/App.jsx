@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import "./App.css";
+import { useToast } from "./components/Toast.jsx";
+import ConfirmDialog from "./components/ConfirmDialog.jsx";
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    HELPERS
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-PH", {
     style: "currency",
@@ -12,9 +14,9 @@ const formatCurrency = (value) =>
     maximumFractionDigits: 2,
   }).format(Number(value || 0));
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    ADMIN AUTH HELPERS
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 const ADMIN_TOKEN_KEY = "taripa_admin_token";
 const ADMIN_USER_KEY  = "taripa_admin_user";
 
@@ -54,9 +56,9 @@ const authFetch = async (url, options = {}) => {
   return response;
 };
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    SVG ICONS
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 const Icons = {
   Dashboard: () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -181,9 +183,9 @@ const navigationItems = [
   { id: "reports", label: "Reports", Icon: Icons.Reports },
 ];
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    ADMIN LOGIN COMPONENT
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -299,17 +301,19 @@ function AdminLogin({ onLoginSuccess }) {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    APP SHELL
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function App() {
-  // â”€â”€ Admin auth state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+	const { showToast } = useToast();
+  // ── Admin auth state ──────────────────────
   const [adminToken, setAdminToken] = useState(() => getAdminToken());
   const [adminUser,  setAdminUser]  = useState(() => getAdminUser());
 
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const handleLoginSuccess = useCallback((token, admin) => {
     setAdminToken(token);
@@ -339,7 +343,7 @@ function App() {
       });
   }, [adminToken]);
 
-  // â”€â”€ Auth gate: show login if no token â”€â”€â”€â”€â”€
+  // ── Auth gate: show login if no token ─────
   if (!adminToken) {
     return <AdminLogin onLoginSuccess={handleLoginSuccess} />;
   }
@@ -348,12 +352,18 @@ function App() {
 
   return (
     <div className="app-shell">
-      {/* â”€â”€ SIDEBAR â”€â”€ */}
-      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
+      {/* ── SIDEBAR ── */}
+      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""} ${mobileSidebarOpen ? "mobile-open" : ""}`}>
         <button
           type="button"
           className="sidebar-toggle"
-          onClick={() => setSidebarCollapsed((c) => !c)}
+          onClick={() => {
+          if (window.innerWidth <= 768) {
+            setMobileSidebarOpen((open) => !open);
+            return;
+          }
+          setSidebarCollapsed((c) => !c);
+        }}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
@@ -424,7 +434,8 @@ function App() {
         </div>
       </aside>
 
-      {/* â”€â”€ MAIN CONTENT â”€â”€ */}
+
+      {/* ── MAIN CONTENT ── */}
       <main className="main-content">
         {activePage === "dashboard" ? (
           <Dashboard onNavigate={setActivePage} />
@@ -446,9 +457,9 @@ function App() {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    PAGE HEADER (reusable)
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function PageHeader({ eyebrow, title, description, action }) {
   return (
     <div className="page-header">
@@ -462,9 +473,9 @@ function PageHeader({ eyebrow, title, description, action }) {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    EMPTY STATE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function EmptyState({ icon, title, description }) {
   return (
     <div className="empty-state">
@@ -475,9 +486,9 @@ function EmptyState({ icon, title, description }) {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    STATUS BADGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function StatusBadge({ status }) {
   const map = {
     Active: "badge-active",
@@ -495,9 +506,9 @@ function StatusBadge({ status }) {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    DASHBOARD
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function Dashboard({ onNavigate }) {
   const [dashboardData, setDashboardData] = useState(null);
   const [recentMeters, setRecentMeters] = useState(null);   // null = loading, [] = empty
@@ -526,7 +537,7 @@ function Dashboard({ onNavigate }) {
     return d.toLocaleDateString("en-PH", { year: "numeric", month: "short" });
   };
 
-  /* â”€â”€ KPI definitions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── KPI definitions ──────────────────────────── */
   const kpis = [
     {
       label: "Active Tenants",
@@ -566,7 +577,7 @@ function Dashboard({ onNavigate }) {
     },
   ];
 
-  /* â”€â”€ Quick actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+  /* ── Quick actions ────────────────────────────── */
   const quickActions = [
     { label: "Add Meter Reading", Icon: Icons.Meters,  page: "meters",  accent: "qa-electric" },
     { label: "Add Tenant",        Icon: Icons.Tenants, page: "tenants", accent: "qa-indigo"   },
@@ -577,7 +588,7 @@ function Dashboard({ onNavigate }) {
   return (
     <div className="page-wrap dashboard-page">
 
-      {/* â”€â”€ 1. WORKSPACE HEADER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── 1. WORKSPACE HEADER ────────────────────── */}
       <div className="dash-header">
         <div className="dash-header-body">
           <p className="eyebrow">ADMIN WORKSPACE</p>
@@ -593,7 +604,7 @@ function Dashboard({ onNavigate }) {
         </div>
       </div>
 
-      {/* â”€â”€ 2. KPI CARDS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── 2. KPI CARDS ───────────────────────────── */}
       <div className="dash-kpi-grid">
         {kpis.map((k) => (
           <div className={`dash-kpi-card ${k.accent}`} key={k.label}>
@@ -613,7 +624,7 @@ function Dashboard({ onNavigate }) {
         ))}
       </div>
 
-      {/* â”€â”€ 3. BILLING OVERVIEW + QUICK ACTIONS row â”€â”€ */}
+      {/* ── 3. BILLING OVERVIEW + QUICK ACTIONS row ── */}
       <div className="dash-mid-row">
 
         {/* Billing Overview */}
@@ -687,7 +698,7 @@ function Dashboard({ onNavigate }) {
         </section>
       </div>
 
-      {/* â”€â”€ 4. RECENT METER READINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── 4. RECENT METER READINGS ───────────────── */}
       <section className="dash-panel">
         <div className="dash-panel-header">
           <div>
@@ -761,7 +772,7 @@ function Dashboard({ onNavigate }) {
         )}
       </section>
 
-      {/* â”€â”€ 5. RECENT BILLING ACTIVITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* ── 5. RECENT BILLING ACTIVITY ─────────────── */}
       <section className="dash-panel">
         <div className="dash-panel-header">
           <div>
@@ -821,9 +832,9 @@ function Dashboard({ onNavigate }) {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    TENANTS PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function TenantsPage() {
   const [tenants, setTenants] = useState([]);
   const [rooms, setRooms] = useState([]);
@@ -1120,9 +1131,9 @@ function TenantsPage() {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    ROOMS PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function RoomsPage() {
   const [rooms, setRooms] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -1285,10 +1296,12 @@ function RoomsPage() {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    METER READINGS PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function MeterReadingsPage() {
+  const { showToast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [readings, setReadings] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -1408,20 +1421,20 @@ function MeterReadingsPage() {
       setIsSubmitting(false);
     }
   };
-
-  const handleDelete = async (reading) => {
-    const confirmed = window.confirm(
-      `Delete the meter reading for ${reading.full_name} for ${reading.billing_month.substring(0, 7)}?`
-    );
-    if (!confirmed) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      const response = await authFetch(`/api/meter-readings/${reading.id}`, { method: "DELETE" });
+      const response = await authFetch(`/api/meter-readings/${deleteTarget.id}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete meter reading."); return; }
+      if (!response.ok || !data.success) {
+        showToast(data.message || "Failed to delete meter reading.", "error");
+        return;
+      }
+      setDeleteTarget(null);
       loadReadings();
     } catch (err) {
       console.error("Failed to delete meter reading:", err);
-      window.alert("Unable to connect to the backend.");
+      showToast("Unable to connect to the backend.", "error");
     }
   };
 
@@ -1588,14 +1601,28 @@ function MeterReadingsPage() {
           ))
         )}
       </div>
+      <ConfirmDialog
+        isOpen={Boolean(deleteTarget)}
+        title="Delete meter reading?"
+        message={
+          deleteTarget
+            ? `Delete the meter reading for ${deleteTarget.full_name} for ${deleteTarget.billing_month.substring(0, 7)}?`
+            : ""
+        }
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+        confirmLabel="Delete"
+        isDangerous
+      />
     </div>
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    UTILITY RATES PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function UtilityRatesPage() {
+  const { showToast } = useToast();
   const [rates, setRates] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingRate, setEditingRate] = useState(null);
@@ -1681,7 +1708,10 @@ function UtilityRatesPage() {
     try {
       const response = await authFetch(`/api/utility-rates/${rate.id}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete utility rate."); return; }
+      if (!response.ok || !data.success) {
+        showToast(data.message || "Failed to delete utility rate.", "error");
+        return;
+      }
       loadRates();
     } catch (err) {
       console.error("Failed to delete utility rate:", err);
@@ -1806,9 +1836,9 @@ function UtilityRatesPage() {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    BILLING PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function BillingPage() {
   const [billingRecords, setBillingRecords] = useState([]);
   const [tenants, setTenants] = useState([]);
@@ -2029,9 +2059,9 @@ function BillingPage() {
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+/* ─────────────────────────────────────────────
    REPORTS PAGE
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+───────────────────────────────────────────── */
 function ReportsPage() {
   const [reports, setReports] = useState([]);
   const [filters, setFilters] = useState({ billing_month: "", tenant_id: "", room_id: "", status: "" });

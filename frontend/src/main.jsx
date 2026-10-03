@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import ClientApp from "./ClientApp.jsx";
+import { ToastProvider } from "./components/Toast.jsx";
 
 const path = window.location.pathname;
 
@@ -15,6 +16,8 @@ const RootApp =
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RootApp />
+    <ToastProvider>
+      <RootApp />
+    </ToastProvider>
   </StrictMode>
 );
