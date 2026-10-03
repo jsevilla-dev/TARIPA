@@ -9,4 +9,6 @@ build/
 *.log
 
 .DS_Store
-Thumbs.db
+Thumbs.dbdatabase/backup/
+
+database/backup/
