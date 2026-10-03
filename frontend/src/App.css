@@ -365,17 +365,17 @@
 
 .page-header-text h2 {
   margin: 0;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 800;
+  font-size: var(--font-size-page-title);
+  font-weight: var(--font-weight-heading);
   letter-spacing: -0.02em;
   color: #112D4E;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .page-description {
   margin: 6px 0 0;
-  font-size: 13.5px;
-  color: #6F7485;
+  font-size: var(--font-size-secondary);
+  color: var(--color-text-secondary);
   line-height: 1.55;
 }
 
@@ -587,8 +587,8 @@
 
 .form-panel-header h3 {
   margin: 0;
-  font-size: 19px;
-  font-weight: 800;
+  font-size: var(--font-size-section);
+  font-weight: var(--font-weight-section);
   color: #112D4E;
   letter-spacing: -0.01em;
 }
@@ -610,7 +610,7 @@
   flex-shrink: 0;
 }
 
-/* ─── Form Grid ──────────────────────────────────────── */
+/* Form Grid */
 
 .form-grid {
   display: grid;
@@ -622,7 +622,7 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* ─── Fields ─────────────────────────────────────────── */
+/* Fields */
 
 .field {
   display: block;
@@ -631,8 +631,8 @@
 .field-label {
   display: block;
   margin-bottom: 7px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
   letter-spacing: 0.09em;
   color: #718096;
 }
@@ -668,7 +668,7 @@
 .field-input:focus {
   border-color: #3F72AF;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(108, 111, 239, 0.12);
+  box-shadow: 0 0 0 3px rgba(63, 114, 175, 0.12);
 }
 
 .field-input[type="month"],
@@ -691,8 +691,8 @@
 }
 
 .utility-section-water {
-  background: #F5F7FF;
-  border-color: rgba(101, 117, 245, 0.2);
+  background: #F9F7F7;
+  border-color: rgba(63, 114, 175, 0.20);
 }
 
 .utility-section-header {
@@ -718,8 +718,8 @@
 }
 
 .water-badge {
-  background: rgba(101, 117, 245, 0.15);
-  color: #4558D0;
+  background: rgba(63, 114, 175, 0.12);
+  color: #3F72AF;
 }
 
 .consumption-preview {
@@ -731,7 +731,7 @@
   border-radius: 999px;
 }
 
-/* ─── Form Messages ──────────────────────────────────── */
+/* Form Messages */
 
 .form-msg {
   display: flex;
@@ -836,8 +836,8 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border-radius: 12px;
-  background: #DBE2EF;
+  font-size: 16px;
+  font-weight: var(--font-weight-section);
   color: #3F72AF;
   font-size: 17px;
   font-weight: 800;
@@ -849,21 +849,21 @@
 }
 
 .avatar-water {
-  background: rgba(101, 117, 245, 0.14);
-  color: #4558D0;
+  background: rgba(63, 114, 175, 0.12);
+  color: #3F72AF;
 }
 
 .record-name {
   display: block;
-  font-size: 14.5px;
-  font-weight: 700;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-section);
   color: #112D4E;
   margin-bottom: 3px;
 }
 
 .record-sub {
   margin: 0;
-  font-size: 12.5px;
+  font-size: var(--font-size-secondary);
   color: #718096;
 }
 
@@ -888,8 +888,8 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-label);
   letter-spacing: 0.08em;
   color: #718096;
   text-transform: uppercase;
@@ -900,8 +900,8 @@
 }
 
 .meta-value {
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-section);
   color: #112D4E;
 }
 
@@ -912,14 +912,14 @@
   flex-shrink: 0;
 }
 
-/* ─── Utility Value Colors ───────────────────────────── */
+/* Utility Value Colors */
 
 .electric-label {
   color: #A07000;
 }
 
 .water-label {
-  color: #4558D0;
+  color: #3F72AF;
 }
 
 .electric-value {
@@ -927,12 +927,12 @@
 }
 
 .water-value {
-  color: #4558D0;
+  color: #3F72AF;
 }
 
 .total-value {
-  color: #112D4E;
-  font-size: 14.5px;
+  font-weight: var(--font-weight-section);
+  font-size: var(--font-size-card-title);
 }
 
 .text-success {
@@ -960,15 +960,15 @@
 }
 
 .pill-water {
-  background: rgba(101, 117, 245, 0.14);
-  color: #4558D0;
+  background: rgba(63, 114, 175, 0.12);
+  color: #3F72AF;
 }
 
 .rate-value {
   font-size: 14.5px;
 }
 
-/* ─── Status Select (billing) ────────────────────────── */
+/* Status Select (billing) */
 
 .status-select {
   min-width: 108px;
@@ -990,7 +990,7 @@
   border-color: #3F72AF;
 }
 
-/* ─── Empty State ────────────────────────────────────── */
+/* Empty State */
 
 .empty-state {
   display: flex;
@@ -1089,17 +1089,17 @@
 
 .dash-heading {
   margin: 0 0 8px;
-  font-size: clamp(22px, 2.8vw, 30px);
-  font-weight: 800;
+  font-size: var(--font-size-page-title);
+  font-weight: var(--font-weight-heading);
   letter-spacing: -0.025em;
-  color: #112D4E;
-  line-height: 1.15;
+  line-height: 1.2;
+
 }
 
 .dash-subheading {
   margin: 0;
-  font-size: 14px;
-  color: #6F7485;
+  font-size: var(--font-size-secondary);
+  color: var(--color-text-secondary);
   max-width: 520px;
   line-height: 1.6;
 }
@@ -1190,8 +1190,8 @@
 
 .dash-kpi-label {
   display: block;
-  font-size: 10px;
-  font-weight: 700;
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-label);
   letter-spacing: 0.10em;
   color: #718096;
   text-transform: uppercase;
@@ -1200,8 +1200,8 @@
 
 .dash-kpi-value {
   display: block;
-  font-size: 26px;
-  font-weight: 800;
+  font-size: var(--font-size-kpi);
+  font-weight: var(--font-weight-heading);
   color: #112D4E;
   letter-spacing: -0.025em;
   line-height: 1.1;
@@ -1241,7 +1241,7 @@
   margin-bottom: 20px;
 }
 
-/* ── Generic panel card ── */
+/* Generic panel card */
 .dash-panel {
   background: #ffffff;
   border: 1px solid #DBE2EF;
@@ -1265,8 +1265,8 @@
 
 .dash-panel-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--font-size-card-title);
+  font-weight: var(--font-weight-section);
   color: #112D4E;
   letter-spacing: -0.01em;
 }
@@ -1396,7 +1396,7 @@
   line-height: 1.3;
 }
 
-/* ── Data table ── */
+/* Data table */
 .dash-table-wrap {
   overflow-x: auto;
   border-radius: 12px;
@@ -1406,7 +1406,7 @@
 .dash-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: var(--font-size-body);
 }
 
 .dash-table thead {
@@ -1416,8 +1416,8 @@
 .dash-table th {
   padding: 11px 16px;
   text-align: left;
-  font-size: 10.5px;
-  font-weight: 700;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-label);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #718096;
@@ -1439,7 +1439,7 @@
 }
 
 .dash-electric-color { color: #A07000; }
-.dash-water-color    { color: #4558D0; }
+.dash-water-color    { color: #3F72AF; }
 
 .dash-table td {
   padding: 13px 16px;
@@ -1465,7 +1465,7 @@
   background: #DBE2EF;
   color: #3F72AF;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: var(--font-weight-section);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -1540,7 +1540,7 @@
 
 .kpi-label {
   display: block;
-  font-size: 10.5px;
+  font-size: var(--font-size-small);
   font-weight: 700;
   letter-spacing: 0.10em;
   color: #718096;
@@ -1619,7 +1619,7 @@
 }
 
 .module-num {
-  font-size: 10.5px;
+  font-size: var(--font-size-small);
   font-weight: 800;
   letter-spacing: 0.12em;
   color: #3F72AF;
@@ -1756,7 +1756,7 @@
 }
 
 .room-meta-item strong {
-  font-size: 13.5px;
+  font-size: var(--font-size-body);
   font-weight: 700;
   color: #112D4E;
 }
@@ -2195,8 +2195,7 @@
   line-height: 1.55;
 }
 
-/* Fields group */
-.admin-login-fields {
+.fields {
   display: flex;
   flex-direction: column;
   gap: 16px;

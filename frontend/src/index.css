@@ -1,4 +1,19 @@
 :root {
+  /* TARIPA typography tokens */
+  --font-weight-body:      400;
+  --font-weight-label:     500;
+  --font-weight-section:   600;
+  --font-weight-heading:   700;
+
+  --font-size-page-title:  28px;
+  --font-size-section:     20px;
+  --font-size-card-title:  16px;
+  --font-size-body:        14px;
+  --font-size-secondary:   13px;
+  --font-size-label:       13px;
+  --font-size-small:       12px;
+  --font-size-kpi:         30px;
+
   font-family:
     "Inter",
     ui-sans-serif,
