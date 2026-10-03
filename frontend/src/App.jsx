@@ -313,6 +313,7 @@ function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const handleLoginSuccess = useCallback((token, admin) => {
     setAdminToken(token);
@@ -352,11 +353,17 @@ function App() {
   return (
     <div className="app-shell">
       {/* ── SIDEBAR ── */}
-      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""}`}>
+      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""} ${mobileSidebarOpen ? "mobile-open" : ""}`}>
         <button
           type="button"
           className="sidebar-toggle"
-          onClick={() => setSidebarCollapsed((c) => !c)}
+          onClick={() => {
+          if (window.innerWidth <= 768) {
+            setMobileSidebarOpen((open) => !open);
+            return;
+          }
+          setSidebarCollapsed((c) => !c);
+        }}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
@@ -426,6 +433,7 @@ function App() {
           </div>
         </div>
       </aside>
+
 
       {/* ── MAIN CONTENT ── */}
       <main className="main-content">
