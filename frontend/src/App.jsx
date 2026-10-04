@@ -305,8 +305,7 @@ function AdminLogin({ onLoginSuccess }) {
    APP SHELL
 ───────────────────────────────────────────── */
 function App() {
-	const { showToast } = useToast();
-  // ── Admin auth state ──────────────────────
+// ── Admin auth state ──────────────────────
   const [adminToken, setAdminToken] = useState(() => getAdminToken());
   const [adminUser,  setAdminUser]  = useState(() => getAdminUser());
 
@@ -1420,6 +1419,9 @@ function MeterReadingsPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+  const handleDelete = (reading) => {
+    setDeleteTarget(reading);
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;

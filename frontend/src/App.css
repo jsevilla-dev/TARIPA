@@ -309,9 +309,6 @@
   padding: 10px;
 }
 
-.sidebar.collapsed .sidebar-admin-avatar {
-  /* stays visible in collapsed mode */
-}
 
 .sidebar.collapsed .sidebar-admin-info,
 .sidebar.collapsed .sidebar-logout-btn {
