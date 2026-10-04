@@ -23,41 +23,46 @@
     "Segoe UI",
     sans-serif;
 
-  /* TARIPA color tokens */
+  /* ── Color tokens — TARIPA V1 Design System ── */
+  --color-primary:         #4F46E5;
+  --color-primary-hover:   #4338CA;
+  --color-primary-light:   #EEF2FF;
+  --color-primary-faint:   #F3F0FF;
 
-  /* Brand */
-  --color-primary:       #3F72AF;
-  --color-primary-hover: #112D4E;
-  --color-primary-light: #DBE2EF;
-  --color-primary-faint: #F9F7F7;
-  --color-primary-dark:  #112D4E;
+  --color-bg:              #F8FAFC;
+  --color-surface:         #FFFFFF;
+  --color-surface-muted:   #F1F5F9;
 
-  /* Surfaces */
-  --color-bg:            #F9F7F7;
-  --color-surface:       #FFFFFF;
-  --color-surface-muted: #DBE2EF;
+  --color-text-main:       #0F172A;
+  --color-text-secondary:  #475569;
+  --color-text-muted:      #64748B;
 
-  /* Text */
-  --color-text-main:      #112D4E;
-  --color-text-secondary: #536273;
-  --color-text-muted:     #718096;
+  --color-border:          #E2E8F0;
+  --color-border-strong:   #CBD5E1;
 
-  /* Borders */
-  --color-border:        #DBE2EF;
-  --color-border-strong: #CBD5E1;
+  --color-success:         #16A34A;
+  --color-warning:         #D97706;
+  --color-danger:          #DC2626;
+  --color-info:            #2563EB;
 
-  /* Semantic */
-  --color-success:       #16A34A;
-  --color-success-light: #DCFCE7;
-  --color-warning:       #D97706;
-  --color-warning-light: #FEF3C7;
-  --color-danger:        #DC2626;
-  --color-danger-light:  #FEE2E2;
-  --color-info:          #2563EB;
-  --color-info-light:    #DBEAFE;
+  --color-electric:        #D97706;
+  --color-water:           #2563EB;
 
-  /* Utility */
-  --color-electric: #FFB52E;
+  /* ── Shadows — subtle ── */
+  --shadow-sm:    0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-card:  0 2px 8px rgba(15, 23, 42, 0.08);
+  --shadow-hover: 0 4px 16px rgba(79, 70, 229, 0.12);
+
+  /* ── Focus ring ── */
+  --focus-ring: 3px solid rgba(79, 70, 229, 0.12);
+
+  color: var(--color-text-main);
+  background: var(--color-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 *,
@@ -101,7 +106,7 @@ p {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  font-weight: var(--font-weight-heading);
+  font-weight: 700;
   line-height: 1.2;
 }
 
