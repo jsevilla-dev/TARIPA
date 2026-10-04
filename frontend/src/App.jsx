@@ -2085,7 +2085,6 @@ function ReportsPage() {
       const response = await authFetch("/api/billing");
       if (!response.ok) throw new Error(`Billing API returned ${response.status}`);
       const data = await response.json();
-      console.log("TARIPA REPORTS:", data);
       if (!data.success) throw new Error(data.message || "Failed to load billing reports.");
       setReports(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
