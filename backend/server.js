@@ -22,17 +22,17 @@ const PORT = 5000;
 
 app.use(express.json());
 
-// â”€â”€ Admin Auth (login â€” public endpoint) â”€â”€
+// -- Admin Auth (login - public endpoint) --
 app.use("/api/admin", adminAuthRouter);
 
-// â”€â”€ Admin-protected CRUD routes â”€â”€
+// -- Admin-protected CRUD routes --
 app.use("/api/rooms",          adminAuth, roomsRouter);
 app.use("/api/tenants",        adminAuth, tenantsRouter);
 app.use("/api/utility-rates",  adminAuth, utilityRatesRouter);
 app.use("/api/meter-readings", adminAuth, meterReadingsRouter);
 app.use("/api/billing",        adminAuth, billingRouter);
 
-// â”€â”€ Client / Tenant Portal (unchanged) â”€â”€
+// -- Client / Tenant Portal (unchanged) --
 app.use("/api/client", clientAuthRouter);
 app.use("/api/client", clientAuth, clientPortalRouter);
 
