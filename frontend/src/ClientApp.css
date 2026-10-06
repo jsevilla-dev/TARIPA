@@ -85,20 +85,186 @@
   align-items: center;
   justify-content: center;
   background:
-    radial-gradient(circle at 50% 12%, rgba(79, 70, 229, 0.08) 0%, rgba(248, 250, 252, 0) 60%),
-    linear-gradient(180deg, #F8FAFC 0%, #EEF2F6 100%);
-  padding: 24px;
+    radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.06) 0%, transparent 45%),
+    linear-gradient(135deg, #F8FAFC 0%, #EDF2F7 100%);
+  padding: 32px 24px;
 }
 
-.cb-login-card {
+/* ── Split Layout Container ── */
+.cb-login-layout-container {
   width: 100%;
-  max-width: 440px;
-  background: var(--cb-surface);
+  max-width: 1080px;
+  min-height: 640px;
+  background: #ffffff;
   border: 1px solid var(--cb-border);
-  border-radius: var(--radius-xl, 24px);
-  padding: 40px 38px 32px;
-  box-shadow: var(--shadow-card-elevated, 0 24px 48px -10px rgba(79, 70, 229, 0.14));
+  border-radius: 28px;
+  box-shadow:
+    0 4px 6px -1px rgba(15, 23, 42, 0.04),
+    0 24px 64px -8px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
   animation: cardEntrance var(--transition-slow, 0.35s) both;
+}
+
+/* ── Left Hero Pane (Tenant Resident Showcase) ── */
+.cb-login-hero-pane {
+  background: linear-gradient(145deg, #091E42 0%, #1E3A8A 55%, #2563EB 100%);
+  color: #ffffff;
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cb-login-hero-pane::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cb-login-hero-pane::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: -60px;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cb-login-hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  gap: 48px;
+}
+
+.cb-login-hero-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cb-login-hero-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #2563EB, #3B82F6);
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+}
+
+.cb-login-hero-brand-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.cb-login-brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.cb-login-brand-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #93C5FD;
+  margin-top: 2px;
+}
+
+.cb-login-hero-tagline {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 300px;
+  letter-spacing: 0.01em;
+}
+
+/* ── Right Form Pane ── */
+.cb-login-form-pane {
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.cb-login-form-pane .cb-login-card {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  animation: none;
+}
+
+.cb-mobile-only-brand {
+  display: none;
+}
+
+.cb-portal-switch-link {
+  color: var(--cb-primary);
+  font-weight: 700;
+}
+
+.cb-portal-switch-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive Split Screen ── */
+@media (max-width: 960px) {
+  .cb-login-layout-container {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+    border-radius: 20px;
+  }
+
+  .cb-login-hero-pane {
+    display: none;
+  }
+
+  .cb-login-form-pane {
+    padding: 40px 32px;
+  }
+
+  .cb-mobile-only-brand {
+    display: flex;
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cb-login-page {
+    padding: 16px;
+  }
+
+  .cb-login-form-pane {
+    padding: 28px 20px;
+  }
 }
 
 /* Brand row */
@@ -170,8 +336,8 @@
 }
 
 .cb-login-title {
-  margin: 0 0 6px;
-  font-size: 26px;
+  margin: 0 0 24px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--cb-text-main);
@@ -1466,4 +1632,100 @@
   /* Desktop: hide accordion cards, show table */
   .cb-bills-list   { display: none; }
   .cb-desktop-only { display: block; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PHASE 3 — CLIENT PORTAL POLISH & ANIMATIONS
+═══════════════════════════════════════════════════════ */
+
+/* ── KPI card top-border accent strips ── */
+.cb-kpi-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.cb-kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
+
+.cb-kpi-indigo::before  { background: var(--cb-primary); }
+.cb-kpi-warning::before { background: #D97706; }
+.cb-kpi-electric::before{ background: #D97706; }
+.cb-kpi-water::before   { background: #2563EB; }
+
+/* ── KPI card staggered entrance ── */
+@keyframes cb-slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cb-kpi-grid .cb-kpi-card {
+  animation: cb-slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cb-kpi-grid .cb-kpi-card:nth-child(1) { animation-delay: 0.04s; }
+.cb-kpi-grid .cb-kpi-card:nth-child(2) { animation-delay: 0.08s; }
+.cb-kpi-grid .cb-kpi-card:nth-child(3) { animation-delay: 0.12s; }
+.cb-kpi-grid .cb-kpi-card:nth-child(4) { animation-delay: 0.16s; }
+
+/* ── Table row hover transition ── */
+.cb-table tbody tr {
+  transition: background 0.12s ease;
+}
+
+/* ── Bill card staggered entrance ── */
+.cb-bills-list .cb-bill-card {
+  animation: cb-slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cb-bills-list .cb-bill-card:nth-child(1) { animation-delay: 0.03s; }
+.cb-bills-list .cb-bill-card:nth-child(2) { animation-delay: 0.07s; }
+.cb-bills-list .cb-bill-card:nth-child(3) { animation-delay: 0.11s; }
+.cb-bills-list .cb-bill-card:nth-child(n+4) { animation-delay: 0.15s; }
+
+/* ── Reading card staggered entrance ── */
+.cb-readings-grid .cb-reading-card {
+  animation: cb-slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cb-readings-grid .cb-reading-card:nth-child(odd)  { animation-delay: 0.04s; }
+.cb-readings-grid .cb-reading-card:nth-child(even) { animation-delay: 0.09s; }
+
+/* ── Dashboard hero pulse emblem ── */
+@keyframes cb-emblemPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%       { opacity: 0.22; transform: scale(1.04); }
+}
+
+.cb-dashboard-hero-emblem {
+  animation: cb-emblemPulse 4s ease-in-out infinite;
+}
+
+/* ── Sidebar nav item active indicator ── */
+.cb-nav-item.active {
+  box-shadow: inset 3px 0 0 var(--cb-primary);
+}
+
+/* ── Logout button hover ── */
+.cb-logout-btn:hover svg {
+  transform: translateX(2px);
+  transition: transform 0.15s ease;
+}
+
+/* ── Reduce motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .cb-kpi-grid .cb-kpi-card,
+  .cb-bills-list .cb-bill-card,
+  .cb-readings-grid .cb-reading-card {
+    animation: none !important;
+  }
+
+  .cb-dashboard-hero-emblem {
+    animation: none !important;
+    opacity: 0.15;
+  }
 }

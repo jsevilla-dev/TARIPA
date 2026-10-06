@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+﻿import { useEffect, useState, useCallback, useRef } from "react";
 import "./ClientApp.css";
 
 /* ─────────────────────────────────────────────
@@ -272,106 +272,124 @@ function LoginPage({ onLogin }) {
 
   return (
     <div className="cb-login-page">
-      <div className="cb-login-card">
-
-        {/* Brand */}
-        <div className="cb-login-brand">
-          <div className="cb-login-brand-mark">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-          </div>
-          <div className="cb-login-brand-text">
-            <div className="cb-login-brand-row">
-              <strong>TARIPA</strong>
-              <span className="cb-login-badge">TENANT PORTAL</span>
-            </div>
-            <span>Tenant Utility & Billing Access</span>
-          </div>
-        </div>
-
-        {/* Header */}
-        <div className="cb-login-header">
-          <h1 className="cb-login-title">Welcome back</h1>
-          <p className="cb-login-subtitle">Sign in to view your bills, payment history, and utility usage.</p>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="cb-login-fields">
-
-            {/* Username */}
-            <label className="cb-field">
-              <span className="cb-field-label">USERNAME</span>
-              <input
-                type="text"
-                className="cb-field-input"
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="Enter your tenant username"
-                autoComplete="username"
-                autoFocus
-                disabled={isLoading}
-              />
-            </label>
-
-            {/* Password with show/hide toggle */}
-            <label className="cb-field">
-              <span className="cb-field-label">PASSWORD</span>
-              <div className="cb-field-input-wrap">
-                <input
-                  type={showPass ? "text" : "password"}
-                  className="cb-field-input cb-field-input-padded"
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  className="cb-field-eye-btn"
-                  onClick={() => setShowPass((s) => !s)}
-                  aria-label={showPass ? "Hide password" : "Show password"}
-                  tabIndex={-1}
-                  disabled={isLoading}
-                >
-                  {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
-                </button>
+      <div className="cb-login-layout-container">
+        {/* Left Side: Minimal Brand Panel */}
+        <div className="cb-login-hero-pane">
+          <div className="cb-login-hero-content">
+            <div className="cb-login-hero-brand">
+              <div className="cb-login-hero-logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
               </div>
-            </label>
-          </div>
-
-          {/* Error */}
-          {error && (
-            <div className="cb-login-error" role="alert">
-              <Icons.Alert /> {error}
+              <div className="cb-login-hero-brand-name">
+                <span className="cb-login-brand-title">TARIPA</span>
+                <span className="cb-login-brand-tag">Tenant Portal</span>
+              </div>
             </div>
-          )}
+            <p className="cb-login-hero-tagline">View your utility statements, usage, and payment history.</p>
+          </div>
+        </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="cb-btn-primary cb-btn-full cb-login-submit"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <span className="cb-btn-spinner" />
-                Signing in…
-              </>
-            ) : "Sign In to Client Portal"}
-          </button>
-        </form>
+        {/* Right Side: Tenant Sign In Form */}
+        <div className="cb-login-form-pane">
+          <div className="cb-login-card">
+            {/* Mobile Brand */}
+            <div className="cb-login-brand cb-mobile-only-brand">
+              <div className="cb-login-brand-mark">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+              </div>
+              <div className="cb-login-brand-text">
+                <div className="cb-login-brand-row">
+                  <strong>TARIPA</strong>
+                  <span className="cb-login-badge">TENANT PORTAL</span>
+                </div>
+                <span>Residential Access</span>
+              </div>
+            </div>
 
-        <div className="cb-login-footer">
-          <p className="cb-login-note">
-            Having trouble? Contact your building administrator.
-          </p>
-          <p className="cb-login-switch">
-            Building administrator?{" "}
-            <a href="/">Admin Portal &rarr;</a>
-          </p>
+            {/* Header */}
+            <div className="cb-login-header">
+              <h1 className="cb-login-title">Welcome back</h1>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="cb-login-fields">
+                {/* Username */}
+                <label className="cb-field">
+                  <span className="cb-field-label">TENANT USERNAME</span>
+                  <input
+                    type="text"
+                    className="cb-field-input"
+                    value={username}
+                    onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                    placeholder="Tenant username"
+                    autoComplete="username"
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                </label>
+
+                {/* Password with show/hide toggle */}
+                <label className="cb-field">
+                  <span className="cb-field-label">PASSWORD</span>
+                  <div className="cb-field-input-wrap">
+                    <input
+                      type={showPass ? "text" : "password"}
+                      className="cb-field-input cb-field-input-padded"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                      placeholder="Enter tenant password"
+                      autoComplete="current-password"
+                      disabled={isLoading}
+                    />
+                    <button
+                      type="button"
+                      className="cb-field-eye-btn"
+                      onClick={() => setShowPass((s) => !s)}
+                      aria-label={showPass ? "Hide password" : "Show password"}
+                      tabIndex={-1}
+                      disabled={isLoading}
+                    >
+                      {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
+                    </button>
+                  </div>
+                </label>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="cb-login-error" role="alert">
+                  <Icons.Alert /> {error}
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                className="cb-btn-primary cb-btn-full cb-login-submit"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="cb-btn-spinner" />
+                    Signing in…
+                  </>
+                ) : "Sign in"}
+              </button>
+            </form>
+
+            <div className="cb-login-footer">
+              <p className="cb-login-switch">
+                Admin?{" "}
+                <a href="/" className="cb-portal-switch-link">Admin Portal &rarr;</a>
+              </p>
+
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -385,6 +403,7 @@ function DashboardPage() {
   const [data,    setData]    = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -433,11 +452,79 @@ function DashboardPage() {
             Room {tenant.room_number ?? "—"}&nbsp;·&nbsp;
             <StatusBadge status={tenant.status} />
           </p>
+          <div style={{ marginTop: "16px" }}>
+            <button
+              type="button"
+              className="cb-btn-secondary"
+              style={{
+                background: "rgba(255,255,255,0.18)",
+                color: "#ffffff",
+                borderColor: "rgba(255,255,255,0.3)",
+                backdropFilter: "blur(4px)",
+              }}
+              onClick={() => setShowPaymentModal(true)}
+            >
+              Payment Instructions &rarr;
+            </button>
+          </div>
         </div>
         <div className="cb-dashboard-hero-emblem" aria-hidden="true">
           <Icons.Meter />
         </div>
       </div>
+
+      {showPaymentModal && (
+        <>
+          <div
+            className="confirm-dialog-backdrop"
+            onClick={() => setShowPaymentModal(false)}
+            aria-hidden="true"
+          />
+          <div className="confirm-dialog" role="dialog" aria-modal="true">
+            <div className="confirm-dialog-content">
+              <h2 className="confirm-dialog-title">Payment Instructions</h2>
+              <p className="confirm-dialog-message">
+                Please settle your outstanding balance through the following official channels:
+              </p>
+              <div
+                style={{
+                  marginTop: "16px",
+                  padding: "16px",
+                  background: "#F8FAFC",
+                  borderRadius: "12px",
+                  border: "1px solid #E2E8F0",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  fontSize: "13.5px",
+                }}
+              >
+                <div>
+                  <strong style={{ color: "#0F172A", display: "block" }}>GCash / Maya</strong>
+                  <span style={{ color: "#4F46E5", fontWeight: 700 }}>0917-123-4567</span>
+                  <span style={{ color: "#64748B", display: "block", fontSize: "12px" }}>Account Name: TARIPA Administration</span>
+                </div>
+                <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "10px" }}>
+                  <strong style={{ color: "#0F172A", display: "block" }}>Bank Transfer (BDO / BPI)</strong>
+                  <span style={{ color: "#475569" }}>Account #: 1234-5678-9012</span>
+                </div>
+                <div style={{ borderTop: "1px solid #E2E8F0", paddingTop: "10px", fontSize: "12px", color: "#64748B" }}>
+                  * After sending payment, please present or message your proof of payment (screenshot/receipt) to your building administrator for account verification.
+                </div>
+              </div>
+              <div className="confirm-dialog-actions" style={{ marginTop: "20px" }}>
+                <button
+                  type="button"
+                  className="confirm-dialog-btn confirm-dialog-btn-confirm"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* KPI Cards */}
       <div className="cb-kpi-grid">
