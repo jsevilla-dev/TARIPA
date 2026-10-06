@@ -171,6 +171,18 @@ const Icons = {
       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   ),
+  Eye: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  EyeOff: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  ),
 };
 
 const navigationItems = [
@@ -189,6 +201,7 @@ const navigationItems = [
 function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
@@ -226,19 +239,22 @@ function AdminLogin({ onLoginSuccess }) {
         {/* Brand mark */}
         <div className="admin-login-brand">
           <div className="admin-login-brand-mark">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
             </svg>
           </div>
           <div className="admin-login-brand-text">
-            <strong>TARIPA</strong>
-            <span>Admin Portal</span>
+            <div className="admin-login-brand-row">
+              <strong>TARIPA</strong>
+              <span className="admin-login-badge">ADMIN</span>
+            </div>
+            <span>Property & Utility Management</span>
           </div>
         </div>
 
         <div className="admin-login-header">
           <h1 className="admin-login-title">Welcome back</h1>
-          <p className="admin-login-subtitle">Sign in to your admin account to continue.</p>
+          <p className="admin-login-subtitle">Sign in to your administrative account to continue.</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
@@ -250,7 +266,7 @@ function AdminLogin({ onLoginSuccess }) {
                 className="field-input"
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="Enter your username"
+                placeholder="Enter admin username"
                 autoComplete="username"
                 autoFocus
                 disabled={loading}
@@ -258,15 +274,27 @@ function AdminLogin({ onLoginSuccess }) {
             </label>
             <label className="field">
               <span className="field-label">PASSWORD</span>
-              <input
-                type="password"
-                className="field-input"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                disabled={loading}
-              />
+              <div className="field-input-wrap">
+                <input
+                  type={showPass ? "text" : "password"}
+                  className="field-input field-input-padded"
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="field-eye-btn"
+                  onClick={() => setShowPass((s) => !s)}
+                  aria-label={showPass ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                  disabled={loading}
+                >
+                  {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
+                </button>
+              </div>
             </label>
           </div>
 
@@ -288,14 +316,20 @@ function AdminLogin({ onLoginSuccess }) {
                 Signing in…
               </>
             ) : (
-              "Sign In"
+              "Sign In to Admin Portal"
             )}
           </button>
         </form>
 
-        <p className="admin-login-note">
-          TARIPA · Residential Utility Tracking & Billing System
-        </p>
+        <div className="admin-login-footer">
+          <p className="admin-login-note">
+            TARIPA · Residential Utility Tracking & Billing System
+          </p>
+          <p className="admin-login-switch">
+            Tenant looking for your bills?{" "}
+            <a href="/client">Client Portal &rarr;</a>
+          </p>
+        </div>
       </div>
     </div>
   );

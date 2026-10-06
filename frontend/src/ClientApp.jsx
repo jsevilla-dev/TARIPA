@@ -277,20 +277,23 @@ function LoginPage({ onLogin }) {
         {/* Brand */}
         <div className="cb-login-brand">
           <div className="cb-login-brand-mark">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
             </svg>
           </div>
           <div className="cb-login-brand-text">
-            <strong>TARIPA</strong>
-            <span>Tenant Portal</span>
+            <div className="cb-login-brand-row">
+              <strong>TARIPA</strong>
+              <span className="cb-login-badge">TENANT PORTAL</span>
+            </div>
+            <span>Tenant Utility & Billing Access</span>
           </div>
         </div>
 
         {/* Header */}
         <div className="cb-login-header">
           <h1 className="cb-login-title">Welcome back</h1>
-          <p className="cb-login-subtitle">Sign in to view your bills and utility usage.</p>
+          <p className="cb-login-subtitle">Sign in to view your bills, payment history, and utility usage.</p>
         </div>
 
         {/* Form */}
@@ -305,7 +308,7 @@ function LoginPage({ onLogin }) {
                 className="cb-field-input"
                 value={username}
                 onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="Enter your username"
+                placeholder="Enter your tenant username"
                 autoComplete="username"
                 autoFocus
                 disabled={isLoading}
@@ -357,13 +360,19 @@ function LoginPage({ onLogin }) {
                 <span className="cb-btn-spinner" />
                 Signing in…
               </>
-            ) : "Sign In"}
+            ) : "Sign In to Client Portal"}
           </button>
         </form>
 
-        <p className="cb-login-footer">
-          Having trouble? Contact your building administrator.
-        </p>
+        <div className="cb-login-footer">
+          <p className="cb-login-note">
+            Having trouble? Contact your building administrator.
+          </p>
+          <p className="cb-login-switch">
+            Building administrator?{" "}
+            <a href="/">Admin Portal &rarr;</a>
+          </p>
+        </div>
       </div>
     </div>
   );
