@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+﻿import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import "./App.css";
 import { useToast } from "./components/Toast.jsx";
 import ConfirmDialog from "./components/ConfirmDialog.jsx";
@@ -171,6 +171,51 @@ const Icons = {
       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
     </svg>
   ),
+  Eye: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  EyeOff: () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  ),
+  Search: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  ),
+  Bell: () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  ),
+  Menu: () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
+  Download: () => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  ),
+  Print: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect x="6" y="14" width="12" height="8" />
+    </svg>
+  ),
 };
 
 const navigationItems = [
@@ -189,6 +234,7 @@ const navigationItems = [
 function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
@@ -222,80 +268,122 @@ function AdminLogin({ onLoginSuccess }) {
 
   return (
     <div className="admin-login-screen">
-      <div className="admin-login-card">
-        {/* Brand mark */}
-        <div className="admin-login-brand">
-          <div className="admin-login-brand-mark">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-          </div>
-          <div className="admin-login-brand-text">
-            <strong>TARIPA</strong>
-            <span>Admin Portal</span>
-          </div>
-        </div>
-
-        <div className="admin-login-header">
-          <h1 className="admin-login-title">Welcome back</h1>
-          <p className="admin-login-subtitle">Sign in to your admin account to continue.</p>
-        </div>
-
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="admin-login-fields">
-            <label className="field">
-              <span className="field-label">USERNAME</span>
-              <input
-                type="text"
-                className="field-input"
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="Enter your username"
-                autoComplete="username"
-                autoFocus
-                disabled={loading}
-              />
-            </label>
-            <label className="field">
-              <span className="field-label">PASSWORD</span>
-              <input
-                type="password"
-                className="field-input"
-                value={password}
-                onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                disabled={loading}
-              />
-            </label>
-          </div>
-
-          {error && (
-            <div className="form-msg form-msg-error" role="alert">
-              <Icons.Alert />
-              {error}
+      <div className="login-layout-container">
+        {/* Left Side: Minimal Brand Panel */}
+        <div className="login-hero-pane">
+          <div className="login-hero-content">
+            <div className="login-hero-brand">
+              <div className="login-hero-logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+              </div>
+              <div className="login-hero-brand-name">
+                <span className="login-brand-title">TARIPA</span>
+                <span className="login-brand-tag">Admin Portal</span>
+              </div>
             </div>
-          )}
+            <p className="login-hero-tagline">Utility &amp; billing management for residential properties.</p>
+          </div>
+        </div>
 
-          <button
-            type="submit"
-            className="btn-primary admin-login-btn"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="admin-login-spinner" />
-                Signing in…
-              </>
-            ) : (
-              "Sign In"
-            )}
-          </button>
-        </form>
+        {/* Right Side: Clean Enterprise Form Card */}
+        <div className="login-form-pane">
+          <div className="admin-login-card">
+            {/* Mobile Brand Mark */}
+            <div className="admin-login-brand mobile-only-brand">
+              <div className="admin-login-brand-mark">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+              </div>
+              <div className="admin-login-brand-text">
+                <div className="admin-login-brand-row">
+                  <strong>TARIPA</strong>
+                  <span className="admin-login-badge">ADMIN</span>
+                </div>
+                <span>Property & Utility Management</span>
+              </div>
+            </div>
 
-        <p className="admin-login-note">
-          TARIPA · Residential Utility Tracking & Billing System
-        </p>
+            <div className="admin-login-header">
+              <h1 className="admin-login-title">Welcome back</h1>
+            </div>
+
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="admin-login-fields">
+                <label className="field">
+                  <span className="field-label">USERNAME</span>
+                  <input
+                    type="text"
+                    className="field-input"
+                    value={username}
+                    onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                    placeholder="Admin username"
+                    autoComplete="username"
+                    autoFocus
+                    disabled={loading}
+                  />
+                </label>
+                <label className="field">
+                  <span className="field-label">PASSWORD</span>
+                  <div className="field-input-wrap">
+                    <input
+                      type={showPass ? "text" : "password"}
+                      className="field-input field-input-padded"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                      placeholder="Enter admin password"
+                      autoComplete="current-password"
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="field-eye-btn"
+                      onClick={() => setShowPass((s) => !s)}
+                      aria-label={showPass ? "Hide password" : "Show password"}
+                      tabIndex={-1}
+                      disabled={loading}
+                    >
+                      {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
+                    </button>
+                  </div>
+                </label>
+              </div>
+
+              {error && (
+                <div className="form-msg form-msg-error" role="alert">
+                  <Icons.Alert />
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="btn-primary admin-login-btn"
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="admin-login-spinner" />
+                    Signing in…
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+            </form>
+
+            <div className="admin-login-footer">
+              <p className="admin-login-note">
+                Tenant?{" "}
+                <a href="/client" className="portal-switch-link">
+                  Client Portal &rarr;
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -305,8 +393,7 @@ function AdminLogin({ onLoginSuccess }) {
    APP SHELL
 ───────────────────────────────────────────── */
 function App() {
-	const { showToast } = useToast();
-  // ── Admin auth state ──────────────────────
+// ── Admin auth state ──────────────────────
   const [adminToken, setAdminToken] = useState(() => getAdminToken());
   const [adminUser,  setAdminUser]  = useState(() => getAdminUser());
 
@@ -326,6 +413,12 @@ function App() {
     setAdminUser(null);
   }, []);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTenants, setSearchTenants] = useState([]);
+  const [searchRooms, setSearchRooms] = useState([]);
+  const searchContainerRef = useRef(null);
+
   useEffect(() => {
     // Only poll health when authenticated
     if (!adminToken) return;
@@ -341,7 +434,57 @@ function App() {
       .catch(() => {
         setBackendStatus("Backend unavailable");
       });
-  }, [adminToken]);
+
+    // Preload lightweight search indices
+    authFetch("/api/tenants")
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setSearchTenants(data.data); })
+      .catch(() => {});
+
+    authFetch("/api/rooms")
+      .then((r) => r.json())
+      .then((data) => { if (data.success) setSearchRooms(data.data); })
+      .catch(() => {});
+  }, [adminToken, activePage]);
+
+  // Click outside listener for search dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    const matchedTenants = searchTenants
+      .filter((t) => t.full_name?.toLowerCase().includes(q) || t.room_number?.toString().includes(q))
+      .slice(0, 4)
+      .map((t) => ({
+        id: `tenant-${t.id}`,
+        title: t.full_name,
+        subtitle: t.room_number ? `Room ${t.room_number} · ${t.status}` : t.status,
+        page: "tenants",
+        badge: "Tenant",
+      }));
+
+    const matchedRooms = searchRooms
+      .filter((r) => r.room_number?.toString().includes(q))
+      .slice(0, 3)
+      .map((r) => ({
+        id: `room-${r.id}`,
+        title: `Room ${r.room_number}`,
+        subtitle: `${r.occupied_count}/${r.capacity} Occupants`,
+        page: "rooms",
+        badge: "Room",
+      }));
+
+    return [...matchedTenants, ...matchedRooms];
+  }, [searchQuery, searchTenants, searchRooms]);
 
   // ── Auth gate: show login if no token ─────
   if (!adminToken) {
@@ -352,18 +495,27 @@ function App() {
 
   return (
     <div className="app-shell">
+      {/* ── MOBILE OVERLAY ── */}
+      {mobileSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
       {/* ── SIDEBAR ── */}
       <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""} ${mobileSidebarOpen ? "mobile-open" : ""}`}>
         <button
           type="button"
           className="sidebar-toggle"
           onClick={() => {
-          if (window.innerWidth <= 768) {
-            setMobileSidebarOpen((open) => !open);
-            return;
-          }
-          setSidebarCollapsed((c) => !c);
-        }}
+            if (window.innerWidth <= 768) {
+              setMobileSidebarOpen((open) => !open);
+              return;
+            }
+            setSidebarCollapsed((c) => !c);
+          }}
           aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {sidebarCollapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
@@ -372,7 +524,7 @@ function App() {
         {/* Brand */}
         <div className="brand">
           <div className="brand-mark">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
             </svg>
           </div>
@@ -390,7 +542,10 @@ function App() {
               key={id}
               type="button"
               className={`nav-item ${activePage === id ? "active" : ""}`}
-              onClick={() => setActivePage(id)}
+              onClick={() => {
+                setActivePage(id);
+                if (window.innerWidth <= 768) setMobileSidebarOpen(false);
+              }}
             >
               <span className="nav-icon">
                 <Icon />
@@ -434,24 +589,124 @@ function App() {
         </div>
       </aside>
 
-
       {/* ── MAIN CONTENT ── */}
       <main className="main-content">
-        {activePage === "dashboard" ? (
-          <Dashboard onNavigate={setActivePage} />
-        ) : activePage === "tenants" ? (
-          <TenantsPage />
-        ) : activePage === "rooms" ? (
-          <RoomsPage />
-        ) : activePage === "meters" ? (
-          <MeterReadingsPage />
-        ) : activePage === "rates" ? (
-          <UtilityRatesPage />
-        ) : activePage === "billing" ? (
-          <BillingPage />
-        ) : activePage === "reports" ? (
-          <ReportsPage />
-        ) : null}
+        {/* ── STICKY TOPBAR ── */}
+        <header className="topbar">
+          <div className="topbar-left">
+            <button
+              type="button"
+              className="mobile-menu-btn"
+              onClick={() => setMobileSidebarOpen((o) => !o)}
+              aria-label="Toggle navigation menu"
+            >
+              <Icons.Menu />
+            </button>
+            <div className="page-context">
+              <span className="context-brand">TARIPA</span>
+              <span className="context-sep">/</span>
+              <span className="breadcrumb-current">
+                {navigationItems.find((n) => n.id === activePage)?.label ?? "Dashboard"}
+              </span>
+            </div>
+          </div>
+
+          <div className="topbar-right">
+            <div className="global-search-wrapper" ref={searchContainerRef}>
+              <div className="global-search">
+                <span className="search-icon">
+                  <Icons.Search />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search records, tenants..."
+                  aria-label="Search"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setSearchOpen(true);
+                  }}
+                  onFocus={() => {
+                    if (searchQuery.trim()) setSearchOpen(true);
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    className="search-clear-btn"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchOpen(false);
+                    }}
+                    aria-label="Clear search"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {searchOpen && searchQuery.trim() && (
+                <div className="search-results-dropdown">
+                  {searchResults.length === 0 ? (
+                    <div className="search-no-results">No matching records found</div>
+                  ) : (
+                    searchResults.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="search-result-item"
+                        onClick={() => {
+                          setActivePage(item.page);
+                          setSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                      >
+                        <div className="search-result-info">
+                          <span className="search-result-title">{item.title}</span>
+                          <span className="search-result-sub">{item.subtitle}</span>
+                        </div>
+                        <span className="search-result-badge">{item.badge}</span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="notification-button"
+              title="System Notifications"
+              aria-label="Notifications"
+            >
+              <Icons.Bell />
+              <span className="notification-dot" />
+            </button>
+
+            <div className="topbar-avatar" title={`Signed in as ${adminUser?.username ?? "Admin"}`}>
+              {String(adminUser?.username ?? "A").charAt(0).toUpperCase()}
+            </div>
+          </div>
+        </header>
+
+        {/* ── PAGE CONTENT WRAPPER ── */}
+        <div className="page-content animate-fade-in" key={activePage}>
+          {activePage === "dashboard" ? (
+            <Dashboard onNavigate={setActivePage} />
+          ) : activePage === "tenants" ? (
+            <TenantsPage />
+          ) : activePage === "rooms" ? (
+            <RoomsPage />
+          ) : activePage === "meters" ? (
+            <MeterReadingsPage />
+          ) : activePage === "rates" ? (
+            <UtilityRatesPage />
+          ) : activePage === "billing" ? (
+            <BillingPage />
+          ) : activePage === "reports" ? (
+            <ReportsPage />
+          ) : null}
+        </div>
       </main>
     </div>
   );
@@ -642,36 +897,90 @@ function Dashboard({ onNavigate }) {
               <span>Loading…</span>
             </div>
           ) : (
-            <div className="dash-billing-stats">
-              <div className="dash-billing-stat dash-bs-outstanding">
-                <span className="dash-bs-label">Outstanding Balance</span>
-                <strong className="dash-bs-value">
-                  {formatCurrency(dashboardData.outstanding_amount)}
-                </strong>
-                <span className="dash-bs-detail">
-                  {dashboardData.pending_bills} bill{dashboardData.pending_bills !== 1 ? "s" : ""} pending
-                </span>
+            <div className="dash-overview-body">
+              <div className="dash-overview-visual">
+                <div
+                  className="dash-donut-chart"
+                  style={{
+                    background: `conic-gradient(var(--color-primary) 0% ${
+                      dashboardData.total_rooms > 0
+                        ? Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)
+                        : 0
+                    }%, #E2E8F0 ${
+                      dashboardData.total_rooms > 0
+                        ? Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)
+                        : 0
+                    }% 100%)`,
+                  }}
+                >
+                  <div className="dash-donut-center">
+                    <strong>
+                      {dashboardData.total_rooms > 0
+                        ? `${Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)}%`
+                        : "0%"}
+                    </strong>
+                    <span>Occupied</span>
+                  </div>
+                </div>
+
+                <div className="dash-overview-legend">
+                  <div className="dash-legend-item">
+                    <div className="dash-legend-main">
+                      <span className="dash-legend-dot dot-indigo" />
+                      <span>Occupied Units</span>
+                    </div>
+                    <strong>{dashboardData.total_rooms - dashboardData.available_rooms} rooms</strong>
+                  </div>
+
+                  <div className="dash-legend-item">
+                    <div className="dash-legend-main">
+                      <span className="dash-legend-dot dot-gray" />
+                      <span>Available Units</span>
+                    </div>
+                    <strong>{dashboardData.available_rooms} rooms</strong>
+                  </div>
+
+                  <div className="dash-legend-item">
+                    <div className="dash-legend-main">
+                      <span className="dash-legend-dot dot-amber" />
+                      <span>Pending Bills</span>
+                    </div>
+                    <strong className="text-warning">{dashboardData.pending_bills} pending</strong>
+                  </div>
+                </div>
               </div>
-              <div className="dash-billing-stat dash-bs-rooms">
-                <span className="dash-bs-label">Room Occupancy</span>
-                <strong className="dash-bs-value">
-                  {dashboardData.total_rooms > 0
-                    ? `${Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)}%`
-                    : "—"}
-                </strong>
-                <span className="dash-bs-detail">
-                  {dashboardData.total_rooms - dashboardData.available_rooms} of {dashboardData.total_rooms} rooms occupied
-                </span>
+
+              <div className="dash-billing-stats">
+                <div className="dash-billing-stat dash-bs-outstanding">
+                  <span className="dash-bs-label">Outstanding Balance</span>
+                  <strong className="dash-bs-value">
+                    {formatCurrency(dashboardData.outstanding_amount)}
+                  </strong>
+                  <span className="dash-bs-detail">
+                    {dashboardData.pending_bills} bill{dashboardData.pending_bills !== 1 ? "s" : ""} pending collection
+                  </span>
+                </div>
+                <div className="dash-billing-stat dash-bs-rooms">
+                  <span className="dash-bs-label">Capacity Meter</span>
+                  <div className="dash-progress-track">
+                    <div
+                      className="dash-progress-fill"
+                      style={{
+                        width: `${
+                          dashboardData.total_rooms > 0
+                            ? Math.round(((dashboardData.total_rooms - dashboardData.available_rooms) / dashboardData.total_rooms) * 100)
+                            : 0
+                        }%`,
+                      }}
+                    />
+                  </div>
+                  <span className="dash-bs-detail">
+                    {dashboardData.total_rooms - dashboardData.available_rooms} of {dashboardData.total_rooms} units assigned
+                  </span>
+                </div>
               </div>
             </div>
           )}
-
-          <div className="dash-billing-note">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            Collection-rate trends and historical charts will appear here when additional reporting data becomes available.
-          </div>
         </section>
 
         {/* Quick Actions */}
@@ -869,11 +1178,27 @@ function TenantsPage() {
 
   useEffect(() => { loadTenants(); loadRooms(); }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({ full_name: "", contact_number: "", room_id: "", move_in_date: "", status: "Active" });
     setFormError("");
     setFormSuccess("");
-  };
+  }, []);
+
+  const closeForm = useCallback(() => {
+    setShowForm(false);
+    setEditingTenant(null);
+    resetForm();
+  }, [resetForm]);
+
+  // Keyboard shortcut: Escape closes the form panel
+  useEffect(() => {
+    if (!showForm) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") closeForm();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showForm, closeForm]);
 
   const openAddForm = () => { setEditingTenant(null); resetForm(); setShowForm(true); };
 
@@ -890,8 +1215,6 @@ function TenantsPage() {
     setFormSuccess("");
     setShowForm(true);
   };
-
-  const closeForm = () => { setShowForm(false); setEditingTenant(null); resetForm(); };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1151,16 +1474,26 @@ function RoomsPage() {
 
   useEffect(() => { loadRooms(); }, []);
 
+  const closeForm = useCallback(() => {
+    setShowForm(false);
+    setFormData({ room_number: "", capacity: "" });
+    setFormError("");
+    setFormSuccess("");
+  }, []);
+
+  // Keyboard shortcut: Escape closes the form panel
+  useEffect(() => {
+    if (!showForm) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") closeForm();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showForm, closeForm]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((c) => ({ ...c, [name]: value }));
-    setFormError("");
-    setFormSuccess("");
-  };
-
-  const closeForm = () => {
-    setShowForm(false);
-    setFormData({ room_number: "", capacity: "" });
     setFormError("");
     setFormSuccess("");
   };
@@ -1336,11 +1669,27 @@ function MeterReadingsPage() {
 
   useEffect(() => { loadReadings(); loadTenants(); }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({ tenant_id: "", billing_month: "", electricity_previous: "", electricity_current: "", water_previous: "", water_current: "" });
     setFormError("");
     setFormSuccess("");
-  };
+  }, []);
+
+  const closeForm = useCallback(() => {
+    setShowForm(false);
+    setEditingReading(null);
+    resetForm();
+  }, [resetForm]);
+
+  // Keyboard shortcut: Escape closes the form panel
+  useEffect(() => {
+    if (!showForm) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") closeForm();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showForm, closeForm]);
 
   const openAddForm = () => { setEditingReading(null); resetForm(); setShowForm(true); };
 
@@ -1358,8 +1707,6 @@ function MeterReadingsPage() {
     setFormSuccess("");
     setShowForm(true);
   };
-
-  const closeForm = () => { setShowForm(false); setEditingReading(null); resetForm(); };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1420,6 +1767,9 @@ function MeterReadingsPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+  const handleDelete = (reading) => {
+    setDeleteTarget(reading);
   };
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -1866,14 +2216,28 @@ function BillingPage() {
 
   useEffect(() => { loadBillingRecords(); loadTenants(); }, []);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setFormData({ tenant_id: "", billing_month: "" });
     setFormError("");
     setFormSuccess("");
-  };
+  }, []);
+
+  const closeForm = useCallback(() => {
+    setShowForm(false);
+    resetForm();
+  }, [resetForm]);
+
+  // Keyboard shortcut: Escape closes the form panel
+  useEffect(() => {
+    if (!showForm) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") closeForm();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showForm, closeForm]);
 
   const openAddForm = () => { resetForm(); setShowForm(true); };
-  const closeForm = () => { setShowForm(false); resetForm(); };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1936,6 +2300,98 @@ function BillingPage() {
       console.error("Failed to delete billing record:", err);
       window.alert("Unable to connect to the backend.");
     }
+  };
+
+  const printStatement = (billing) => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    const month = billing.billing_month ? billing.billing_month.substring(0, 7) : "—";
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Statement of Account - ${billing.full_name}</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #0F172A; max-width: 600px; margin: 0 auto; line-height: 1.5; }
+            .header { border-bottom: 2px solid #4F46E5; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+            .title { font-size: 22px; font-weight: 800; color: #0F172A; margin: 0; }
+            .brand { font-size: 14px; font-weight: 700; color: #4F46E5; }
+            .meta { margin-bottom: 24px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 16px; border-radius: 8px; }
+            .meta table { width: 100%; }
+            .meta td { padding: 4px 0; font-size: 14px; }
+            .meta td.label { color: #64748B; font-weight: 600; width: 140px; }
+            .meta td.value { font-weight: 700; color: #0F172A; }
+            .charges-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+            .charges-table th, .charges-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #E2E8F0; }
+            .charges-table th { background: #F1F5F9; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }
+            .charges-table td.amount { text-align: right; font-weight: 700; }
+            .total-row td { font-size: 16px; font-weight: 800; border-top: 2px solid #0F172A; border-bottom: none; color: #0F172A; }
+            .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #EEF2FF; color: #4F46E5; }
+            .footer { margin-top: 40px; font-size: 12px; color: #94A3B8; text-align: center; border-top: 1px solid #E2E8F0; padding-top: 16px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="brand">TARIPA UTILITY MANAGEMENT</div>
+              <h1 class="title">Billing Statement</h1>
+            </div>
+            <div>
+              <span class="badge">${billing.status}</span>
+            </div>
+          </div>
+
+          <div class="meta">
+            <table>
+              <tr>
+                <td class="label">Tenant Name:</td>
+                <td class="value">${billing.full_name}</td>
+              </tr>
+              <tr>
+                <td class="label">Room Assignment:</td>
+                <td class="value">${billing.room_number ? `Room ${billing.room_number}` : "Unassigned"}</td>
+              </tr>
+              <tr>
+                <td class="label">Billing Period:</td>
+                <td class="value">${month}</td>
+              </tr>
+            </table>
+          </div>
+
+          <table class="charges-table">
+            <thead>
+              <tr>
+                <th>Utility Description</th>
+                <th style="text-align: right;">Amount (PHP)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Electricity Charge</td>
+                <td class="amount">${formatCurrency(billing.electricity_charge)}</td>
+              </tr>
+              <tr>
+                <td>Water Charge</td>
+                <td class="amount">${formatCurrency(billing.water_charge)}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total Amount Due</td>
+                <td class="amount">${formatCurrency(billing.total_amount)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer">
+            Generated on ${new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })} · TARIPA Residential Management
+          </div>
+
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   return (
@@ -2046,6 +2502,15 @@ function BillingPage() {
                   </select>
                 </div>
                 <div className="meta-actions">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    style={{ padding: "6px 10px", fontSize: "12px", gap: "4px" }}
+                    onClick={() => printStatement(billing)}
+                    title="Print Statement of Account"
+                  >
+                    <Icons.Print /> Print
+                  </button>
                   <button type="button" className="btn-delete" onClick={() => handleDelete(billing)}>
                     <Icons.Delete /> Delete
                   </button>
@@ -2085,7 +2550,6 @@ function ReportsPage() {
       const response = await authFetch("/api/billing");
       if (!response.ok) throw new Error(`Billing API returned ${response.status}`);
       const data = await response.json();
-      console.log("TARIPA REPORTS:", data);
       if (!data.success) throw new Error(data.message || "Failed to load billing reports.");
       setReports(Array.isArray(data.data) ? data.data : []);
     } catch (err) {
@@ -2141,6 +2605,30 @@ function ReportsPage() {
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
+  const exportToCSV = () => {
+    if (!filteredReports.length) return;
+    const headers = ["ID", "Tenant", "Room", "Billing Month", "Electricity Charge", "Water Charge", "Total Amount", "Status"];
+    const rows = filteredReports.map((r) => [
+      r.id,
+      `"${(r.full_name || "").replace(/"/g, '""')}"`,
+      r.room_number || "Unassigned",
+      getBillingMonth(r.billing_month),
+      Number(r.electricity_charge || 0).toFixed(2),
+      Number(r.water_charge || 0).toFixed(2),
+      Number(r.total_amount || 0).toFixed(2),
+      r.status,
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `taripa_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="page-wrap">
       <PageHeader
@@ -2148,9 +2636,20 @@ function ReportsPage() {
         title="Reports"
         description="Search and filter billing records to review utility usage and payment information."
         action={
-          <button type="button" className="btn-secondary" onClick={loadReports}>
-            <Icons.Refresh /> Refresh
-          </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={exportToCSV}
+              disabled={filteredReports.length === 0}
+              title="Export filtered records to CSV"
+            >
+              <Icons.Download /> Export CSV
+            </button>
+            <button type="button" className="btn-secondary" onClick={loadReports}>
+              <Icons.Refresh /> Refresh
+            </button>
+          </div>
         }
       />
 
