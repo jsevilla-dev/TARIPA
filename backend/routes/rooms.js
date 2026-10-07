@@ -46,10 +46,25 @@ router.post("/", async (req, res) => {
             });
         }
 
-        if (!Number.isInteger(Number(capacity)) || Number(capacity) <= 0) {
+        const roomNumTrimmed = String(room_number).trim();
+        if (!roomNumTrimmed || !/^\d+$/.test(roomNumTrimmed)) {
             return res.status(400).json({
                 success: false,
-                message: "Capacity must be a positive whole number",
+                message: "Room number must be numbers only (e.g. 101, 102)",
+            });
+        }
+        if (roomNumTrimmed.length > 4) {
+            return res.status(400).json({
+                success: false,
+                message: "Room number must be between 1 and 4 digits (e.g. 101, 102)",
+            });
+        }
+
+        const capNum = Number(capacity);
+        if (!Number.isInteger(capNum) || capNum <= 0 || capNum > 30) {
+            return res.status(400).json({
+                success: false,
+                message: "Capacity must be a positive whole number between 1 and 30",
             });
         }
 
@@ -58,7 +73,7 @@ router.post("/", async (req, res) => {
         INSERT INTO rooms (room_number, capacity)
         VALUES (?, ?)
       `,
-            [room_number.trim(), Number(capacity)]
+            [roomNumTrimmed, capNum]
         );
 
         res.status(201).json({
@@ -66,8 +81,8 @@ router.post("/", async (req, res) => {
             message: "Room created successfully",
             data: {
                 id: result.insertId,
-                room_number: room_number.trim(),
-                capacity: Number(capacity),
+                room_number: roomNumTrimmed,
+                capacity: capNum,
             },
         });
     } catch (error) {
@@ -99,10 +114,38 @@ router.put("/:id", async (req, res) => {
             });
         }
 
-        if (!Number.isInteger(Number(capacity)) || Number(capacity) <= 0) {
+        const roomNumTrimmed = String(room_number).trim();
+        if (!roomNumTrimmed || !/^\d+$/.test(roomNumTrimmed)) {
             return res.status(400).json({
                 success: false,
-                message: "Capacity must be a positive whole number",
+                message: "Room number must be numbers only (e.g. 101, 102)",
+            });
+        }
+        if (roomNumTrimmed.length > 4) {
+            return res.status(400).json({
+                success: false,
+                message: "Room number must be between 1 and 4 digits (e.g. 101, 102)",
+            });
+        }
+
+        const capNum = Number(capacity);
+        if (!Number.isInteger(capNum) || capNum <= 0 || capNum > 30) {
+            return res.status(400).json({
+                success: false,
+                message: "Capacity must be a positive whole number between 1 and 30",
+            });
+        }
+
+        // Verify that capacity is not lower than active occupants
+        const [occupantRows] = await db.query(
+            "SELECT COUNT(*) AS active_tenants FROM tenants WHERE room_id = ? AND status = 'Active'",
+            [id]
+        );
+        const currentActive = occupantRows[0]?.active_tenants || 0;
+        if (capNum < currentActive) {
+            return res.status(400).json({
+                success: false,
+                message: `Capacity cannot be lower than the current active tenants (${currentActive})`,
             });
         }
 
@@ -112,7 +155,7 @@ router.put("/:id", async (req, res) => {
         SET room_number = ?, capacity = ?
         WHERE id = ?
       `,
-            [room_number.trim(), Number(capacity), id]
+            [roomNumTrimmed, capNum, id]
         );
 
         if (result.affectedRows === 0) {
@@ -146,6 +189,18 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Check if any tenants are associated with this room
+        const [tenantRows] = await db.query(
+            "SELECT COUNT(*) AS tenant_count FROM tenants WHERE room_id = ?",
+            [id]
+        );
+        if (tenantRows[0]?.tenant_count > 0) {
+            return res.status(409).json({
+                success: false,
+                message: "Room cannot be deleted because tenants are assigned to it",
+            });
+        }
 
         const [result] = await db.query(
             `

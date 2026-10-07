@@ -1,4 +1,4 @@
-﻿const path = require("path");
+const path = require("path");
 require("dotenv").config({
     path: path.resolve(__dirname, "../.env"),
 });
@@ -48,6 +48,7 @@ app.get("/api/dashboard", adminAuth, async (req, res) => {
         const [roomRows] = await db.query(`
             SELECT
                 COUNT(*) AS total_rooms,
+                COALESCE(SUM(capacity), 0) AS total_capacity,
                 COALESCE(
                     SUM(
                         CASE
@@ -76,7 +77,7 @@ app.get("/api/dashboard", adminAuth, async (req, res) => {
             SELECT
                 COUNT(
                     CASE
-                        WHEN status = 'Pending' THEN 1
+                        WHEN status IN ('Pending', 'Overdue') THEN 1
                     END
                 ) AS pending_bills,
                 COALESCE(
@@ -88,20 +89,63 @@ app.get("/api/dashboard", adminAuth, async (req, res) => {
                         END
                     ),
                     0
-                ) AS outstanding_amount
+                ) AS outstanding_amount,
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN status = 'Paid'
+                            THEN total_amount
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS total_collected
             FROM billing_records
+        `);
+
+        const [utilityRows] = await db.query(`
+            SELECT
+                COALESCE(SUM(electricity_consumption), 0) AS total_electricity_kwh,
+                COALESCE(SUM(electricity_charge), 0) AS total_electricity_cost,
+                COALESCE(SUM(water_consumption), 0) AS total_water_cum,
+                COALESCE(SUM(water_charge), 0) AS total_water_cost
+            FROM billing_records
+        `);
+
+        const [highestUsageRoom] = await db.query(`
+            SELECT
+                r.room_number,
+                SUM(b.electricity_consumption) AS electricity_kwh
+            FROM billing_records b
+            INNER JOIN tenants t ON t.id = b.tenant_id
+            INNER JOIN rooms r ON r.id = t.room_id
+            GROUP BY r.id, r.room_number
+            ORDER BY electricity_kwh DESC
+            LIMIT 1
         `);
 
         res.json({
             success: true,
             data: {
-                total_tenants: Number(tenantRows[0].total_tenants),
-                total_rooms: Number(roomRows[0].total_rooms),
-                available_rooms: Number(roomRows[0].available_rooms),
-                pending_bills: Number(billingRows[0].pending_bills),
-                outstanding_amount: Number(
-                    billingRows[0].outstanding_amount
-                ),
+                total_tenants: Number(tenantRows[0].total_tenants || 0),
+                total_rooms: Number(roomRows[0].total_rooms || 0),
+                total_capacity: Number(roomRows[0].total_capacity || 0),
+                available_rooms: Number(roomRows[0].available_rooms || 0),
+                pending_bills: Number(billingRows[0].pending_bills || 0),
+                outstanding_amount: Number(billingRows[0].outstanding_amount || 0),
+                total_collected: Number(billingRows[0].total_collected || 0),
+                electricity: {
+                    kwh: Number(utilityRows[0]?.total_electricity_kwh || 0),
+                    cost: Number(utilityRows[0]?.total_electricity_cost || 0),
+                },
+                water: {
+                    cum: Number(utilityRows[0]?.total_water_cum || 0),
+                    cost: Number(utilityRows[0]?.total_water_cost || 0),
+                },
+                highest_usage_room: highestUsageRoom.length > 0 ? {
+                    room_number: highestUsageRoom[0].room_number,
+                    kwh: Number(highestUsageRoom[0].electricity_kwh || 0),
+                } : null,
             },
         });
     } catch (error) {

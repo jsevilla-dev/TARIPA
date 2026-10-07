@@ -56,11 +56,12 @@ router.post("/", async (req, res) => {
 
         if (
             Number.isNaN(Number(rate_per_unit)) ||
-            Number(rate_per_unit) < 0
+            Number(rate_per_unit) <= 0 ||
+            Number(rate_per_unit) > 10000
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Rate per unit must be a non-negative number",
+                message: "Rate per unit must be between 0.01 and 10,000",
             });
         }
 
@@ -134,11 +135,12 @@ router.put("/:id", async (req, res) => {
 
         if (
             Number.isNaN(Number(rate_per_unit)) ||
-            Number(rate_per_unit) < 0
+            Number(rate_per_unit) <= 0 ||
+            Number(rate_per_unit) > 10000
         ) {
             return res.status(400).json({
                 success: false,
-                message: "Rate per unit must be a non-negative number",
+                message: "Rate per unit must be between 0.01 and 10,000",
             });
         }
 
