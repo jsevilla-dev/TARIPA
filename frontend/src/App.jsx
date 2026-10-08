@@ -4598,14 +4598,6 @@ function ReportsPage() {
           >
             <Icons.Download /> Export CSV
           </button>
-          <button
-            type="button"
-            className="btn-pill-action"
-            onClick={loadReports}
-            style={{ height: "38px", padding: "0 18px", fontSize: "13px" }}
-          >
-            <Icons.Refresh /> Refresh
-          </button>
         </div>
       </div>
 
