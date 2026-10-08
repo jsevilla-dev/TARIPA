@@ -259,10 +259,7 @@ a {
 .split-login-hero {
   flex: 1;
   min-height: 100vh;
-  background-color: #091710;
-  background-image: url('/login-hero-bg.jpg');
-  background-position: center center;
-  background-size: cover;
+  background-color: #0f172a;
   position: relative;
   display: block;
 }
