@@ -1697,16 +1697,37 @@ function TenantsPage() {
   // Filter rows
   const filteredTenants = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const digitsInQuery = q.replace(/\D/g, "");
+
     return tenants.filter((t) => {
+      // 1. Room filter dropdown
+      const roomNumStr = t.room_number != null ? String(t.room_number).trim() : "";
       const matchesRoom =
         roomFilter === "All rooms" ||
-        (t.room_number && `Room ${t.room_number}` === roomFilter) ||
-        (t.room_number && String(t.room_number) === roomFilter);
-      const matchesQuery =
-        !q ||
-        t.full_name.toLowerCase().includes(q) ||
-        (t.contact_number && t.contact_number.replace(/\D/g, "").includes(q.replace(/\D/g, "")));
-      return matchesRoom && matchesQuery;
+        (roomNumStr && `Room ${roomNumStr}`.toLowerCase() === roomFilter.toLowerCase()) ||
+        (roomNumStr && roomNumStr.toLowerCase() === roomFilter.toLowerCase());
+
+      if (!matchesRoom) return false;
+      if (!q) return true;
+
+      // 2. Full name match (e.g. "James", "Lorrely", "Mathew")
+      const nameMatch = Boolean(t.full_name && t.full_name.toLowerCase().includes(q));
+
+      // 3. Room number match (e.g. "101", "Room 101", "rm 101")
+      const roomMatch =
+        Boolean(roomNumStr && roomNumStr.toLowerCase().includes(q)) ||
+        Boolean(roomNumStr && `room ${roomNumStr}`.toLowerCase().includes(q));
+
+      // 4. Contact number match (only when query contains digits or literal match)
+      const cleanContact = t.contact_number ? t.contact_number.replace(/\D/g, "") : "";
+      const contactMatch =
+        (digitsInQuery.length >= 2 && cleanContact.includes(digitsInQuery)) ||
+        Boolean(t.contact_number && t.contact_number.toLowerCase().includes(q));
+
+      // 5. Status match ("active", "moved out")
+      const statusMatch = Boolean(t.status && t.status.toLowerCase().includes(q));
+
+      return nameMatch || roomMatch || contactMatch || statusMatch;
     });
   }, [tenants, query, roomFilter]);
 
