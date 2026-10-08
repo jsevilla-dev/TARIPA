@@ -329,13 +329,12 @@ function AdminLogin({ onLoginSuccess }) {
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
 
+  const isFormValid = username.trim().length > 0 && password.length >= 6;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isFormValid || loading) return;
     setError("");
-    if (!username.trim() || !password) {
-      setError("Username and password are required.");
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch("/api/admin/login", {
@@ -358,152 +357,113 @@ function AdminLogin({ onLoginSuccess }) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", minHeight: "100vh", background: "#F6F8FB" }}>
-      {/* ── LEFT HERO PANE (Exact Screenshot 4) ── */}
-      <aside style={{
-        position: "relative",
-        background: "#0B132B",
-        backgroundImage: "url('/images/login-architecture.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        minHeight: "480px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        padding: "48px 40px",
-        overflow: "hidden",
-      }}>
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, #0B132B 0%, rgba(11, 19, 43, 0.45) 50%, rgba(11, 19, 43, 0.7) 100%)" }} />
-        <div style={{ position: "relative", zIndex: 1, color: "#FFFFFF" }}>
-          <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "#94A3B8", margin: 0 }}>
-            For Philippine property managers
-          </p>
-          <p style={{ fontSize: "28px", fontWeight: 800, lineHeight: 1.25, letterSpacing: "-0.02em", margin: "12px 0 0", maxWidth: "440px" }}>
-            Rent, submeters, and receipts — reconciled every cycle.
-          </p>
-          <div style={{ display: "flex", gap: "36px", marginTop: "32px", flexWrap: "wrap" }}>
-            <div>
-              <span style={{ display: "block", fontSize: "12px", color: "#94A3B8", fontWeight: 500 }}>Rooms managed</span>
-              <strong style={{ fontSize: "18px", fontWeight: 800, color: "#FFFFFF" }}>1,240+</strong>
-            </div>
-            <div>
-              <span style={{ display: "block", fontSize: "12px", color: "#94A3B8", fontWeight: 500 }}>kWh billed / mo</span>
-              <strong style={{ fontSize: "18px", fontWeight: 800, color: "#FFFFFF" }}>386,000</strong>
-            </div>
-            <div>
-              <span style={{ display: "block", fontSize: "12px", color: "#94A3B8", fontWeight: 500 }}>Avg. collection</span>
-              <strong style={{ fontSize: "18px", fontWeight: 800, color: "#FFFFFF" }}>96.4%</strong>
-            </div>
-          </div>
-        </div>
-      </aside>
+    <div className="insta-login-page">
+      {/* ── TOP BRAND MARK (like Instagram top-left logo) ── */}
+      <div className="insta-top-brand">
+        <img src="/taripa-owl.jpg" alt="TARIPA" className="insta-top-logo" />
+        <span className="insta-top-name">TARIPA</span>
+      </div>
 
-      {/* ── RIGHT FORM PANE (Exact Screenshot 4) ── */}
-      <main style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
-        <div className="glass" style={{ width: "100%", maxWidth: "420px", borderRadius: "28px", padding: "32px", boxSizing: "border-box" }}>
-          {/* Logo Badge */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "28px" }}>
-            <span style={{ width: "40px", height: "40px", borderRadius: "12px", background: "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)", display: "grid", placeItems: "center", color: "#FFFFFF", overflow: "hidden", flexShrink: 0 }}>
-              <img src="/taripa-owl.jpg" alt="TARIPA" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            </span>
-            <div>
-              <strong style={{ display: "block", fontSize: "15px", fontWeight: 800, color: "#090D16" }}>TARIPA</strong>
-              <span style={{ display: "block", fontSize: "9.5px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#64748B" }}>PROPERTY & UTILITIES</span>
-            </div>
-          </div>
-
-          <h1 style={{ fontSize: "24px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            Welcome back
+      {/* ── MAIN 2-COLUMN CONTAINER ── */}
+      <main className="insta-main-container">
+        {/* Left Column: Headline & Floating Showcase */}
+        <section className="insta-left-col">
+          <h1 className="insta-hero-headline">
+            Rent, submeters, and receipts&nbsp;—<br />
+            <span className="insta-highlight">reconciled every cycle.</span>
           </h1>
-          <p style={{ fontSize: "13.5px", color: "#64748B", margin: "4px 0 0", fontWeight: 500 }}>
-            Sign in to manage billing for your property.
-          </p>
 
-          {/* Segmented Portal Switcher */}
-          <div className="glass-inset" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", padding: "4px", borderRadius: "9999px", marginTop: "24px" }}>
-            <button
-              type="button"
-              className="glass-pill-active"
-              style={{ height: "34px", borderRadius: "9999px", border: "none", fontSize: "12.5px", fontWeight: 600, color: "#090D16", cursor: "pointer" }}
-            >
-              Admin Portal
-            </button>
-            <a
-              href="/client"
-              style={{ height: "34px", borderRadius: "9999px", display: "grid", placeItems: "center", textDecoration: "none", fontSize: "12.5px", fontWeight: 600, color: "#64748B" }}
-            >
-              Tenant Portal
-            </a>
-          </div>
-
-          <form onSubmit={handleSubmit} style={{ marginTop: "24px", display: "flex", flexDirection: "column", gap: "16px" }}>
-            <div>
-              <label className="v0-label">USERNAME / EMAIL</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                placeholder="admin"
-                autoComplete="username"
-                className="v0-input"
-                autoFocus
-                required
+          <div className="insta-mockup-wrapper">
+            {/* Phone/Card Frame */}
+            <div className="insta-mockup-frame">
+              <img
+                src="/images/taripa-owl-building.png"
+                alt="TARIPA Residential Building & Submeter System"
+                className="insta-mockup-img"
               />
             </div>
+          </div>
+        </section>
 
-            <div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                <label className="v0-label" style={{ margin: 0 }}>PASSWORD</label>
-                <a href="#forgot" onClick={(e) => { e.preventDefault(); alert("Contact system administrator to reset admin credentials in .env."); }} style={{ fontSize: "12px", fontWeight: 600, color: "#2563EB", textDecoration: "none" }}>
-                  Forgot password?
-                </a>
+        {/* Center Hairline Divider */}
+        <div className="insta-divider" />
+
+        {/* Right Column: Clean Form */}
+        <section className="insta-right-col">
+          <div className="insta-form-box">
+            <h2 className="insta-form-title">Log into TARIPA</h2>
+            <p className="insta-form-subtitle">Admin billing & property management portal</p>
+
+            {/* Portal Switcher */}
+            <div className="insta-portal-switch">
+              <button type="button" className="insta-portal-btn active">
+                Admin Portal
+              </button>
+              <a href="/client" className="insta-portal-btn">
+                Tenant Portal
+              </a>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="insta-input-wrapper">
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => { setUsername(e.target.value); setError(""); }}
+                  placeholder="Username or email"
+                  autoComplete="username"
+                  className="insta-input"
+                  autoFocus
+                  required
+                />
               </div>
-              <div style={{ position: "relative" }}>
+
+              <div className="insta-input-wrapper">
                 <input
                   type={showPass ? "text" : "password"}
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                  placeholder="Enter your password"
+                  placeholder="Password"
                   autoComplete="current-password"
-                  className="v0-input"
-                  style={{ paddingRight: "70px" }}
+                  className="insta-input"
+                  style={{ paddingRight: "44px" }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass((s) => !s)}
-                  style={{ position: "absolute", top: "50%", right: "8px", transform: "translateY(-50%)", height: "28px", padding: "0 10px", borderRadius: "9999px", border: "none", background: "rgba(15,23,42,0.06)", fontSize: "11.5px", fontWeight: 600, color: "#64748B", cursor: "pointer" }}
+                  className="insta-pass-toggle-btn"
+                  title={showPass ? "Hide password" : "Show password"}
+                  aria-label={showPass ? "Hide password" : "Show password"}
                 >
-                  {showPass ? "Hide" : "Show"}
+                  {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
                 </button>
               </div>
-            </div>
 
-            <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12.5px", color: "#090D16", fontWeight: 500, cursor: "pointer", userSelect: "none" }}>
-              <input type="checkbox" defaultChecked style={{ accentColor: "#2563EB" }} />
-              Remember this device
-            </label>
+              {error && (
+                <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626", padding: "10px 14px", borderRadius: "10px", fontSize: "12.5px", fontWeight: 600, marginBottom: "12px" }}>
+                  {error}
+                </div>
+              )}
 
-            {error && (
-              <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626", padding: "10px 14px", borderRadius: "14px", fontSize: "13px", fontWeight: 600 }}>
-                {error}
-              </div>
-            )}
+              <button
+                type="submit"
+                className="insta-btn-submit"
+                disabled={!isFormValid || loading}
+              >
+                {loading ? "Logging in…" : "Log in"}
+              </button>
 
-            <button
-              type="submit"
-              className="btn-cobalt"
-              style={{ height: "42px", borderRadius: "9999px", fontSize: "14px", fontWeight: 600, color: "#FFFFFF", cursor: "pointer", marginTop: "4px" }}
-              disabled={loading}
-            >
-              {loading ? "Signing In…" : "Sign In"}
-            </button>
-          </form>
-
-          <p style={{ textAlign: "center", fontSize: "11px", color: "#94A3B8", margin: "24px 0 0", lineHeight: 1.4 }}>
-            Protected by session encryption · Data Privacy Act of 2012 compliant
-          </p>
-        </div>
+              <a
+                href="#forgot"
+                onClick={(e) => { e.preventDefault(); alert("Contact system administrator to reset admin credentials in .env."); }}
+                className="insta-forgot-link"
+              >
+                Forgot password?
+              </a>
+            </form>
+          </div>
+        </section>
       </main>
     </div>
   );
@@ -519,8 +479,39 @@ function App() {
 
   const [activePage, setActivePage] = useState("dashboard");
   const [backendStatus, setBackendStatus] = useState("Checking...");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("taripa_sidebar_collapsed") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const toggleSidebar = useCallback(() => {
+    if (window.innerWidth <= 992) {
+      setMobileSidebarOpen((prev) => !prev);
+    } else {
+      setSidebarCollapsed((prev) => {
+        const next = !prev;
+        try {
+          localStorage.setItem("taripa_sidebar_collapsed", String(next));
+        } catch {}
+        return next;
+      });
+    }
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    if (window.innerWidth <= 992) {
+      setMobileSidebarOpen(false);
+    } else {
+      setSidebarCollapsed(true);
+      try {
+        localStorage.setItem("taripa_sidebar_collapsed", "true");
+      } catch {}
+    }
+  }, []);
 
   const handleLoginSuccess = useCallback((token, admin) => {
     setAdminToken(token);
@@ -702,7 +693,7 @@ function App() {
   const isOnline = backendStatus === "Connected";
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? "sidebar-collapsed" : ""}`}>
       {/* ── MOBILE OVERLAY ── */}
       {mobileSidebarOpen && (
         <div
@@ -714,16 +705,27 @@ function App() {
 
       {/* ── SIDEBAR ── */}
       {/* ── SIDEBAR (Floating Liquid Glass Card) ── */}
-      <aside className={`sidebar ${mobileSidebarOpen ? "mobile-open" : ""}`}>
-        {/* Brand */}
-        <div className="brand" onClick={() => setActivePage("dashboard")}>
-          <div className="brand-badge">
-            <img src="/taripa-owl.jpg" alt="TARIPA" />
+      <aside className={`sidebar ${sidebarCollapsed ? "collapsed" : ""} ${mobileSidebarOpen ? "mobile-open" : ""}`}>
+        {/* Brand Header */}
+        <div className="sidebar-brand-header">
+          <div className="brand" onClick={() => setActivePage("dashboard")}>
+            <div className="brand-badge">
+              <img src="/taripa-owl.jpg" alt="TARIPA" />
+            </div>
+            <div className="brand-text">
+              <strong>TARIPA</strong>
+              <span>PROPERTY & UTILITIES</span>
+            </div>
           </div>
-          <div className="brand-text">
-            <strong>TARIPA</strong>
-            <span>PROPERTY & UTILITIES</span>
-          </div>
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            onClick={closeSidebar}
+            title="Close sidebar"
+            aria-label="Close sidebar"
+          >
+            <Icons.Close />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -790,8 +792,9 @@ function App() {
           <div className="topbar-left">
             <button
               type="button"
-              className="mobile-menu-btn"
-              onClick={() => setMobileSidebarOpen((o) => !o)}
+              className="topbar-menu-btn mobile-menu-btn"
+              onClick={toggleSidebar}
+              title={sidebarCollapsed ? "Open sidebar" : "Toggle sidebar"}
               aria-label="Toggle navigation menu"
             >
               <Icons.Menu />

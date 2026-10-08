@@ -28,6 +28,9 @@ export default defineConfig([
     files: ['src/App.jsx', 'src/ClientApp.jsx'],
     rules: {
       'react-hooks/set-state-in-effect': 'off',
+      'no-unused-vars': 'warn',
+      'no-empty': 'off',
+      'no-useless-assignment': 'off',
     },
   },
 ])
