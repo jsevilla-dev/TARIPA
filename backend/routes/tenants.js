@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const db = require("../config/db");
 
 const router = express.Router();
@@ -52,9 +53,11 @@ router.get("/", async (req, res) => {
         r.room_number,
         t.move_in_date,
         t.status,
-        t.created_at
+        t.created_at,
+        ta.username
       FROM tenants t
       LEFT JOIN rooms r ON r.id = t.room_id
+      LEFT JOIN tenant_accounts ta ON ta.tenant_id = t.id
       ORDER BY t.full_name;
     `);
 
@@ -158,11 +161,47 @@ router.post("/", async (req, res) => {
             ]
         );
 
+        const newTenantId = result.insertId;
+
+        // Auto-provision tenant login account
+        const nameParts = formattedName
+            .toLowerCase()
+            .replace(/[^a-z0-9\s]/g, "")
+            .split(/\s+/)
+            .filter(Boolean);
+        let baseUsername =
+            nameParts.length >= 2
+                ? `${nameParts[0]}.${nameParts.slice(1).join("")}`
+                : nameParts[0] || `tenant${newTenantId}`;
+        baseUsername = baseUsername.slice(0, 70);
+
+        let finalUsername = baseUsername;
+        let suffix = 1;
+        while (true) {
+            const [existing] = await db.query(
+                "SELECT id FROM tenant_accounts WHERE username = ? LIMIT 1",
+                [finalUsername]
+            );
+            if (existing.length === 0) break;
+            suffix += 1;
+            finalUsername = `${baseUsername}${suffix}`;
+        }
+
+        const defaultPassword = "taripa2026";
+        const passwordHash = await bcrypt.hash(defaultPassword, 10);
+
+        await db.query(
+            "INSERT INTO tenant_accounts (tenant_id, username, password_hash) VALUES (?, ?, ?)",
+            [newTenantId, finalUsername, passwordHash]
+        );
+
         res.status(201).json({
             success: true,
-            message: "Tenant created successfully",
+            message: `Tenant registered successfully! Portal login: ${finalUsername} (Default Password: ${defaultPassword})`,
             data: {
-                id: result.insertId,
+                id: newTenantId,
+                username: finalUsername,
+                default_password: defaultPassword,
             },
         });
     } catch (error) {

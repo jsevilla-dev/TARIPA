@@ -1710,8 +1710,11 @@ function TenantsPage() {
       if (!matchesRoom) return false;
       if (!q) return true;
 
-      // 2. Full name match (e.g. "James", "Lorrely", "Mathew")
-      const nameMatch = Boolean(t.full_name && t.full_name.toLowerCase().includes(q));
+      // 2. Full name or username match (e.g. "James", "Lorrely", "james.sevilla")
+      const nameMatch = Boolean(
+        (t.full_name && t.full_name.toLowerCase().includes(q)) ||
+        (t.username && t.username.toLowerCase().includes(q))
+      );
 
       // 3. Room number match (e.g. "101", "Room 101", "rm 101")
       const roomMatch =
@@ -1859,9 +1862,16 @@ function TenantsPage() {
                           <span style={{ width: "28px", height: "28px", borderRadius: "9999px", background: "linear-gradient(180deg, #F1F5F9 0%, #E2E8F0 100%)", border: "1px solid #FFFFFF", display: "grid", placeItems: "center", fontSize: "10px", fontWeight: 700, color: "#475569" }}>
                             {initial}
                           </span>
-                          <strong style={{ fontWeight: 600, color: "#090D16", fontSize: "13.5px" }}>
-                            {t.full_name}
-                          </strong>
+                          <div>
+                            <strong style={{ fontWeight: 600, color: "#090D16", fontSize: "13.5px", display: "block" }}>
+                              {t.full_name}
+                            </strong>
+                            {t.username && (
+                              <span style={{ fontSize: "11.5px", color: "#64748B", display: "block", fontFamily: "monospace", marginTop: "1px" }}>
+                                @{t.username}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                       <td style={{ padding: "14px 16px", fontFamily: "monospace", fontSize: "13px", color: "#64748B" }}>
