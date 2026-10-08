@@ -3,6 +3,44 @@ const db = require("../config/db");
 
 const router = express.Router();
 
+function validateFullName(name) {
+    if (!name || typeof name !== "string") {
+        return "Full name is required";
+    }
+    const clean = name.trim().replace(/\s+/g, " ");
+    if (clean.length < 3 || clean.length > 60) {
+        return "Full name must be between 3 and 60 characters";
+    }
+    if (!/^[a-zA-Z\s.\-']+$/.test(clean)) {
+        return "Full name must contain letters only";
+    }
+    if (/(.)\1{2,}/i.test(clean)) {
+        return "Full name cannot contain repeating characters (e.g. 'ddd')";
+    }
+    const words = clean.split(" ").filter(Boolean);
+    if (words.length < 2) {
+        return "Please enter a valid full name with both First Name and Last Name (e.g. Juan Dela Cruz)";
+    }
+    const invalidWord = words.find((part) => {
+        const cleanWord = part.replace(/[^a-zA-Z]/g, "").toLowerCase();
+        if (cleanWord.length === 1) return false;
+        if (["jr", "sr", "ii", "iii", "iv", "v"].includes(cleanWord)) return false;
+        return cleanWord.length < 2 || !/[aeiouy]/.test(cleanWord);
+    });
+    if (invalidWord) {
+        return `"${invalidWord}" does not appear to be a valid name`;
+    }
+    return null;
+}
+
+function formatFullName(name) {
+    const words = name.trim().replace(/\s+/g, " ").split(" ").filter(Boolean);
+    return words.map(w => {
+        if (["ii", "iii", "iv"].includes(w.toLowerCase())) return w.toUpperCase();
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    }).join(" ");
+}
+
 router.get("/", async (req, res) => {
     try {
         const [tenants] = await db.query(`
@@ -47,6 +85,23 @@ router.post("/", async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Full name and move-in date are required",
+            });
+        }
+
+        const nameError = validateFullName(full_name);
+        if (nameError) {
+            return res.status(400).json({
+                success: false,
+                message: nameError,
+            });
+        }
+        const formattedName = formatFullName(full_name);
+
+        const trimmedContact = contact_number ? String(contact_number).trim() : null;
+        if (trimmedContact && !/^\d{7,15}$/.test(trimmedContact)) {
+            return res.status(400).json({
+                success: false,
+                message: "Contact number must contain digits only (7-15 digits)",
             });
         }
 
@@ -96,8 +151,8 @@ router.post("/", async (req, res) => {
         VALUES (?, ?, ?, ?, 'Active')
       `,
             [
-                full_name.trim(),
-                contact_number?.trim() || null,
+                formattedName,
+                trimmedContact || null,
                 room_id || null,
                 move_in_date,
             ]
@@ -135,6 +190,23 @@ router.put("/:id", async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Full name, move-in date, and status are required",
+            });
+        }
+
+        const nameError = validateFullName(full_name);
+        if (nameError) {
+            return res.status(400).json({
+                success: false,
+                message: nameError,
+            });
+        }
+        const formattedName = formatFullName(full_name);
+
+        const trimmedContact = contact_number ? String(contact_number).trim() : null;
+        if (trimmedContact && !/^\d{7,15}$/.test(trimmedContact)) {
+            return res.status(400).json({
+                success: false,
+                message: "Contact number must contain digits only (7-15 digits)",
             });
         }
 
@@ -212,8 +284,8 @@ router.put("/:id", async (req, res) => {
         WHERE id = ?
       `,
             [
-                full_name.trim(),
-                contact_number?.trim() || null,
+                formattedName,
+                trimmedContact || null,
                 room_id || null,
                 move_in_date,
                 status,
@@ -259,7 +331,7 @@ router.delete("/:id", async (req, res) => {
             });
         }
 
-        // Check for meter readings (ON DELETE RESTRICT — would fail at DB level)
+        // Check for meter readings (ON DELETE RESTRICT - would fail at DB level)
         const [meterRows] = await db.query(
             `SELECT COUNT(*) AS cnt FROM meter_readings WHERE tenant_id = ?`,
             [id]
@@ -269,11 +341,11 @@ router.delete("/:id", async (req, res) => {
         if (meterCount > 0) {
             return res.status(409).json({
                 success: false,
-                message: `Cannot delete tenant "${tenantRows[0].full_name}" — they have ${meterCount} meter reading${meterCount !== 1 ? "s" : ""} on record. Delete the meter readings first.`,
+                message: `Cannot delete tenant "${tenantRows[0].full_name}" - they have ${meterCount} meter reading${meterCount !== 1 ? "s" : ""} on record. Delete the meter readings first.`,
             });
         }
 
-        // Check for billing records (ON DELETE RESTRICT — would fail at DB level)
+        // Check for billing records (ON DELETE RESTRICT - would fail at DB level)
         const [billingRows] = await db.query(
             `SELECT COUNT(*) AS cnt FROM billing_records WHERE tenant_id = ?`,
             [id]
@@ -283,11 +355,11 @@ router.delete("/:id", async (req, res) => {
         if (billingCount > 0) {
             return res.status(409).json({
                 success: false,
-                message: `Cannot delete tenant "${tenantRows[0].full_name}" — they have ${billingCount} billing record${billingCount !== 1 ? "s" : ""} on record. Delete the billing records first.`,
+                message: `Cannot delete tenant "${tenantRows[0].full_name}" - they have ${billingCount} billing record${billingCount !== 1 ? "s" : ""} on record. Delete the billing records first.`,
             });
         }
 
-        // Safe to delete — tenant_accounts row cascades automatically
+        // Safe to delete - tenant_accounts row cascades automatically
         const [result] = await db.query(
             `DELETE FROM tenants WHERE id = ?`,
             [id]

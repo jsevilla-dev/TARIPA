@@ -85,20 +85,22 @@ router.get("/dashboard", async (req, res) => {
             [tenantId]
         );
 
-        // Recent billing records (last 3)
+        // Recent billing records (last 12)
         const [recentBillRows] = await db.query(
             `
             SELECT
                 id,
                 DATE_FORMAT(billing_month, '%Y-%m-%d') AS billing_month,
+                electricity_consumption,
                 electricity_charge,
+                water_consumption,
                 water_charge,
                 total_amount,
                 status
             FROM billing_records
             WHERE tenant_id = ?
             ORDER BY billing_month DESC
-            LIMIT 3
+            LIMIT 12
             `,
             [tenantId]
         );

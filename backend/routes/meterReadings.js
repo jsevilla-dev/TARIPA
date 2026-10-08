@@ -78,10 +78,10 @@ router.post("/", async (req, res) => {
             waterCurrent,
         ];
 
-        if (readings.some((value) => Number.isNaN(value) || value < 0)) {
+        if (readings.some((value) => Number.isNaN(value) || value < 0 || value > 99999)) {
             return res.status(400).json({
                 success: false,
-                message: "Meter readings must be non-negative numbers",
+                message: "Meter readings must be between 0 and 99,999",
             });
         }
 
@@ -214,10 +214,10 @@ router.put("/:id", async (req, res) => {
             waterCurrent,
         ];
 
-        if (readings.some((value) => Number.isNaN(value) || value < 0)) {
+        if (readings.some((value) => Number.isNaN(value) || value < 0 || value > 99999)) {
             return res.status(400).json({
                 success: false,
-                message: "Meter readings must be non-negative numbers",
+                message: "Meter readings must be between 0 and 99,999",
             });
         }
 
