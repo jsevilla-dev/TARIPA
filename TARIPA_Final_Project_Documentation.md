@@ -270,68 +270,68 @@ The database comprises six normalized tables with explicit foreign key constrain
 
 ```mermaid
 erDiagram
-    ROOMS ||--o{ TENANTS : "houses (room_id)"
-    TENANTS ||--|| TENANT_ACCOUNTS : "authenticates (tenant_id)"
-    TENANTS ||--o{ METER_READINGS : "measured_for (tenant_id)"
-    TENANTS ||--o{ BILLING_RECORDS : "billed_to (tenant_id)"
+    ROOMS ||--o{ TENANTS : "houses"
+    TENANTS ||--|| TENANT_ACCOUNTS : "authenticates"
+    TENANTS ||--o{ METER_READINGS : "measured_for"
+    TENANTS ||--o{ BILLING_RECORDS : "billed_to"
 
     ROOMS {
-        int unsigned id PK
-        varchar room_number UK
-        int unsigned capacity
-        timestamp created_at
+        int id PK
+        string room_number UK
+        int capacity
+        datetime created_at
     }
 
     TENANTS {
-        int unsigned id PK
-        varchar full_name
-        varchar contact_number
-        int unsigned room_id FK
+        int id PK
+        string full_name
+        string contact_number
+        int room_id FK
         date move_in_date
-        enum status
-        timestamp created_at
+        string status
+        datetime created_at
     }
 
     TENANT_ACCOUNTS {
-        int unsigned id PK
-        int unsigned tenant_id FK,UK
-        varchar username UK
-        varchar password_hash
-        timestamp created_at
-        timestamp updated_at
+        int id PK
+        int tenant_id FK
+        string username UK
+        string password_hash
+        datetime created_at
+        datetime updated_at
     }
 
     UTILITY_RATES {
-        int unsigned id PK
-        enum utility_type
+        int id PK
+        string utility_type
         decimal rate_per_unit
         date effective_from
-        timestamp created_at
+        datetime created_at
     }
 
     METER_READINGS {
-        int unsigned id PK
-        int unsigned tenant_id FK
+        int id PK
+        int tenant_id FK
         date billing_month
         decimal electricity_previous
         decimal electricity_current
         decimal water_previous
         decimal water_current
-        timestamp recorded_at
+        datetime recorded_at
     }
 
     BILLING_RECORDS {
-        int unsigned id PK
-        int unsigned tenant_id FK
+        int id PK
+        int tenant_id FK
         date billing_month
         decimal electricity_consumption
         decimal electricity_charge
         decimal water_consumption
         decimal water_charge
         decimal total_amount
-        enum status
-        timestamp created_at
-        timestamp updated_at
+        string status
+        datetime created_at
+        datetime updated_at
     }
 ```
 
