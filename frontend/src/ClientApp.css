@@ -9,11 +9,11 @@
 
 /* ── Color tokens ── */
 :root {
-  /* Primary — TARIPA Indigo */
-  --cb-primary:        var(--color-primary, #4F46E5);
-  --cb-primary-dark:   var(--color-primary-dark, #4338CA);
-  --cb-primary-light:  var(--color-primary-light, #EEF2FF);
-  --cb-primary-faint:  var(--color-primary-faint, #F5F3FF);
+  /* Primary — TARIPA Cobalt Blue */
+  --cb-primary:        var(--color-primary, #1D4ED8);
+  --cb-primary-dark:   var(--color-primary-dark, #1E40AF);
+  --cb-primary-light:  var(--color-primary-light, #EFF6FF);
+  --cb-primary-faint:  var(--color-primary-faint, #F0F7FF);
 
   /* Accent utilities */
   --cb-electric:       var(--color-electric, #D97706);
@@ -595,12 +595,12 @@
   width: 38px;
   height: 38px;
   border-radius: 11px;
-  background: linear-gradient(135deg, #4F46E5 0%, #3730A3 100%);
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
   color: #fff;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
   overflow: hidden;
 }
 
@@ -654,7 +654,7 @@
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #4F46E5, #6366F1);
+  background: linear-gradient(135deg, #1D4ED8, #2563EB);
   color: #fff;
   font-weight: 800;
   font-size: 15px;

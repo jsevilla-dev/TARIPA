@@ -754,8 +754,8 @@
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 999px;
-  background: var(--color-primary-light, #EEF2FF);
-  color: var(--color-primary, #4F46E5);
+  background: var(--color-primary-light, #EFF6FF);
+  color: var(--color-primary, #1D4ED8);
   flex-shrink: 0;
 }
 
@@ -868,14 +868,14 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: #EEF2FF;
-  color: #4F46E5;
+  background: #EFF6FF;
+  color: #1D4ED8;
 }
 
 .notifications-mark-read {
   font-size: 11.5px;
   font-weight: 600;
-  color: #4F46E5;
+  color: #1D4ED8;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -978,7 +978,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #4F46E5;
+  background: #1D4ED8;
   flex-shrink: 0;
   margin-top: 6px;
 }
@@ -1029,7 +1029,7 @@
   border: none;
   font-size: 12px;
   font-weight: 600;
-  color: #4F46E5;
+  color: #1D4ED8;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
@@ -1792,8 +1792,8 @@
 .loading-spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid var(--color-primary-light, #EEF2FF);
-  border-top-color: var(--color-primary, #4F46E5);
+  border: 3px solid var(--color-primary-light, #EFF6FF);
+  border-top-color: var(--color-primary, #1D4ED8);
   border-radius: 50%;
   animation: taripaSpin 0.75s linear infinite;
   margin-bottom: 6px;
@@ -1901,7 +1901,7 @@
   border-radius: 16px 16px 0 0;
 }
 
-.kpi-indigo.dash-kpi-card::before  { background: linear-gradient(90deg, #4F46E5, #818CF8); }
+.kpi-indigo.dash-kpi-card::before  { background: linear-gradient(90deg, #1D4ED8, #60A5FA); }
 .kpi-blue.dash-kpi-card::before    { background: linear-gradient(90deg, #2563EB, #60A5FA); }
 .kpi-success.dash-kpi-card::before { background: linear-gradient(90deg, #16A34A, #4ADE80); }
 .kpi-warning.dash-kpi-card::before { background: linear-gradient(90deg, #D97706, #FCD34D); }
@@ -2114,7 +2114,7 @@
   flex-shrink: 0;
 }
 
-.dot-indigo { background: var(--color-primary, #4F46E5); }
+.dot-indigo { background: var(--color-primary, #1D4ED8); }
 .dot-gray   { background: #E2E8F0; border: 1px solid #CBD5E1; }
 .dot-amber  { background: #D97706; }
 
@@ -2139,7 +2139,7 @@
 .dash-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-primary, #4F46E5) 0%, #818CF8 100%);
+  background: linear-gradient(90deg, var(--color-primary, #1D4ED8) 0%, #60A5FA 100%);
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -2249,7 +2249,7 @@
   border-radius: 10px;
 }
 
-.qa-indigo  .dash-qa-icon { background: #EEF2FF; color: #4F46E5; }
+.qa-indigo  .dash-qa-icon { background: #EFF6FF; color: #1D4ED8; }
 .qa-electric .dash-qa-icon{ background: #FEF9C3; color: #CA8A04; }
 .qa-blue    .dash-qa-icon { background: #E0F2FE; color: #0284C7; }
 .qa-success .dash-qa-icon { background: #DCFCE7; color: #16A34A; }
@@ -2329,8 +2329,8 @@
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: #EEF2FF;
-  color: #4F46E5;
+  background: #EFF6FF;
+  color: #1D4ED8;
   font-size: 13px;
   font-weight: 700;
   display: grid;
@@ -2399,7 +2399,7 @@
   border-radius: 13px;
 }
 
-.kpi-indigo .kpi-icon { background: #EEF2FF; color: #4F46E5; }
+.kpi-indigo .kpi-icon { background: #EFF6FF; color: #1D4ED8; }
 .kpi-blue   .kpi-icon { background: #E0F2FE; color: #0284C7; }
 .kpi-warning .kpi-icon { background: #FEF9C3; color: #CA8A04; }
 .kpi-danger  .kpi-icon { background: #FEE2E2; color: #DC2626; }
@@ -2564,8 +2564,8 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: #EEF2FF;
-  color: #4F46E5;
+  background: #EFF6FF;
+  color: #1D4ED8;
 }
 
 .room-number {
@@ -3216,11 +3216,11 @@
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #4F46E5, #6366F1);
+  background: linear-gradient(135deg, #1D4ED8, #2563EB);
   display: grid;
   place-items: center;
   color: #ffffff;
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.35);
   flex-shrink: 0;
 }
 
@@ -3241,7 +3241,7 @@
   font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #6366F1;
+  color: #2563EB;
   margin-top: 2px;
   text-transform: uppercase;
 }
@@ -3625,7 +3625,8 @@
 /* Topbar: page title styling ── */
 .topbar .breadcrumb-current {
   font-size: 14px;
-  color: #4F46E5;
+  color: #1D4ED8;
+  font-weight: 700;
 }
 
 /* Page content padding adjustment for cooler bg */
