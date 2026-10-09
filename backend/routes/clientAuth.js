@@ -21,6 +21,8 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        const cleanUsername = username.trim().replace(/^@/, "");
+
         // Look up the account and join the tenant profile in one query
         const [rows] = await db.query(
             `
@@ -35,10 +37,10 @@ router.post("/login", async (req, res) => {
             FROM tenant_accounts ta
             INNER JOIN tenants t ON t.id = ta.tenant_id
             LEFT JOIN rooms r ON r.id = t.room_id
-            WHERE ta.username = ?
+            WHERE ta.username = ? OR ta.username = ?
             LIMIT 1
             `,
-            [username.trim()]
+            [cleanUsername, username.trim()]
         );
 
         if (rows.length === 0) {

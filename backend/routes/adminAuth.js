@@ -36,7 +36,8 @@ router.post("/login", async (req, res) => {
 
         // Deliberately vague on both username mismatch and wrong password
         // to avoid revealing whether the username exists
-        if (username.trim() !== adminUsername) {
+        const cleanUsername = username.trim().replace(/^@/, "");
+        if (cleanUsername !== adminUsername) {
             return res.status(401).json({
                 success: false,
                 message: "Invalid username or password.",
