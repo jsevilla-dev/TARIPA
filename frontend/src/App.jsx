@@ -4474,29 +4474,30 @@ function ReportsPage() {
   const occupiedSlots = rooms.reduce((s, r) => s + Number(r.occupied_count || 0), 0);
   const occupancyPct = totalSlots > 0 ? (occupiedSlots / totalSlots) * 100 : 0;
 
-  // Real 6-Month Collections Trend aggregation
-  const { monthlyData, ceiling, yAxisLabels } = useMemo(() => {
-    const now = new Date();
-    let anchorYear = now.getFullYear();
-    let anchorMonth = now.getMonth();
-
-    // Check if any report is from a later month
+  // Available years from reports data
+  const availableYears = useMemo(() => {
+    const years = new Set([2026, new Date().getFullYear()]);
     reports.forEach((r) => {
       const ym = getBillingMonth(r.billing_month);
       if (ym) {
-        const [y, m] = ym.split("-").map(Number);
-        if (y > anchorYear || (y === anchorYear && m - 1 > anchorMonth)) {
-          anchorYear = y;
-          anchorMonth = m - 1;
-        }
+        const y = Number(ym.split("-")[0]);
+        if (!isNaN(y)) years.add(y);
       }
     });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [reports]);
 
+  const [chartYear, setChartYear] = useState(2026);
+
+  // Full 12-Month Collections Trend aggregation (Jan - Dec)
+  const { monthlyData, ceiling, yAxisLabels } = useMemo(() => {
+    const targetYear = chartYear || 2026;
+
+    // Generate all 12 calendar months for the target year
     const months = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(anchorYear, anchorMonth - i, 1);
-      const year = d.getFullYear();
-      const monthIndex = d.getMonth();
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      const d = new Date(targetYear, monthIndex, 1);
+      const year = targetYear;
       const key = `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
       const month = d.toLocaleDateString("en-US", { month: "short" });
       months.push({ key, month, year, monthIndex, rent: 0, electric: 0, water: 0, total: 0 });
@@ -4547,11 +4548,16 @@ function ReportsPage() {
     ];
 
     return { monthlyData: months, ceiling: ceil, yAxisLabels: labels };
-  }, [reports, filteredReports]);
+  }, [chartYear, filteredReports]);
 
-  // Real 6-Month Occupancy Trend curve calculation
+  // Real 12-Month Occupancy Trend curve calculation (Jan - Dec)
   const occupancyPoints = useMemo(() => {
     if (!monthlyData.length) return [];
+    const count = monthlyData.length; // 12
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonthIndex = now.getMonth();
+
     return monthlyData.map((m, i) => {
       const endOfMonth = new Date(m.year, m.monthIndex + 1, 0, 23, 59, 59);
       const activeCount = tenants.filter((t) => {
@@ -4560,9 +4566,11 @@ function ReportsPage() {
         return moveIn <= endOfMonth;
       }).length;
       const rate = totalSlots > 0 ? Math.min(100, Math.round((activeCount / totalSlots) * 100)) : 0;
-      const x = 24 + i * ((296 - 24) / 5);
+      // 12 points evenly spaced on SVG width: paddingLeft=20, paddingRight=20, width=380
+      const x = 20 + i * ((380 - 40) / Math.max(1, count - 1));
       const y = 96 - (rate / 100) * 78;
-      return { ...m, activeCount, rate, x, y };
+      const isCurrentMonth = m.year === currentYear && m.monthIndex === currentMonthIndex;
+      return { ...m, activeCount, rate, x, y, isCurrentMonth };
     });
   }, [monthlyData, tenants, totalSlots]);
 
@@ -4661,8 +4669,28 @@ function ReportsPage() {
         <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "20px" }}>
             <div>
-              <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Monthly Collections Trend</h3>
-              <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>Rent, electricity, and water breakdown</p>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Monthly Collections Trend</h3>
+                {availableYears.length > 1 ? (
+                  <select
+                    value={chartYear}
+                    onChange={(e) => setChartYear(Number(e.target.value))}
+                    className="v0-input"
+                    style={{ height: "26px", padding: "0 8px", fontSize: "11px", minWidth: "65px", cursor: "pointer", fontWeight: 700 }}
+                  >
+                    {availableYears.map((yr) => (
+                      <option key={yr} value={yr}>{yr}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
+                    {chartYear}
+                  </span>
+                )}
+              </div>
+              <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
+                Rent, electricity, and water breakdown (Full Year {chartYear})
+              </p>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B" }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
@@ -4677,24 +4705,25 @@ function ReportsPage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "12px", height: "200px", alignItems: "flex-end" }}>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10px", color: "#94A3B8", textAlign: "right", minWidth: "40px" }}>
+          <div style={{ display: "flex", gap: "8px", height: "200px", alignItems: "flex-end" }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10px", color: "#94A3B8", textAlign: "right", minWidth: "36px" }}>
               {yAxisLabels.map((lbl, idx) => (
                 <span key={idx}>{lbl}</span>
               ))}
             </div>
 
-            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-around", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px" }}>
+            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-between", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "3px" }}>
               {monthlyData.map((d) => {
                 const sum = d.rent + d.electric + d.water;
                 const totalPct = ceiling > 0 ? Math.min(100, (sum / ceiling) * 100) : 0;
+                const isCurrent = d.year === new Date().getFullYear() && d.monthIndex === new Date().getMonth();
                 return (
-                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, maxWidth: "44px", height: "100%", justifyContent: "flex-end" }}>
+                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "16px", maxWidth: "28px", height: "100%", justifyContent: "flex-end" }}>
                     <div
                       style={{
                         width: "100%",
                         height: sum > 0 ? `${Math.max(6, totalPct)}%` : "4px",
-                        borderRadius: "10px 10px 0 0",
+                        borderRadius: "5px 5px 0 0",
                         overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
@@ -4713,7 +4742,9 @@ function ReportsPage() {
                         </>
                       ) : null}
                     </div>
-                    <span style={{ fontSize: "11px", fontWeight: 600, color: sum > 0 ? "#090D16" : "#94A3B8", marginTop: "8px" }}>{d.month}</span>
+                    <span style={{ fontSize: "9.5px", fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#1D4ED8" : (sum > 0 ? "#090D16" : "#94A3B8"), marginTop: "8px" }}>
+                      {d.month}
+                    </span>
                   </div>
                 );
               })}
@@ -4724,8 +4755,15 @@ function ReportsPage() {
         {/* Occupancy Trend SVG Area Chart */}
         <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <div>
-            <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Occupancy Trend</h3>
-            <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>Bedspace utilization, last 6 months</p>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Occupancy Trend</h3>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
+                {chartYear}
+              </span>
+            </div>
+            <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
+              Bedspace utilization, Full Year {chartYear} (12 months)
+            </p>
 
             <div style={{ marginTop: "16px" }}>
               <p style={{ fontSize: "36px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
@@ -4738,7 +4776,7 @@ function ReportsPage() {
           </div>
 
           <div style={{ marginTop: "16px" }}>
-            <svg viewBox="0 0 320 125" style={{ width: "100%", height: "auto" }}>
+            <svg viewBox="0 0 380 130" style={{ width: "100%", height: "auto" }}>
               <defs>
                 <linearGradient id="occGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
@@ -4746,9 +4784,9 @@ function ReportsPage() {
                 </linearGradient>
               </defs>
               {/* Reference Grid lines */}
-              <line x1="24" y1="18" x2="296" y2="18" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="24" y1="57" x2="296" y2="57" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="24" y1="96" x2="296" y2="96" stroke="#F1F5F9" strokeDasharray="3 3" />
+              <line x1="20" y1="18" x2="360" y2="18" stroke="#F1F5F9" strokeDasharray="3 3" />
+              <line x1="20" y1="57" x2="360" y2="57" stroke="#F1F5F9" strokeDasharray="3 3" />
+              <line x1="20" y1="96" x2="360" y2="96" stroke="#F1F5F9" strokeDasharray="3 3" />
 
               {/* Area fill */}
               {occAreaD && <path d={occAreaD} fill="url(#occGrad)" />}
@@ -4759,24 +4797,24 @@ function ReportsPage() {
                   d={occPathD}
                   fill="none"
                   stroke="#2563EB"
-                  strokeWidth="2.5"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               )}
 
               {/* Data points and month labels */}
-              {occupancyPoints.map((p, idx) => {
-                const isLast = idx === occupancyPoints.length - 1;
+              {occupancyPoints.map((p) => {
+                const isCurrent = p.isCurrentMonth;
                 return (
                   <g key={p.key}>
                     <circle
                       cx={p.x}
                       cy={p.y}
-                      r={isLast ? 4.5 : 3.5}
-                      fill={isLast ? "#2563EB" : "#FFFFFF"}
+                      r={isCurrent ? 4.5 : 3}
+                      fill={isCurrent ? "#2563EB" : (p.rate > 0 ? "#FFFFFF" : "#F8FAFC")}
                       stroke="#2563EB"
-                      strokeWidth={isLast ? 2 : 1.5}
+                      strokeWidth={isCurrent ? 2 : 1.5}
                     >
                       <title>{`${p.month} ${p.year}: ${p.rate}% (${p.activeCount}/${totalSlots} slots occupied)`}</title>
                     </circle>
@@ -4784,9 +4822,9 @@ function ReportsPage() {
                       x={p.x}
                       y="118"
                       textAnchor="middle"
-                      fill={isLast ? "#090D16" : "#94A3B8"}
-                      fontSize="10"
-                      fontWeight={isLast ? "700" : "500"}
+                      fill={isCurrent ? "#090D16" : "#94A3B8"}
+                      fontSize="9"
+                      fontWeight={isCurrent ? "700" : "500"}
                     >
                       {p.month}
                     </text>
