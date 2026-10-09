@@ -1538,7 +1538,6 @@ function TenantsPage() {
   });
   const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
-  const [successBanner, setSuccessBanner] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [deleteError, setDeleteError] = useState("");
@@ -1666,7 +1665,6 @@ function TenantsPage() {
       loadTenants(); loadRooms();
       closeForm();
       const msg = data.message || (isEditing ? "Tenant updated successfully." : "Tenant registered successfully.");
-      setSuccessBanner(msg);
       showToast(msg, "success");
     } catch (err) {
       console.error("Failed to save tenant:", err);
@@ -1753,13 +1751,6 @@ function TenantsPage() {
           Every dormer and lessee, their room assignment, and contact records.
         </p>
       </div>
-
-      {successBanner && (
-        <div style={{ background: "#ECFDF5", border: "1px solid #A7F3D0", color: "#065F46", padding: "12px 18px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13.5px", fontWeight: 600 }}>
-          <span>🎉 {successBanner}</span>
-          <button type="button" onClick={() => setSuccessBanner("")} style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", fontSize: "16px", lineHeight: 1 }}>×</button>
-        </div>
-      )}
 
       {deleteError && (
         <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", color: "#DC2626", padding: "10px 16px", borderRadius: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13.5px", fontWeight: 600 }}>
