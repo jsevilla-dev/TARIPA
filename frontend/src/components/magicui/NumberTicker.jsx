@@ -60,3 +60,4 @@ export function NumberTicker({
     </span>
   );
 }
+
