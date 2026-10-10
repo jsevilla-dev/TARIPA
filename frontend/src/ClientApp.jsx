@@ -204,12 +204,27 @@ function LoginPage({ onLogin }) {
   const [showPass,    setShowPass]    = useState(false);
   const [error,       setError]       = useState("");
   const [isLoading,   setIsLoading]   = useState(false);
+  const [cooldown,    setCooldown]    = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const interval = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          setError("");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldown]);
 
   const isFormValid = username.trim().length > 0 && password.length >= 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid || isLoading) return;
+    if (!isFormValid || isLoading || cooldown > 0) return;
     setError("");
     setIsLoading(true);
     try {
@@ -222,6 +237,9 @@ function LoginPage({ onLogin }) {
 
       if (!res.ok || !data.success) {
         setError(data.message || "Login failed. Please check your credentials.");
+        if (data.retryAfter) {
+          setCooldown(Number(data.retryAfter));
+        }
         return;
       }
 
@@ -330,9 +348,9 @@ function LoginPage({ onLogin }) {
               <button
                 type="submit"
                 className="insta-btn-submit"
-                disabled={!isFormValid || isLoading}
+                disabled={!isFormValid || isLoading || cooldown > 0}
               >
-                {isLoading ? "Logging in…" : "Log in"}
+                {isLoading ? "Logging in…" : cooldown > 0 ? `Locked (${cooldown}s remaining)` : "Log in"}
               </button>
 
               <a

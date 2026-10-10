@@ -3,6 +3,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 const clientAuth = require("../middleware/clientAuth");
+const {
+    checkLoginAttempt,
+    recordFailedAttempt,
+    recordSuccessfulLogin,
+} = require("../middleware/loginLimiter");
 
 const router = express.Router();
 
@@ -18,6 +23,16 @@ router.post("/login", async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Username and password are required.",
+            });
+        }
+
+        // Check rate limit / lockout status
+        const lockCheck = checkLoginAttempt(req, username);
+        if (lockCheck.locked) {
+            return res.status(429).json({
+                success: false,
+                message: lockCheck.message,
+                retryAfter: lockCheck.remainingSeconds,
             });
         }
 
@@ -44,10 +59,12 @@ router.post("/login", async (req, res) => {
         );
 
         if (rows.length === 0) {
-            // Deliberately vague — do not reveal whether username exists
-            return res.status(401).json({
+            const failResult = recordFailedAttempt(req, username);
+            return res.status(failResult.locked ? 429 : 401).json({
                 success: false,
-                message: "Invalid username or password.",
+                message: failResult.message,
+                retryAfter: failResult.remainingSeconds,
+                remainingAttempts: failResult.remainingAttempts,
             });
         }
 
@@ -64,11 +81,17 @@ router.post("/login", async (req, res) => {
         const passwordMatch = await bcrypt.compare(password, account.password_hash);
 
         if (!passwordMatch) {
-            return res.status(401).json({
+            const failResult = recordFailedAttempt(req, username);
+            return res.status(failResult.locked ? 429 : 401).json({
                 success: false,
-                message: "Invalid username or password.",
+                message: failResult.message,
+                retryAfter: failResult.remainingSeconds,
+                remainingAttempts: failResult.remainingAttempts,
             });
         }
+
+        // Reset failed attempt counter on successful login
+        recordSuccessfulLogin(req, username);
 
         // Sign a JWT — tenantId is embedded and verified server-side on every request
         const token = jwt.sign(

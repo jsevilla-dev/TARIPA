@@ -2,6 +2,11 @@ const express = require("express");
 const bcrypt  = require("bcrypt");
 const jwt     = require("jsonwebtoken");
 const adminAuth = require("../middleware/adminAuth");
+const {
+    checkLoginAttempt,
+    recordFailedAttempt,
+    recordSuccessfulLogin,
+} = require("../middleware/loginLimiter");
 
 const router = express.Router();
 
@@ -23,6 +28,16 @@ router.post("/login", async (req, res) => {
             });
         }
 
+        // Check rate limit / lockout status
+        const lockCheck = checkLoginAttempt(req, username);
+        if (lockCheck.locked) {
+            return res.status(429).json({
+                success: false,
+                message: lockCheck.message,
+                retryAfter: lockCheck.remainingSeconds,
+            });
+        }
+
         const adminUsername = process.env.ADMIN_USERNAME;
         const adminHash     = process.env.ADMIN_PASSWORD_HASH;
 
@@ -38,20 +53,29 @@ router.post("/login", async (req, res) => {
         // to avoid revealing whether the username exists
         const cleanUsername = username.trim().replace(/^@/, "");
         if (cleanUsername !== adminUsername) {
-            return res.status(401).json({
+            const failResult = recordFailedAttempt(req, username);
+            return res.status(failResult.locked ? 429 : 401).json({
                 success: false,
-                message: "Invalid username or password.",
+                message: failResult.message,
+                retryAfter: failResult.remainingSeconds,
+                remainingAttempts: failResult.remainingAttempts,
             });
         }
 
         const passwordMatch = await bcrypt.compare(password, adminHash);
 
         if (!passwordMatch) {
-            return res.status(401).json({
+            const failResult = recordFailedAttempt(req, username);
+            return res.status(failResult.locked ? 429 : 401).json({
                 success: false,
-                message: "Invalid username or password.",
+                message: failResult.message,
+                retryAfter: failResult.remainingSeconds,
+                remainingAttempts: failResult.remainingAttempts,
             });
         }
+
+        // Reset failed attempt counter on successful login
+        recordSuccessfulLogin(req, username);
 
         // Sign a JWT — role: "admin" is the discriminator that separates
         // this token from any client/tenant JWT (which has tenantId, no role)
