@@ -1533,6 +1533,35 @@ function ProfilePage() {
 ───────────────────────────────────────────── */
 function PortalShell({ tenant, onLogout }) {
   const [activePage, setActivePage] = useState("dashboard");
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [unreadBills, setUnreadBills] = useState([]);
+  const notifRef = useRef(null);
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    clientFetch("/api/client/dashboard")
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success && json.data?.recent_bills) {
+          const pending = json.data.recent_bills.filter(
+            (b) => b.status === "Pending" || b.status === "Overdue"
+          );
+          setUnreadBills(pending);
+        }
+      })
+      .catch(() => {});
+  }, [activePage]);
+
+  // Click outside listener for notifications dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     clearAuth(); // Only clears client auth
@@ -1623,24 +1652,181 @@ function PortalShell({ tenant, onLogout }) {
           </nav>
 
           {/* Right: Notification Bell & Sign Out */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative" }} ref={notifRef}>
             <button
               type="button"
               className="tenant-circle-btn"
-              title="Notifications"
-              onClick={() => alert("No new notifications.")}
+              title={unreadBills.length > 0 ? `${unreadBills.length} pending notification${unreadBills.length > 1 ? "s" : ""}` : "Notifications"}
+              onClick={() => setNotifOpen((prev) => !prev)}
+              aria-label="Notifications"
             >
               <Icons.Bell />
-              <span style={{
-                position: "absolute",
-                top: "7px",
-                right: "7px",
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "#EF4444",
-              }} />
+              {unreadBills.length > 0 && (
+                <span style={{
+                  position: "absolute",
+                  top: "7px",
+                  right: "7px",
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "#EF4444",
+                  boxShadow: "0 0 0 2px #FFFFFF",
+                }} />
+              )}
             </button>
+
+            {/* Floating Notification Dropdown */}
+            {notifOpen && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 12px)",
+                  right: 0,
+                  width: "320px",
+                  background: "#FFFFFF",
+                  borderRadius: "20px",
+                  boxShadow: "0 16px 40px -8px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08)",
+                  padding: "16px",
+                  zIndex: 1000,
+                  animation: "pageFadeIn 0.18s ease-out",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "12px",
+                    paddingBottom: "10px",
+                    borderBottom: "1px solid #F1F5F9",
+                  }}
+                >
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#0F172A" }}>
+                    Notifications
+                  </span>
+                  {unreadBills.length > 0 ? (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        background: "#FEE2E2",
+                        color: "#DC2626",
+                        padding: "2px 8px",
+                        borderRadius: "9999px",
+                      }}
+                    >
+                      {unreadBills.length} pending
+                    </span>
+                  ) : (
+                    <span
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        background: "#F1F5F9",
+                        color: "#64748B",
+                        padding: "2px 8px",
+                        borderRadius: "9999px",
+                      }}
+                    >
+                      0 new
+                    </span>
+                  )}
+                </div>
+
+                {unreadBills.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "18px 10px", color: "#64748B" }}>
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        background: "#F0FDF4",
+                        color: "#16A34A",
+                        display: "grid",
+                        placeItems: "center",
+                        margin: "0 auto 10px",
+                        fontSize: "16px",
+                        fontWeight: 700,
+                      }}
+                    >
+                      ✓
+                    </div>
+                    <p style={{ margin: 0, fontSize: "13px", fontWeight: 700, color: "#0F172A" }}>
+                      All caught up!
+                    </p>
+                    <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#64748B" }}>
+                      No unsettled balance or pending bills.
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {unreadBills.map((b) => (
+                      <div
+                        key={b.id}
+                        onClick={() => {
+                          setActivePage("bills");
+                          setNotifOpen(false);
+                          showToast("Navigating to Statement of Account...", "info");
+                        }}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          padding: "10px 12px",
+                          borderRadius: "14px",
+                          background: "#F8FAFC",
+                          border: "1px solid #F1F5F9",
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "#EFF6FF";
+                          e.currentTarget.style.borderColor = "#BFDBFE";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "#F8FAFC";
+                          e.currentTarget.style.borderColor = "#F1F5F9";
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "10px",
+                            background: "#FEE2E2",
+                            color: "#DC2626",
+                            display: "grid",
+                            placeItems: "center",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Icons.Bills />
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: "13px", fontWeight: 700, color: "#0F172A" }}>
+                            Unsettled Utility Bill
+                          </div>
+                          <div style={{ fontSize: "12px", color: "#64748B", marginTop: "2px" }}>
+                            {b.billing_month
+                              ? new Date(b.billing_month).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "Current"}{" "}
+                            · ₱{Number(b.total_amount || 0).toLocaleString("en-PH", {
+                              minimumFractionDigits: 2,
+                            })}
+                          </div>
+                        </div>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: "#2563EB" }}>
+                          View →
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             <button
               type="button"
