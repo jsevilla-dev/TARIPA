@@ -2,6 +2,10 @@ import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import "./App.css";
 import { useToast } from "./components/Toast.jsx";
 import ConfirmDialog from "./components/ConfirmDialog.jsx";
+import { NumberTicker } from "./components/magicui/NumberTicker.jsx";
+import { BorderBeam } from "./components/magicui/BorderBeam.jsx";
+import { DotPattern } from "./components/magicui/DotPattern.jsx";
+import "./components/magicui/magicui.css";
 
 /* ─────────────────────────────────────────────
    HELPERS
@@ -357,7 +361,8 @@ function AdminLogin({ onLoginSuccess }) {
   };
 
   return (
-    <div className="insta-login-page">
+    <div className="insta-login-page" style={{ position: "relative", overflow: "hidden" }}>
+      <DotPattern />
       {/* ── TOP BRAND MARK (like Instagram top-left logo) ── */}
       <div className="insta-top-brand">
         <img src="/taripa-owl.jpg" alt="TARIPA" className="insta-top-logo" />
@@ -376,6 +381,7 @@ function AdminLogin({ onLoginSuccess }) {
           <div className="insta-mockup-wrapper">
             {/* Phone/Card Frame */}
             <div className="insta-mockup-frame">
+              <BorderBeam size={280} duration={8} borderWidth={2.5} colorFrom="#1D4ED8" colorTo="#60A5FA" />
               <img
                 src="/images/taripa-owl-building.png"
                 alt="TARIPA Residential Building & Submeter System"
@@ -1212,7 +1218,7 @@ function Dashboard({ onNavigate }) {
             </span>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(dashboardData?.total_collected || 0)}
+            <NumberTicker value={Number(dashboardData?.total_collected || 0)} prefix="₱" decimalPlaces={2} />
           </p>
           <div style={{ fontSize: "12.5px", fontWeight: 500, color: "#64748B", display: "flex", alignItems: "center", gap: "6px" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", borderRadius: "9999px", border: "1px solid #A7F3D0", background: "#ECFDF5", padding: "2px 8px", fontSize: "11.5px", fontWeight: 700, color: "#059669" }}>
@@ -1231,11 +1237,11 @@ function Dashboard({ onNavigate }) {
             </span>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(dashboardData?.outstanding_amount || 0)}
+            <NumberTicker value={Number(dashboardData?.outstanding_amount || 0)} prefix="₱" decimalPlaces={2} />
           </p>
           <div style={{ fontSize: "12.5px", fontWeight: 500, color: "#64748B" }}>
             <strong style={{ color: (dashboardData?.pending_bills || 0) > 0 ? "#D97706" : "#059669", fontWeight: 700 }}>
-              {dashboardData?.pending_bills || 0} pending {dashboardData?.pending_bills === 1 ? "invoice" : "invoices"}
+              <NumberTicker value={Number(dashboardData?.pending_bills || 0)} /> pending {dashboardData?.pending_bills === 1 ? "invoice" : "invoices"}
             </strong>{" "}
             this cycle
           </div>
@@ -1250,13 +1256,13 @@ function Dashboard({ onNavigate }) {
             </span>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {totalTenants}/{totalCapacity} Slots
+            <NumberTicker value={totalTenants} />/{totalCapacity} Slots
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div className="glass-inset" style={{ height: "8px", flex: 1, borderRadius: "9999px", overflow: "hidden" }}>
               <div className="liquid-bar" style={{ width: `${Math.min(100, Math.max(0, occPercent))}%`, height: "100%", borderRadius: "9999px" }} />
             </div>
-            <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#090D16" }}>{occPercent}%</span>
+            <span style={{ fontSize: "12.5px", fontWeight: 700, color: "#090D16" }}><NumberTicker value={occPercent} suffix="%" /></span>
           </div>
         </div>
 
@@ -1269,10 +1275,10 @@ function Dashboard({ onNavigate }) {
             </span>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {totalTenants} {totalTenants === 1 ? "Occupant" : "Occupants"}
+            <NumberTicker value={totalTenants} /> {totalTenants === 1 ? "Occupant" : "Occupants"}
           </p>
           <div style={{ fontSize: "12.5px", fontWeight: 500, color: "#64748B" }}>
-            across <strong style={{ color: "#090D16" }}>{dashboardData?.total_rooms || 0} rooms</strong> ({dashboardData?.available_rooms || 0} vacant)
+            across <strong style={{ color: "#090D16" }}><NumberTicker value={Number(dashboardData?.total_rooms || 0)} /> rooms</strong> ({dashboardData?.available_rooms || 0} vacant)
           </div>
         </div>
       </section>
@@ -4628,7 +4634,7 @@ function ReportsPage() {
         <div className="glass" style={{ borderRadius: "24px", padding: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
           <p className="eyebrow" style={{ margin: 0 }}>TOTAL COLLECTIONS</p>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(totalAmount)}
+            <NumberTicker value={Number(totalAmount)} prefix="₱" decimalPlaces={2} />
           </p>
           <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>Recorded revenue</p>
         </div>
@@ -4639,7 +4645,7 @@ function ReportsPage() {
             <p className="eyebrow" style={{ margin: 0 }}>RENT REVENUE</p>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(totalRent)}
+            <NumberTicker value={Number(totalRent)} prefix="₱" decimalPlaces={2} />
           </p>
           <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>{rentShare}% share</p>
         </div>
@@ -4650,7 +4656,7 @@ function ReportsPage() {
             <p className="eyebrow" style={{ margin: 0 }}>ELECTRIC REVENUE</p>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(totalElectricity)}
+            <NumberTicker value={Number(totalElectricity)} prefix="₱" decimalPlaces={2} />
           </p>
           <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>{electricShare}% share</p>
         </div>
@@ -4661,7 +4667,7 @@ function ReportsPage() {
             <p className="eyebrow" style={{ margin: 0 }}>WATER REVENUE</p>
           </div>
           <p style={{ fontSize: "28px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-            {formatCurrency(totalWater)}
+            <NumberTicker value={Number(totalWater)} prefix="₱" decimalPlaces={2} />
           </p>
           <p style={{ fontSize: "12px", color: "#64748B", margin: 0, fontWeight: 500 }}>{waterShare}% share</p>
         </div>

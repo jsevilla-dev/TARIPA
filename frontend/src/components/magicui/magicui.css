@@ -1,0 +1,63 @@
+/* ─────────────────────────────────────────────────────────────
+   Magic UI Styles — TARIPA Customization
+   ───────────────────────────────────────────────────────────── */
+
+/* Border Beam */
+.magic-border-beam {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: var(--border-width, 2px) solid transparent;
+  mask: linear-gradient(transparent, transparent), linear-gradient(#fff, #fff);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+  -webkit-mask: linear-gradient(transparent, transparent), linear-gradient(#fff, #fff);
+  -webkit-mask-clip: padding-box, border-box;
+  -webkit-mask-composite: source-out;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.magic-border-beam::after {
+  content: "";
+  position: absolute;
+  aspect-ratio: 1;
+  width: var(--size, 220px);
+  background: radial-gradient(circle, var(--color-to, #60A5FA) 0%, var(--color-from, #1D4ED8) 55%, transparent 100%);
+  offset-path: rect(0 auto auto 0 round inherit);
+  animation: magic-beam-travel var(--duration, 7s) infinite linear;
+}
+
+@keyframes magic-beam-travel {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+/* Fallback for browsers lacking offset-path */
+@supports not (offset-path: rect(0 auto auto 0 round 0)) {
+  .magic-border-beam::after {
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent 0deg 300deg, var(--color-to, #60A5FA) 330deg, var(--color-from, #1D4ED8) 360deg);
+    animation: magic-beam-spin var(--duration, 7s) infinite linear;
+    offset-path: none;
+  }
+  @keyframes magic-beam-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* Number Ticker */
+.magic-number-ticker {
+  display: inline-block;
+  will-change: transform;
+}

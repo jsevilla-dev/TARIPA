@@ -1,5 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import "./ClientApp.css";
+import { NumberTicker } from "./components/magicui/NumberTicker.jsx";
+import { BorderBeam } from "./components/magicui/BorderBeam.jsx";
+import { DotPattern } from "./components/magicui/DotPattern.jsx";
+import "./components/magicui/magicui.css";
 
 /* ─────────────────────────────────────────────
    CLIENT AUTH CONSTANTS
@@ -315,7 +319,8 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div className="insta-login-page">
+    <div className="insta-login-page" style={{ position: "relative", overflow: "hidden" }}>
+      <DotPattern />
       {/* ── TOP BRAND MARK (like Instagram top-left logo) ── */}
       <div className="insta-top-brand">
         <img src="/taripa-owl.jpg" alt="TARIPA" className="insta-top-logo" />
@@ -334,6 +339,7 @@ function LoginPage({ onLogin }) {
           <div className="insta-mockup-wrapper">
             {/* Phone/Card Frame */}
             <div className="insta-mockup-frame">
+              <BorderBeam size={280} duration={8} borderWidth={2.5} colorFrom="#1D4ED8" colorTo="#60A5FA" />
               <img
                 src="/images/taripa-owl-building.png"
                 alt="TARIPA Residential Building & Submeter System"
@@ -752,6 +758,7 @@ function DashboardPage() {
             position: "relative",
             overflow: "hidden",
           }}>
+            <BorderBeam size={260} duration={8} borderWidth={1.5} colorFrom="rgba(255,255,255,0.7)" colorTo="rgba(147,197,253,0.9)" />
             <p style={{
               fontSize: "11px",
               fontWeight: 700,
@@ -769,7 +776,7 @@ function DashboardPage() {
               margin: "10px 0 16px",
               lineHeight: 1,
             }}>
-              {formatCurrency(outstanding.amount || latest_bill?.total_amount || 0)}
+              <NumberTicker value={Number(outstanding.amount || latest_bill?.total_amount || 0)} prefix="₱" decimalPlaces={2} />
             </div>
             
             <div style={{
