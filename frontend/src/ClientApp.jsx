@@ -949,7 +949,7 @@ function DashboardPage() {
                 }}>
                   <strong style={{ fontSize: "14px", fontWeight: 700, color: "#0F172A" }}>Total Due</strong>
                   <strong style={{ fontSize: "16.5px", fontWeight: 800, color: "#2563EB" }}>
-                    {formatCurrency(latest_bill?.total_amount || 0)}
+                    <NumberTicker value={Number(latest_bill?.total_amount || 0)} prefix="₱" decimalPlaces={2} />
                   </strong>
                 </div>
               </div>
@@ -987,7 +987,7 @@ function DashboardPage() {
               </p>
               <div>
                 <strong style={{ fontSize: "24px", fontWeight: 800, color: "#0F172A" }}>
-                  {elecConsumption.toFixed(0)}
+                  <NumberTicker value={Number(elecConsumption)} />
                 </strong>
                 <span style={{ fontSize: "13px", fontWeight: 600, color: "#64748B", marginLeft: "4px" }}>
                   kWh
@@ -1054,7 +1054,7 @@ function DashboardPage() {
               </p>
               <div>
                 <strong style={{ fontSize: "24px", fontWeight: 800, color: "#0F172A" }}>
-                  {waterConsumption.toFixed(0)}
+                  <NumberTicker value={Number(waterConsumption)} />
                 </strong>
                 <span style={{ fontSize: "13px", fontWeight: 600, color: "#64748B", marginLeft: "4px" }}>
                   Cu.M
