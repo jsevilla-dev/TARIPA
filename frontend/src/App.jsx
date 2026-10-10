@@ -310,6 +310,8 @@ function AdminLogin({ onLoginSuccess }) {
    APP SHELL
 ───────────────────────────────────────────── */
 function App() {
+  const { showToast } = useToast();
+
 // ── Admin auth state ──────────────────────
   const [adminToken, setAdminToken] = useState(() => getAdminToken());
   const [adminUser,  setAdminUser]  = useState(() => getAdminUser());
@@ -353,13 +355,15 @@ function App() {
   const handleLoginSuccess = useCallback((token, admin) => {
     setAdminToken(token);
     setAdminUser(admin);
-  }, []);
+    showToast(`Welcome back, ${admin?.username || "Admin"}!`, "success");
+  }, [showToast]);
 
   const handleLogout = useCallback(() => {
     clearAdminAuth();
     setAdminToken(null);
     setAdminUser(null);
-  }, []);
+    showToast("Signed out of Admin portal", "info");
+  }, [showToast]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -407,9 +411,20 @@ function App() {
 
     authFetch("/api/billing?status=Pending")
       .then((r) => r.json())
-      .then((data) => { if (data.success) setPendingBills(data.data || []); })
+      .then((data) => {
+        if (data.success) {
+          const bills = data.data || [];
+          setPendingBills(bills);
+          if (bills.length > 0 && !sessionStorage.getItem("taripa_pending_warned")) {
+            sessionStorage.setItem("taripa_pending_warned", "true");
+            setTimeout(() => {
+              showToast(`Heads up: You have ${bills.length} pending bill${bills.length > 1 ? "s" : ""} awaiting payment.`, "warning");
+            }, 1000);
+          }
+        }
+      })
       .catch(() => {});
-  }, [adminToken, activePage]);
+  }, [adminToken, activePage, showToast]);
 
   // Click outside listener for search & notification dropdowns
   useEffect(() => {
@@ -478,6 +493,7 @@ function App() {
     } catch {
       /* ignore storage failure */
     }
+    showToast("All notifications marked as read", "success");
   };
 
   const handleNotificationClick = (item) => {
@@ -492,6 +508,7 @@ function App() {
     }
     setActivePage(item.page);
     setNotificationsOpen(false);
+    showToast(`Navigating to ${item.title}...`, "info");
   };
 
   const searchResults = useMemo(() => {
@@ -3430,6 +3447,7 @@ function UtilityRatesPage() {
    BILLING PAGE
 ───────────────────────────────────────────── */
 function BillingPage() {
+  const { showToast } = useToast();
   const [billingRecords, setBillingRecords] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -3501,13 +3519,20 @@ function BillingPage() {
         body: JSON.stringify({ tenant_id: Number(formData.tenant_id), billing_month: `${formData.billing_month}-01` }),
       });
       const data = await response.json();
-      if (!response.ok || !data.success) { setFormError(data.message || "Failed to generate bill."); return; }
+      if (!response.ok || !data.success) {
+        const msg = data.message || "Failed to generate bill.";
+        setFormError(msg);
+        showToast(msg, "error");
+        return;
+      }
       setFormSuccess("Billing record generated successfully.");
+      showToast("Billing record generated successfully!", "success");
       loadBillingRecords();
       setTimeout(() => { closeForm(); }, 800);
     } catch (err) {
       console.error("Failed to generate billing record:", err);
       setFormError("Unable to connect to the backend.");
+      showToast("Unable to connect to the backend.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -3521,11 +3546,18 @@ function BillingPage() {
         body: JSON.stringify({ status }),
       });
       const data = await response.json();
-      if (!response.ok || !data.success) { window.alert(data.message || "Failed to update billing status."); return; }
+      if (!response.ok || !data.success) {
+        const msg = data.message || "Failed to update billing status.";
+        window.alert(msg);
+        showToast(msg, "error");
+        return;
+      }
       loadBillingRecords();
+      showToast(`Bill for ${billing.full_name || "Tenant"} marked as ${status}!`, status === "Paid" ? "success" : "info");
     } catch (err) {
       console.error("Failed to update billing status:", err);
       window.alert("Unable to connect to the backend.");
+      showToast("Unable to connect to the backend.", "error");
     }
   };
 
@@ -3535,11 +3567,18 @@ function BillingPage() {
     try {
       const response = await authFetch(`/api/billing/${billing.id}`, { method: "DELETE" });
       const data = await response.json();
-      if (!response.ok || !data.success) { window.alert(data.message || "Failed to delete billing record."); return; }
+      if (!response.ok || !data.success) {
+        const msg = data.message || "Failed to delete billing record.";
+        window.alert(msg);
+        showToast(msg, "error");
+        return;
+      }
       loadBillingRecords();
+      showToast("Billing record deleted successfully.", "success");
     } catch (err) {
       console.error("Failed to delete billing record:", err);
       window.alert("Unable to connect to the backend.");
+      showToast("Unable to connect to the backend.", "error");
     }
   };
 

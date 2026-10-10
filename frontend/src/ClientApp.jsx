@@ -4,6 +4,7 @@ import { NumberTicker } from "./components/magicui/NumberTicker.jsx";
 import { BorderBeam } from "./components/magicui/BorderBeam.jsx";
 import { DotPattern } from "./components/magicui/DotPattern.jsx";
 import "./components/magicui/magicui.css";
+import { useToast } from "./components/Toast.jsx";
 import {
   IconHome,
   IconReceipt,
@@ -1687,6 +1688,7 @@ function PortalShell({ tenant, onLogout }) {
      4. If no token → show login immediately.
 ───────────────────────────────────────────── */
 export default function ClientApp() {
+  const { showToast } = useToast();
   // "validating" = we have a stored token and are checking it
   // "authenticated" = token validated, portal shown
   // "unauthenticated" = no valid token, login shown
@@ -1789,6 +1791,7 @@ export default function ClientApp() {
     setTenant(tenantData);
     setAuthState("authenticated");
     window.history.replaceState(null, "", "/client");
+    showToast(`Welcome back, ${tenantData.full_name?.split(" ")[0] || "Tenant"}!`, "success");
   };
 
   const handleLogout = () => {
@@ -1796,6 +1799,7 @@ export default function ClientApp() {
     setTenant(null);
     setAuthState("unauthenticated");
     window.history.replaceState(null, "", "/client/login");
+    showToast("Signed out of Tenant Portal", "info");
   };
 
   // Brief init — waiting for JS to parse localStorage before deciding
