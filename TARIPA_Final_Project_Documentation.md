@@ -59,11 +59,11 @@ To design, develop, test, and deploy **TARIPA**, a secure, full-stack residentia
 4. **Comprehensive Data Retrieval & Analytics:** Provide real-time dashboard analytics, search, filtering by payment status (`Pending`, `Paid`, `Overdue`), and digital printable receipts.
 
 ### 1.4 Project Description
-**TARIPA** is an enterprise-grade, lightweight web application built on modern full-stack web technologies. The front-end leverages **React 19** and **Vite 8**, featuring a "Light Liquid Glass" aesthetic and an Instagram-inspired minimalist login interface. The back-end is powered by **Node.js** and **Express 4.x**, adhering to RESTful API architectural principles. Data persistence is managed by **MySQL 8.0** using an optimized connection pool (`mysql2/promise`).
+**TARIPA** is an enterprise-grade, lightweight web application built on modern full-stack web technologies. The front-end leverages **React 19** and **Vite 8**, featuring a high-contrast **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19` to `#111726`) paired with Light Liquid Glass content cards, pixel-perfect **Tabler Icons** (`@tabler/icons-react`), and an Instagram-inspired dual-column login interface enhanced with **Magic UI** animations (`NumberTicker`, `BorderBeam`, `DotPattern`) and **Lenis** smooth momentum scrolling. The back-end is powered by **Node.js** and **Express 5.x**, adhering to RESTful API architectural principles with custom in-memory brute-force rate limiting (`loginLimiter.js`). Data persistence is managed by **MySQL 8.0** using an optimized connection pool (`mysql2/promise`).
 
 The system supports two primary user workflows:
-- **Administrative Operations:** Administrators log in to configure rooms, register tenants with move-in dates, set effective utility rates, record monthly submeter readings, generate consolidated billing statements, and track overall collection metrics.
-- **Tenant Operations:** Tenants log in using credentials provisioned by the administrator to inspect their assigned room, view their current and historical billing statements, inspect meter consumption differentials, view official payment instructions, and print receipts.
+- **Administrative Operations:** Administrators log in to configure rooms, register tenants with move-in dates, set effective utility rates, record monthly submeter readings, generate consolidated billing statements, monitor collection metrics with live toast feedback, and track overall collection metrics.
+- **Tenant Operations:** Tenants log in using credentials provisioned by the administrator to inspect their assigned room, view their current and historical billing statements, inspect meter consumption differentials, receive interactive notification alerts for unpaid bills, view official payment instructions, and print receipts.
 
 ### 1.5 Target Users
 | User Role | Description & Responsibilities |
@@ -109,14 +109,17 @@ The system supports two primary user workflows:
 | **FR-12** | Search & Filter | The system must allow real-time client-side search across tenants and rooms and filtering of bills by status. | **Medium** |
 | **FR-13** | Digital Receipts | The system must generate itemized digital receipts with printable layouts and payment instructions for tenants. | **Medium** |
 | **FR-14** | Client Portal | The system must provide a dedicated, isolated interface for authenticated tenants to inspect their personal statement and reading history only. | **High** |
+| **FR-15** | Brute-Force Rate Limiting | The system must enforce a 5-attempt login threshold per client IP and username target, locking out subsequent attempts for 30 seconds with HTTP 429 status and client-side countdown timer persisted in `localStorage`. | **High** |
+| **FR-16** | Notification Center | The system must deliver contextual floating toast notifications for user operations and provide an interactive dropdown displaying pending bills and property alerts. | **Medium** |
 
 ### 2.2 Non-Functional Requirements
 
-- **Usability:** The interface is built with responsive CSS, visual hierarchy, Liquid Glass tokens, distinct status badges, and interactive feedback toasts. The login page provides an Instagram-inspired layout with dynamic button state indicators (requiring 6+ character passwords before activation).
-- **Performance:** Database queries are optimized with primary and unique indexes. The frontend compiles via Vite with production bundle sizes $< 130\text{ KB}$ CSS and $< 430\text{ KB}$ JS, achieving sub-second page loads.
+- **Usability:** The interface is built with responsive CSS, visual hierarchy, Liquid Glass tokens, distinct status badges, and interactive feedback toasts (`useToast`). The Admin Portal features a **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19`), pixel-perfect **Tabler Icons** (`@tabler/icons-react`), **Lenis** smooth momentum scrolling, and **Magic UI** components (`NumberTicker`, `BorderBeam`, `DotPattern`). The login page provides an Instagram-inspired layout with dynamic button state indicators (requiring 6+ character passwords before activation).
+- **Performance:** Database queries are optimized with primary and unique indexes. The frontend compiles via Vite with production bundle sizes $< 130\text{ KB}$ CSS and $< 450\text{ KB}$ JS, achieving sub-second page loads.
 - **Security:** 
   - Passwords are never stored in plaintext; bcrypt hashing with cost factor 12 is enforced.
-  - Endpoints are protected with Express middleware validating JWT tokens.
+  - Endpoints are protected with Express middleware validating JWT tokens with role separation (`admin` vs `tenantId`).
+  - **Brute-Force Rate Limiting & Account Lockout:** In-memory rate limiter (`loginLimiter.js`) restricts consecutive failed login attempts to 5 per IP/user target, issuing early warnings at 2 and 1 attempts remaining, followed by an automated 30-second lockout cooldown persisted in `localStorage`.
   - Parameterized SQL queries (`mysql2/promise`) are used across all endpoints to prevent SQL Injection (SQLi).
   - Vague authentication failure messages (`"Invalid username or password"`) prevent username enumeration attacks.
 - **Reliability & Data Integrity:** Foreign key constraints with cascading updates and deletions guarantee referential integrity. Database check constraints guarantee non-negative utility rates and readings.
@@ -137,8 +140,8 @@ The system supports two primary user workflows:
 - **Package Manager:** npm v9.x or v10.x+
 - **Database Server:** MySQL Server v8.0 or MariaDB v10.5+
 - **Front-End Frameworks:** React 19.x, Vite 8.x
-- **Back-End Frameworks:** Express.js 4.x
-- **Core Libraries:** `mysql2`, `bcrypt`, `jsonwebtoken`, `dotenv`
+- **Back-End Frameworks:** Express.js 5.x
+- **Core Libraries & Tooling:** `mysql2`, `bcrypt`, `jsonwebtoken`, `dotenv`, `@tabler/icons-react`, Magic UI animation suite, Lenis smooth scrolling
 - **Web Browser:** Google Chrome, Mozilla Firefox, Microsoft Edge, or Safari (Modern Evergreen Browsers)
 
 ### 2.4 User Roles and Permissions
@@ -430,24 +433,53 @@ The TARIPA user experience was constructed around two primary portals:
 - **Testing Tools:** Native Node.js HTTP test suites, PowerShell verification scripts, curl, and browser DevTools
 
 ### 4.2 Front-End Implementation
-The front-end is structured into a Single Page Application (SPA) driven by React 19. It avoids heavy third-party UI component libraries in favor of tailored CSS design tokens that provide high aesthetic fidelity and rapid performance.
+The front-end is structured into a Single Page Application (SPA) driven by React 19 and Vite 8. It features tailored CSS design tokens, a high-contrast **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19`), pixel-perfect **Tabler Icons** (`@tabler/icons-react`), **Lenis** smooth momentum scrolling, and **Magic UI** micro-interactions (`NumberTicker`, `BorderBeam`, `DotPattern`).
 
-#### Key Front-End Code Excerpt: Dynamic Password Validation & Portal Toggle
+#### Key Front-End Code Excerpt: Dynamic Password Validation, Persistent Cooldown, & Portal Toggle
 *(From `frontend/src/App.jsx`)*
 ```jsx
-function LoginScreen({ onLoginSuccess }) {
+const ADMIN_LOCK_KEY = "taripa_admin_lock_until";
+
+function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
+  const [cooldown, setCooldown] = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? diff : 0;
+    } catch { return 0; }
+  });
+  const [error, setError] = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? `Too many failed attempts. Login temporarily locked for ${diff}s.` : "";
+    } catch { return ""; }
+  });
+  const [loading, setLoading] = useState(false);
 
-  // Dynamic Validation: Require non-empty username AND 6+ character password
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const interval = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
+          setError("");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldown]);
+
   const isFormValid = username.trim().length > 0 && password.length >= 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isFormValid || loading) return;
+    if (!isFormValid || loading || cooldown > 0) return;
     setError("");
     setLoading(true);
     try {
@@ -459,8 +491,15 @@ function LoginScreen({ onLoginSuccess }) {
       const data = await res.json();
       if (!res.ok || !data.success) {
         setError(data.message || "Invalid username or password.");
+        if (data.retryAfter) {
+          const seconds = Number(data.retryAfter);
+          const until = Date.now() + seconds * 1000;
+          try { localStorage.setItem(ADMIN_LOCK_KEY, String(until)); } catch {}
+          setCooldown(seconds);
+        }
         return;
       }
+      try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
       saveAdminAuth(data.data.token, data.data.admin);
       onLoginSuccess(data.data.token, data.data.admin);
     } catch {
@@ -469,75 +508,68 @@ function LoginScreen({ onLoginSuccess }) {
       setLoading(false);
     }
   };
-
-  return (
-    <div className="insta-login-page">
-      <div className="insta-top-brand">
-        <img src="/taripa-owl.jpg" alt="TARIPA" className="insta-top-logo" />
-        <span className="insta-top-name">TARIPA</span>
-      </div>
-      <main className="insta-main-container">
-        {/* Left Column: Artwork Showcase */}
-        <section className="insta-left-col">
-          <h1 className="insta-hero-headline">
-            Rent, submeters, and receipts&nbsp;—<br />
-            <span className="insta-highlight">reconciled every cycle.</span>
-          </h1>
-          <div className="insta-mockup-wrapper">
-            <div className="insta-mockup-frame">
-              <img src="/images/taripa-owl-building.png" alt="Building Mascot" className="insta-mockup-img" />
-            </div>
-          </div>
-        </section>
-        <div className="insta-divider" />
-        {/* Right Column: Form */}
-        <section className="insta-right-col">
-          <div className="insta-form-box">
-            <h2 className="insta-form-title">Log into TARIPA</h2>
-            <p className="insta-form-subtitle">Admin billing & property management portal</p>
-            {/* Segmented Switcher */}
-            <div className="insta-portal-switch">
-              <button type="button" className="insta-portal-btn active">Admin Portal</button>
-              <a href="/client" className="insta-portal-btn">Tenant Portal</a>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="insta-input-wrapper">
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => { setUsername(e.target.value); setError(""); }}
-                  placeholder="Username or email"
-                  className="insta-input"
-                  required
-                />
-              </div>
-              <div className="insta-input-wrapper">
-                <input
-                  type={showPass ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(""); }}
-                  placeholder="Password"
-                  className="insta-input"
-                  required
-                />
-                <button type="button" onClick={() => setShowPass(!showPass)} className="insta-pass-toggle-btn">
-                  {showPass ? <Icons.EyeOff /> : <Icons.Eye />}
-                </button>
-              </div>
-              <button type="submit" className="insta-btn-submit" disabled={!isFormValid || loading}>
-                {loading ? "Logging in…" : "Log in"}
-              </button>
-            </form>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
 ```
 
 ### 4.3 Back-End Implementation
-The Express backend enforces centralized database querying and middleware validation.
+The Express backend enforces centralized database querying, JWT middleware validation, and in-memory brute-force rate limiting.
+
+#### Key Back-End Code Excerpt: In-Memory Brute-Force Rate Limiter & Cooldown Lockout
+*(From `backend/middleware/loginLimiter.js`)*
+```javascript
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_MS = 30 * 1000; // 30-second lockout cooldown
+const attemptsMap = new Map();
+
+function checkLoginAttempt(req, username) {
+    const key = `${req.socket.remoteAddress || "127.0.0.1"}:${String(username || "").trim().toLowerCase()}`;
+    const data = attemptsMap.get(key);
+    const now = Date.now();
+
+    if (data && data.lockUntil > now) {
+        const remainingSeconds = Math.ceil((data.lockUntil - now) / 1000);
+        return {
+            locked: true,
+            remainingSeconds,
+            message: `Too many failed attempts. Please wait ${remainingSeconds}s before trying again.`,
+        };
+    }
+    return { locked: false };
+}
+
+function recordFailedAttempt(req, username) {
+    const key = `${req.socket.remoteAddress || "127.0.0.1"}:${String(username || "").trim().toLowerCase()}`;
+    const now = Date.now();
+    const data = attemptsMap.get(key) || { count: 0, lockUntil: 0, lastAttempt: now };
+
+    if (data.lockUntil && data.lockUntil <= now) {
+        data.count = 0;
+        data.lockUntil = 0;
+    }
+
+    data.count += 1;
+    data.lastAttempt = now;
+
+    if (data.count >= MAX_ATTEMPTS) {
+        data.lockUntil = now + LOCKOUT_MS;
+        attemptsMap.set(key, data);
+        const remainingSeconds = Math.ceil(LOCKOUT_MS / 1000);
+        return { locked: true, remainingSeconds, remainingAttempts: 0, message: `Too many failed attempts. Login temporarily locked for ${remainingSeconds}s.` };
+    }
+
+    attemptsMap.set(key, data);
+    const remainingAttempts = MAX_ATTEMPTS - data.count;
+    let message = remainingAttempts <= 2
+        ? `Invalid username or password. ${remainingAttempts} attempt${remainingAttempts > 1 ? "s" : ""} remaining.`
+        : "Invalid username or password.";
+
+    return { locked: false, remainingAttempts, message };
+}
+
+function recordSuccessfulLogin(req, username) {
+    const key = `${req.socket.remoteAddress || "127.0.0.1"}:${String(username || "").trim().toLowerCase()}`;
+    attemptsMap.delete(key);
+}
+```
 
 #### Key Back-End Code Excerpt: Automated Billing Computation Logic
 *(From `backend/routes/billing.js`)*
