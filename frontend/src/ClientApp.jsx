@@ -198,19 +198,38 @@ function SessionInitScreen() {
 /* ─────────────────────────────────────────────
    LOGIN PAGE
 ───────────────────────────────────────────── */
+const CLIENT_LOCK_KEY = "taripa_client_lock_until";
+
 function LoginPage({ onLogin }) {
   const [username,    setUsername]    = useState("");
   const [password,    setPassword]    = useState("");
   const [showPass,    setShowPass]    = useState(false);
-  const [error,       setError]       = useState("");
+  const [cooldown,    setCooldown]    = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(CLIENT_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? diff : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [error,       setError]       = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(CLIENT_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? `Too many failed attempts. Login temporarily locked for ${diff}s.` : "";
+    } catch {
+      return "";
+    }
+  });
   const [isLoading,   setIsLoading]   = useState(false);
-  const [cooldown,    setCooldown]    = useState(0);
 
   useEffect(() => {
     if (cooldown <= 0) return;
     const interval = setInterval(() => {
       setCooldown((prev) => {
         if (prev <= 1) {
+          try { localStorage.removeItem(CLIENT_LOCK_KEY); } catch {}
           setError("");
           return 0;
         }
@@ -238,11 +257,15 @@ function LoginPage({ onLogin }) {
       if (!res.ok || !data.success) {
         setError(data.message || "Login failed. Please check your credentials.");
         if (data.retryAfter) {
-          setCooldown(Number(data.retryAfter));
+          const seconds = Number(data.retryAfter);
+          const until = Date.now() + seconds * 1000;
+          try { localStorage.setItem(CLIENT_LOCK_KEY, String(until)); } catch {}
+          setCooldown(seconds);
         }
         return;
       }
 
+      try { localStorage.removeItem(CLIENT_LOCK_KEY); } catch {}
       saveAuth(data.data.token, data.data.tenant);
       onLogin(data.data.tenant);
     } catch {

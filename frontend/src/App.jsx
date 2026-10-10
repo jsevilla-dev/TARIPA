@@ -157,19 +157,38 @@ const navigationItems = [
 /* ─────────────────────────────────────────────
    ADMIN LOGIN COMPONENT
 ───────────────────────────────────────────── */
+const ADMIN_LOCK_KEY = "taripa_admin_lock_until";
+
 function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [error, setError]       = useState("");
+  const [cooldown, setCooldown] = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? diff : 0;
+    } catch {
+      return 0;
+    }
+  });
+  const [error, setError] = useState(() => {
+    try {
+      const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
+      const diff = Math.ceil((until - Date.now()) / 1000);
+      return diff > 0 ? `Too many failed attempts. Login temporarily locked for ${diff}s.` : "";
+    } catch {
+      return "";
+    }
+  });
   const [loading, setLoading]   = useState(false);
-  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
     if (cooldown <= 0) return;
     const interval = setInterval(() => {
       setCooldown((prev) => {
         if (prev <= 1) {
+          try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
           setError("");
           return 0;
         }
@@ -196,10 +215,14 @@ function AdminLogin({ onLoginSuccess }) {
       if (!res.ok || !data.success) {
         setError(data.message || "Login failed. Please try again.");
         if (data.retryAfter) {
-          setCooldown(Number(data.retryAfter));
+          const seconds = Number(data.retryAfter);
+          const until = Date.now() + seconds * 1000;
+          try { localStorage.setItem(ADMIN_LOCK_KEY, String(until)); } catch {}
+          setCooldown(seconds);
         }
         return;
       }
+      try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
       saveAdminAuth(data.data.token, data.data.admin);
       onLoginSuccess(data.data.token, data.data.admin);
     } catch {
