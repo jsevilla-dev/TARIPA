@@ -1,4 +1,4 @@
-Create a 10-slide professional academic project defense presentation for our Information Management 2 (IM 2) final project titled:
+Create a 10-slide professional academic project defense presentation for our CC316 (App Dev and Emerging Tech) final project titled:
 "TARIPA: Apartment Electricity and Water Sub-Meter Billing Management System"
 
 Team Members:
@@ -14,9 +14,9 @@ Use the following exact 10-slide structure and content:
 ---
 SLIDE 1: TITLE SLIDE
 Title: TARIPA: Apartment Electricity & Water Sub-Meter Billing Management System
-Subtitle: A Web-Based Relational Database Solution for Transparent Residential Utility Tracking & Automated Billing
+Subtitle: A Web-Based Full-Stack Application for Transparent Residential Utility Tracking & Automated Billing
  metadata:
-- Course: Information Management 2 (IM 2)
+- Subject: CC316 (App Dev and Emerging Tech)
 - Proponents: James Sevilla, Lorrely Paga & Mathew Alarcon
 - Instructor: Prof. Xerxes
 
