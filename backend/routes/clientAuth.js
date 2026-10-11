@@ -19,10 +19,22 @@ router.post("/login", async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        if (!username || !password) {
+        if (
+            !username ||
+            !password ||
+            typeof username !== "string" ||
+            typeof password !== "string"
+        ) {
             return res.status(400).json({
                 success: false,
                 message: "Username and password are required.",
+            });
+        }
+
+        if (username.length > 100 || password.length > 128) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid username or password.",
             });
         }
 
@@ -100,7 +112,7 @@ router.post("/login", async (req, res) => {
                 username: account.username,
             },
             process.env.JWT_SECRET,
-            { expiresIn: "8h" }
+            { algorithm: "HS256", expiresIn: "8h" }
         );
 
         res.json({

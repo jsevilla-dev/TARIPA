@@ -3770,12 +3770,22 @@ function BillingPage() {
   const printStatement = (billing) => {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-    const month = billing.billing_month ? billing.billing_month.substring(0, 7) : "—";
+    const escapeHtml = (val) =>
+      String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const month = escapeHtml(billing.billing_month ? billing.billing_month.substring(0, 7) : "—");
+    const safeName = escapeHtml(billing.full_name);
+    const safeStatus = escapeHtml(billing.status);
+    const safeRoom = billing.room_number ? `Room ${escapeHtml(billing.room_number)}` : "Unassigned";
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Statement of Account - ${billing.full_name}</title>
+          <title>Statement of Account - ${safeName}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 40px; color: #0F172A; max-width: 600px; margin: 0 auto; line-height: 1.5; }
             .header { border-bottom: 2px solid #2563EB; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -3802,7 +3812,7 @@ function BillingPage() {
               <h1 class="title">Billing Statement</h1>
             </div>
             <div>
-              <span class="badge">${billing.status}</span>
+              <span class="badge">${safeStatus}</span>
             </div>
           </div>
 
@@ -3810,11 +3820,11 @@ function BillingPage() {
             <table>
               <tr>
                 <td class="label">Tenant Name:</td>
-                <td class="value">${billing.full_name}</td>
+                <td class="value">${safeName}</td>
               </tr>
               <tr>
                 <td class="label">Room Assignment:</td>
-                <td class="value">${billing.room_number ? `Room ${billing.room_number}` : "Unassigned"}</td>
+                <td class="value">${safeRoom}</td>
               </tr>
               <tr>
                 <td class="label">Billing Period:</td>

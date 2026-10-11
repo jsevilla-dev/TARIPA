@@ -24,7 +24,9 @@ function adminAuth(req, res, next) {
     const token = authHeader.slice(7); // strip "Bearer "
 
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
+        const payload = jwt.verify(token, process.env.JWT_SECRET, {
+            algorithms: ["HS256"],
+        });
 
         // Hard role check — client tokens have tenantId but no role: "admin"
         if (payload.role !== "admin") {

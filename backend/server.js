@@ -20,7 +20,17 @@ const adminAuth         = require("./middleware/adminAuth");
 const app = express();
 const PORT = 5000;
 
-app.use(express.json());
+// Security hardening: hide Express fingerprint & enforce defensive HTTP headers
+app.disable("x-powered-by");
+app.use((req, res, next) => {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("X-Frame-Options", "DENY");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+    next();
+});
+
+app.use(express.json({ limit: "100kb" }));
 
 // -- Admin Auth (login - public endpoint) --
 app.use("/api/admin", adminAuthRouter);
