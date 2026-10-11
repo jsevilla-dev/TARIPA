@@ -11,8 +11,6 @@ import {
   IconMaximize,
   IconMinimize,
   IconSparkles,
-  IconPhone,
-  IconCalendar,
 } from "@tabler/icons-react";
 
 const formatPHP = (value) =>
@@ -27,7 +25,7 @@ const formatPHP = (value) =>
  * Isometric Math Helper
  * Converts 3D grid coordinates (x, y, z) into 2D SVG screen coordinates (sx, sy)
  */
-const iso = (x, y, z = 0, originX = 430, originY = 215) => {
+const iso = (x, y, z = 0, originX = 0, originY = 0) => {
   const sx = originX + (x - y) * 0.866025;
   const sy = originY + (x + y) * 0.5 - z;
   return { x: Number(sx.toFixed(1)), y: Number(sy.toFixed(1)) };
@@ -52,8 +50,8 @@ function IsoBox({
   stroke = "rgba(15,23,42,0.14)",
   strokeWidth = 0.8,
   opacity = 1,
-  originX = 430,
-  originY = 215,
+  originX = 0,
+  originY = 0,
 }) {
   const b00 = iso(x, y, z, originX, originY);
   const b10 = iso(x + dx, y, z, originX, originY);
@@ -97,8 +95,6 @@ function IsoBox({
 
 /**
  * Draws an Isometric 3D Room Cutaway inside the unified Apartment Building
- * Includes: Tiled floor, interior walls, AC unit, wardrobe cabinet, 3D beds with pillows,
- * front hallway doorway, digital sub-meter box with pulsing LED, and floating callout badge.
  */
 function IsoRoomUnit({
   room,
@@ -115,10 +111,10 @@ function IsoRoomUnit({
   showWater,
   showRoof,
   roomStats,
-  originX = 430,
-  originY = 215,
+  originX = 0,
+  originY = 0,
 }) {
-  const H = 52; // Wall height
+  const H = 48; // Wall height
   const wallT = 6;
 
   const liftZ = isSelected ? 10 : isHovered ? 5 : 0;
@@ -129,7 +125,6 @@ function IsoRoomUnit({
   const isFull = occupied >= capacity;
   const hasUnpaid = roomStats?.unpaidCount > 0;
 
-  // Rich cobalt & architectural palette inspired by the viral 3D building dashboard
   const palette = isSelected
     ? {
         floor: "#DBEAFE",
@@ -179,10 +174,10 @@ function IsoRoomUnit({
   const s11 = iso(rx + W, ry + D, rz + 1, originX, originY);
   const s01 = iso(rx, ry + D, rz + 1, originX, originY);
 
-  const centerTop = iso(rx + W / 2, ry + D / 2, z + H + 26, originX, originY);
+  const centerTop = iso(rx + W / 2, ry + D / 2, z + H + 22, originX, originY);
   const centerFloor = iso(rx + W / 2, ry + D / 2, z + 6, originX, originY);
 
-  // Calculate bed positions inside the room
+  // Calculate bed positions inside the room (up to 6 visible beds)
   const visibleBeds = Math.min(capacity, 6);
   const beds = [];
   for (let i = 0; i < visibleBeds; i++) {
@@ -194,8 +189,7 @@ function IsoRoomUnit({
     beds.push({ bx, by, isBedOccupied, id: i });
   }
 
-  // Sub-meter position on the front exterior wall
-  const meterPos = iso(rx + 26, ry + D + 3, z + 24, originX, originY);
+  const meterPos = iso(rx + 26, ry + D + 3, z + 22, originX, originY);
 
   return (
     <g
@@ -245,7 +239,7 @@ function IsoRoomUnit({
         );
       })}
 
-      {/* 2. Rear Exterior Wall (along Y=ry) */}
+      {/* 2. Rear Wall */}
       <IsoBox
         x={rx}
         y={ry}
@@ -278,7 +272,7 @@ function IsoRoomUnit({
         originY={originY}
       />
 
-      {/* 3. Left Partition Wall (along X=rx) */}
+      {/* 3. Left Partition Wall */}
       <IsoBox
         x={rx}
         y={ry}
@@ -294,14 +288,14 @@ function IsoRoomUnit({
         originY={originY}
       />
 
-      {/* Interior Wardrobe / Locker Cabinet in Back-Right Corner */}
+      {/* Interior Wardrobe Cabinet */}
       <IsoBox
         x={rx + W - 22}
         y={ry + 10}
         z={z + 6}
         dx={14}
         dy={22}
-        dz={32}
+        dz={30}
         topColor="#F1F5F9"
         leftColor="#94A3B8"
         rightColor="#CBD5E1"
@@ -311,10 +305,9 @@ function IsoRoomUnit({
         originY={originY}
       />
 
-      {/* 4. Interior 3D Beds (Lit Cobalt Blue = Occupied, Crisp White = Vacant) */}
+      {/* 4. Interior 3D Beds */}
       {beds.map((b) => (
         <g key={b.id}>
-          {/* Bed Base */}
           <IsoBox
             x={b.bx}
             y={b.by}
@@ -330,7 +323,6 @@ function IsoRoomUnit({
             originX={originX}
             originY={originY}
           />
-          {/* Blanket Fold Accent */}
           {b.isBedOccupied && (
             <IsoBox
               x={b.bx + 12}
@@ -347,7 +339,6 @@ function IsoRoomUnit({
               originY={originY}
             />
           )}
-          {/* Pillow */}
           <IsoBox
             x={b.bx + 2}
             y={b.by + 2.5}
@@ -373,7 +364,7 @@ function IsoRoomUnit({
         z={z + 6}
         dx={wallT}
         dy={D}
-        dz={20}
+        dz={18}
         topColor={palette.wallTop}
         leftColor={palette.wallLeft}
         rightColor={palette.wallRight}
@@ -382,14 +373,14 @@ function IsoRoomUnit({
         originY={originY}
       />
 
-      {/* 6. Front Hallway Wall with Doorway Cutout & Window */}
+      {/* 6. Front Hallway Wall with Doorway Cutout */}
       <IsoBox
         x={rx}
         y={ry + D - wallT}
         z={z + 6}
         dx={W * 0.62}
         dy={wallT}
-        dz={30}
+        dz={26}
         topColor={palette.wallTop}
         leftColor={palette.wallLeft}
         rightColor={palette.wallRight}
@@ -397,7 +388,8 @@ function IsoRoomUnit({
         originX={originX}
         originY={originY}
       />
-      {/* Welcome Door Mat at Room Entrance */}
+
+      {/* Welcome Door Mat */}
       <IsoBox
         x={rx + W * 0.65}
         y={ry + D - 10}
@@ -413,14 +405,14 @@ function IsoRoomUnit({
         originY={originY}
       />
 
-      {/* Wall-Mounted Smart Sub-Meter Box on Front Wall */}
+      {/* Wall-Mounted Smart Sub-Meter Box */}
       <IsoBox
         x={rx + 18}
         y={ry + D}
-        z={z + 15}
+        z={z + 14}
         dx={16}
         dy={4}
-        dz={14}
+        dz={13}
         topColor="#F8FAFC"
         leftColor="#0F172A"
         rightColor="#1E293B"
@@ -429,7 +421,6 @@ function IsoRoomUnit({
         originX={originX}
         originY={originY}
       />
-      {/* Sub-Meter Glowing LED */}
       <circle
         cx={meterPos.x}
         cy={meterPos.y}
@@ -451,16 +442,16 @@ function IsoRoomUnit({
         />
       )}
 
-      {/* Optional Architectural Roof Overhang when Roof Mode is toggled on */}
+      {/* Optional Architectural Roof Overhang */}
       {showRoof && (
         <g>
           <IsoBox
             x={rx - 2}
-            y={ry - 4}
+            y={ry - 2}
             z={z + H + 6}
             dx={W + 4}
-            dy={D + 16}
-            dz={7}
+            dy={D + 8}
+            dz={6}
             topColor="#2563EB"
             leftColor="#1E3A8A"
             rightColor="#1D4ED8"
@@ -469,11 +460,10 @@ function IsoRoomUnit({
             originX={originX}
             originY={originY}
           />
-          {/* Solar Panel Array on Roof */}
           <IsoBox
             x={rx + 16}
             y={ry + 14}
-            z={z + H + 13}
+            z={z + H + 12}
             dx={W - 32}
             dy={D - 32}
             dz={2}
@@ -504,8 +494,8 @@ function IsoRoomUnit({
           <ellipse
             cx={centerFloor.x}
             cy={centerFloor.y}
-            rx="24"
-            ry="13"
+            rx="22"
+            ry="12"
             fill="rgba(37, 99, 235, 0.22)"
             stroke="#2563EB"
             strokeWidth="1.5"
@@ -515,35 +505,35 @@ function IsoRoomUnit({
 
       {/* Floating 3D Callout Badge Above Room */}
       <g
-        transform={`translate(${centerTop.x}, ${centerTop.y - (isSelected ? 10 : 0)})`}
+        transform={`translate(${centerTop.x}, ${centerTop.y - (isSelected ? 8 : 0)})`}
         style={{ transition: "transform 0.3s ease" }}
       >
-        <line x1="0" y1="12" x2="0" y2="26" stroke={isSelected ? "#1D4ED8" : "#64748B"} strokeWidth="1.6" />
-        <circle cx="0" cy="26" r="2.8" fill={isSelected ? "#1D4ED8" : "#64748B"} />
+        <line x1="0" y1="11" x2="0" y2="23" stroke={isSelected ? "#1D4ED8" : "#64748B"} strokeWidth="1.5" />
+        <circle cx="0" cy="23" r="2.5" fill={isSelected ? "#1D4ED8" : "#64748B"} />
 
         <rect
-          x="-50"
-          y="-15"
-          width="100"
-          height="28"
-          rx="14"
+          x="-48"
+          y="-14"
+          width="96"
+          height="26"
+          rx="13"
           fill={isSelected ? "#0F172A" : "#FFFFFF"}
           stroke={isSelected ? "#3B82F6" : hasUnpaid ? "#EF4444" : "#CBD5E1"}
           strokeWidth={isSelected ? "2" : "1.2"}
-          filter="drop-shadow(0 6px 12px rgba(15, 23, 42, 0.18))"
+          filter="drop-shadow(0 5px 10px rgba(15, 23, 42, 0.16))"
         />
 
         <circle
-          cx="-36"
+          cx="-35"
           cy="-1"
-          r="4.2"
+          r="4"
           fill={hasUnpaid ? "#EF4444" : isFull ? "#3B82F6" : "#10B981"}
         />
 
         <text
-          x="-26"
+          x="-25"
           y="3"
-          fontSize="11.5"
+          fontSize="11"
           fontWeight="800"
           fontFamily="Plus Jakarta Sans, Inter, sans-serif"
           fill={isSelected ? "#FFFFFF" : "#0F172A"}
@@ -551,9 +541,9 @@ function IsoRoomUnit({
           RM {room.room_number}
         </text>
         <text
-          x="24"
+          x="22"
           y="3"
-          fontSize="10.5"
+          fontSize="10"
           fontWeight="700"
           fontFamily="JetBrains Mono, monospace"
           fill={isSelected ? "#93C5FD" : "#64748B"}
@@ -566,9 +556,9 @@ function IsoRoomUnit({
 }
 
 /**
- * Decorative Isometric Tree & Streetlamp
+ * Decorative Isometric Tree
  */
-function IsoTree({ x, y, z = 0, scale = 1, originX = 430, originY = 215 }) {
+function IsoTree({ x, y, z = 0, scale = 1, originX = 0, originY = 0 }) {
   const trunkBase = iso(x, y, z, originX, originY);
   const crownCenter = iso(x, y, z + 20 * scale, originX, originY);
   const crownTop = iso(x, y, z + 33 * scale, originX, originY);
@@ -593,6 +583,8 @@ function IsoTree({ x, y, z = 0, scale = 1, originX = 430, originY = 215 }) {
 
 /**
  * Main Isometric 3D Building Digital Twin Component
+ * Dynamically scales its building podium, hallways, roads, pillars, and SVG viewBox
+ * to support ANY number of rooms (1 to 30+) with ZERO overlapping!
  */
 export default function IsometricBuildingView({
   rooms = [],
@@ -684,64 +676,116 @@ export default function IsometricBuildingView({
     return map;
   }, [rooms, tenants, readings, bills]);
 
-  // Position rooms as a cohesive connected Apartment Wing (side-by-side along a shared corridor!)
   const ROOM_W = 114;
   const ROOM_D = 96;
+  const ROW_CORRIDOR_GAP = 26; // Internal walkway between rows of rooms
 
-  const positionedRooms = useMemo(() => {
+  /**
+   * Smart Floor & Grid Layout Engine:
+   * - Filters rooms by search query & floor filter
+   * - Assigns floor based on room number (200+ -> Floor 2, or if > 6 rooms on Floor 1, splits neatly)
+   * - Dynamically computes exact building width, depth, podium, front veranda, road, and camera bounds!
+   */
+  const campusLayout = useMemo(() => {
     const sorted = [...rooms].sort((a, b) => Number(a.room_number) - Number(b.room_number));
-    const floor1 = [];
-    const floor2 = [];
 
-    sorted.forEach((rm) => {
-      const numStr = String(rm.room_number);
-      if (numStr.startsWith("2") || numStr.startsWith("3")) {
-        floor2.push(rm);
-      } else {
-        floor1.push(rm);
+    // Filter by search query first
+    const searched = sorted.filter((rm) => {
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const matchRoom = String(rm.room_number).toLowerCase().includes(q);
+      const matchTenant = (roomTelemetryMap[rm.id]?.tenants || []).some((t) =>
+        t.full_name?.toLowerCase().includes(q)
+      );
+      return matchRoom || matchTenant;
+    });
+
+    // Determine floor for each room:
+    // If room starts with '2', '3', etc. -> Floor 2.
+    // Otherwise, if there are more than 6 rooms and none start with '2', put rooms 7+ on Floor 2 so the 1st & 2nd floor tabs are both useful!
+    const hasExplicitFloor2 = searched.some((r) => {
+      const s = String(r.room_number);
+      return s.startsWith("2") || s.startsWith("3") || s.startsWith("4");
+    });
+
+    const withFloors = searched.map((rm, idx) => {
+      const s = String(rm.room_number);
+      let fl = 1;
+      if (hasExplicitFloor2) {
+        fl = s.startsWith("2") || s.startsWith("3") || s.startsWith("4") ? 2 : 1;
+      } else if (searched.length > 6 && idx >= 6) {
+        fl = 2;
       }
+      return { room: rm, floor: fl };
     });
 
-    const items = [];
-
-    // Ground Floor Connected Wing (Rooms share partition walls seamlessly!)
-    floor1.forEach((rm, i) => {
-      const col = i % 3;
-      const row = Math.floor(i / 3);
-      items.push({
-        room: rm,
-        floor: 1,
-        rx: 30 + col * ROOM_W,
-        ry: 35 + row * (ROOM_D + 26),
-        rz: 24,
-      });
+    const visibleList = withFloors.filter((item) => {
+      if (floorFilter === "all") return true;
+      return String(item.floor) === floorFilter;
     });
 
-    // 2nd Floor Connected Wing
-    floor2.forEach((rm, i) => {
-      const col = i % 3;
-      const row = Math.floor(i / 3);
-      items.push({
-        room: rm,
-        floor: 2,
-        rx: 30 + col * ROOM_W,
-        ry: -95 - row * (ROOM_D + 24),
-        rz: 84,
-      });
+    // Arrange all currently visible rooms in a clean, cohesive architectural grid on the podium
+    // Max 3 rooms per row (or 4 if >= 8 rooms)
+    const maxCols = visibleList.length >= 8 ? 4 : Math.max(1, Math.min(3, visibleList.length || 3));
+    const totalRows = Math.max(1, Math.ceil(visibleList.length / maxCols));
+
+    const START_X = 30;
+    const START_Y = 35;
+
+    const positioned = visibleList.map((item, idx) => {
+      const col = idx % maxCols;
+      const row = Math.floor(idx / maxCols);
+      return {
+        ...item,
+        col,
+        row,
+        rx: START_X + col * ROOM_W,
+        ry: START_Y + row * (ROOM_D + ROW_CORRIDOR_GAP),
+        rz: 25,
+      };
     });
 
-    return items.filter((item) => {
-      if (floorFilter !== "all" && String(item.floor) !== floorFilter) return false;
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchRoom = String(item.room.room_number).toLowerCase().includes(q);
-        const matchTenant = (roomTelemetryMap[item.room.id]?.tenants || []).some((t) =>
-          t.full_name?.toLowerCase().includes(q)
-        );
-        return matchRoom || matchTenant;
-      }
-      return true;
-    });
+    // Dynamic Building Dimensions
+    const wingWidth = maxCols * ROOM_W;
+    const roomsTotalDepth = totalRows * ROOM_D + Math.max(0, totalRows - 1) * ROW_CORRIDOR_GAP;
+    const verandaY = START_Y + roomsTotalDepth;
+    const verandaDepth = 32;
+    const stepsY = verandaY + verandaDepth;
+    const roadY = stepsY + 26;
+    const lotDepth = roadY + 125;
+    const lotWidth = wingWidth + 205;
+
+    // Compute exact 2D isometric bounding box so SVG viewBox auto-fits any number of rooms!
+    const corners = [
+      iso(-105, -75, 0),
+      iso(-105 + lotWidth, -75, 0),
+      iso(-105 + lotWidth, -75 + lotDepth, 0),
+      iso(-105, -75 + lotDepth, 0),
+      iso(START_X + wingWidth / 2, START_Y, 130), // Rooftop sign peak
+    ];
+    const xs = corners.map((c) => c.x);
+    const ys = corners.map((c) => c.y);
+    const minX = Math.min(...xs) - 45;
+    const maxX = Math.max(...xs) + 55;
+    const minY = Math.min(...ys) - 45;
+    const maxY = Math.max(...ys) + 45;
+
+    return {
+      positioned,
+      maxCols,
+      totalRows,
+      START_X,
+      START_Y,
+      wingWidth,
+      roomsTotalDepth,
+      verandaY,
+      verandaDepth,
+      stepsY,
+      roadY,
+      lotDepth,
+      lotWidth,
+      viewBox: `${Math.round(minX)} ${Math.round(minY)} ${Math.round(maxX - minX)} ${Math.round(maxY - minY)}`,
+    };
   }, [rooms, floorFilter, searchQuery, roomTelemetryMap]);
 
   const selectedRoom = useMemo(
@@ -759,14 +803,27 @@ export default function IsometricBuildingView({
     return { totalBeds, occupiedBeds, totalKwh, totalWater };
   }, [rooms, roomTelemetryMap]);
 
-  const ORIGIN_X = 425;
-  const ORIGIN_Y = 225;
+  const {
+    positioned: positionedRooms,
+    maxCols,
+    totalRows,
+    START_X,
+    START_Y,
+    wingWidth,
+    roomsTotalDepth,
+    verandaY,
+    verandaDepth,
+    stepsY,
+    roadY,
+    lotDepth,
+    lotWidth,
+    viewBox,
+  } = campusLayout;
 
-  const wingCols = Math.max(1, Math.min(3, rooms.length || 3));
-  const wingWidth = wingCols * ROOM_W;
-
-  const powerHubPt = iso(-58, 92, 32, ORIGIN_X, ORIGIN_Y);
-  const waterHubPt = iso(-58, 148, 28, ORIGIN_X, ORIGIN_Y);
+  // Main Utility Hub coordinates (dynamically centered alongside the left of the building)
+  const hubBaseY = START_Y + Math.max(20, roomsTotalDepth / 2 - 60);
+  const powerHubPt = iso(-58, hubBaseY + 26, 32);
+  const waterHubPt = iso(-58, hubBaseY + 82, 28);
 
   return (
     <div
@@ -794,7 +851,7 @@ export default function IsometricBuildingView({
         }
         @keyframes taripaVanDrive {
           0%, 100% { transform: translate(0px, 0px); }
-          50% { transform: translate(38px, 22px); }
+          50% { transform: translate(52px, 30px); }
         }
         .iso-flow-line {
           animation: taripaFlowDash 1s linear infinite;
@@ -1005,7 +1062,7 @@ export default function IsometricBuildingView({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          CENTER STAGE: INTERACTIVE 3D ISOMETRIC BUILDING SVG CANVAS
+          CENTER STAGE: DYNAMICALLY SCALED 3D ISOMETRIC BUILDING SVG CANVAS
       ══════════════════════════════════════════════════════════════════ */}
       <div
         style={{
@@ -1015,14 +1072,17 @@ export default function IsometricBuildingView({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          paddingRight: "280px",
+          paddingRight: "300px",
+          paddingTop: "40px",
+          paddingBottom: "40px",
         }}
       >
         <svg
-          viewBox="0 0 920 600"
+          viewBox={viewBox}
+          preserveAspectRatio="xMidYMid meet"
           style={{
             width: "100%",
-            height: "650px",
+            height: "580px",
             transform: `scale(${zoom})`,
             transition: "transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
             overflow: "visible",
@@ -1037,31 +1097,24 @@ export default function IsometricBuildingView({
                 strokeWidth="1"
               />
             </pattern>
-            <radialGradient id="stageGlow" cx="50%" cy="50%" r="55%">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.88" />
-              <stop offset="65%" stopColor="#DBEAFE" stopOpacity="0.38" />
-              <stop offset="100%" stopColor="#DBEAFE" stopOpacity="0" />
-            </radialGradient>
           </defs>
 
-          <rect x="-100" y="-100" width="1200" height="800" fill="url(#isoGridPattern)" />
-          <ellipse cx="440" cy="330" rx="400" ry="225" fill="url(#stageGlow)" />
+          {/* Infinite Isometric Background Grid */}
+          <rect x="-1500" y="-1500" width="3500" height="3500" fill="url(#isoGridPattern)" />
 
-          {/* ── 1. PROPERTY FOUNDATION & CAMPUS GROUNDS ── */}
+          {/* ── 1. DYNAMIC PROPERTY BASEPLATE & CAMPUS GROUNDS ── */}
           <IsoBox
             x={-95}
             y={-65}
             z={0}
-            dx={525}
-            dy={350}
+            dx={lotWidth}
+            dy={lotDepth}
             dz={14}
             topColor="#DBEAFE"
             leftColor="#94A3B8"
             rightColor="#CBD5E1"
             stroke="#64748B"
             strokeWidth={1.2}
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
           {/* Landscaped Inner Courtyard Turf */}
@@ -1069,92 +1122,99 @@ export default function IsometricBuildingView({
             x={-80}
             y={-50}
             z={14}
-            dx={495}
-            dy={320}
+            dx={lotWidth - 30}
+            dy={lotDepth - 30}
             dz={5}
             topColor="#F1F5F9"
             leftColor="#CBD5E1"
             rightColor="#E2E8F0"
             stroke="#94A3B8"
             strokeWidth={0.8}
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
-          {/* ── 2. UNIFIED APARTMENT BUILDING FOUNDATION PODIUM & FRONT CORRIDOR ── */}
-          {/* Building Raised Concrete Podium */}
+          {/* ── 2. DYNAMIC UNIFIED APARTMENT BUILDING PODIUM & WALKWAYS ── */}
+          {/* Building Raised Concrete Podium wrapping all room rows */}
           <IsoBox
-            x={20}
-            y={25}
+            x={START_X - 10}
+            y={START_Y - 10}
             z={19}
             dx={wingWidth + 20}
-            dy={ROOM_D + 52}
+            dy={roomsTotalDepth + verandaDepth + 18}
             dz={6}
             topColor="#E2E8F0"
             leftColor="#475569"
             rightColor="#64748B"
             stroke="#334155"
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
-          {/* Connected Front Hallway / Veranda Walkway in front of all rooms */}
+          {/* Internal Hallway Corridors between rows (when totalRows > 1) */}
+          {Array.from({ length: Math.max(0, totalRows - 1) }).map((_, rIdx) => (
+            <IsoBox
+              key={`corridor-${rIdx}`}
+              x={START_X}
+              y={START_Y + (rIdx + 1) * ROOM_D + rIdx * ROW_CORRIDOR_GAP}
+              z={25}
+              dx={wingWidth}
+              dy={ROW_CORRIDOR_GAP}
+              dz={2}
+              topColor="#CBD5E1"
+              leftColor="#64748B"
+              rightColor="#94A3B8"
+              stroke="#475569"
+            />
+          ))}
+
+          {/* Connected Front Hallway / Veranda Walkway at the front edge of the building */}
           <IsoBox
-            x={30}
-            y={35 + ROOM_D}
+            x={START_X}
+            y={verandaY}
             z={25}
             dx={wingWidth}
-            dy={32}
+            dy={verandaDepth}
             dz={3}
             topColor="#CBD5E1"
             leftColor="#64748B"
             rightColor="#94A3B8"
             stroke="#475569"
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
-          {/* Front Entrance Steps leading from Roadway to Hallway */}
+          {/* Front Entrance Steps leading from Roadway to Front Veranda */}
           <IsoBox
-            x={30 + wingWidth / 2 - 28}
-            y={35 + ROOM_D + 32}
+            x={START_X + wingWidth / 2 - 30}
+            y={stepsY}
             z={19}
-            dx={56}
+            dx={60}
             dy={18}
             dz={5}
             topColor="#93C5FD"
             leftColor="#1D4ED8"
             rightColor="#2563EB"
             stroke="#1E3A8A"
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
-          {/* Architectural Rear Blue Facade Header Wall (Gives it the viral blue building silhouette) */}
+          {/* Architectural Rear Blue Facade Wall */}
           <IsoBox
-            x={26}
-            y={27}
+            x={START_X - 4}
+            y={START_Y - 8}
             z={25}
             dx={wingWidth + 8}
             dy={8}
-            dz={66}
+            dz={64}
             topColor="#3B82F6"
             leftColor="#1E3A8A"
             rightColor="#1D4ED8"
             stroke="#172554"
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
 
           {/* Building Rooftop Sign ("TARIPA RESIDENCES") */}
           {(() => {
-            const signAnchor = iso(30 + wingWidth / 2, 27, 102, ORIGIN_X, ORIGIN_Y);
+            const signAnchor = iso(START_X + wingWidth / 2, START_Y - 4, 102);
             return (
               <g transform={`translate(${signAnchor.x}, ${signAnchor.y})`} pointerEvents="none">
                 <rect
-                  x="-76"
+                  x="-80"
                   y="-13"
-                  width="152"
+                  width="160"
                   height="22"
                   rx="8"
                   fill="#1E3A8A"
@@ -1177,24 +1237,24 @@ export default function IsometricBuildingView({
             );
           })()}
 
-          {/* Front Asphalt Street & Crosswalk */}
+          {/* ── 3. DYNAMIC FRONT ASPHALT STREET & CROSSWALK (Always in front of all rooms!) ── */}
           <IsoBox
             x={-95}
-            y={230}
+            y={roadY}
             z={15}
-            dx={525}
+            dx={lotWidth}
             dy={46}
             dz={5}
             topColor="#334155"
             leftColor="#0F172A"
             rightColor="#1E293B"
             stroke="#1E293B"
-            originX={ORIGIN_X}
-            originY={ORIGIN_Y}
           />
-          {[-45, 35, 115, 195, 275, 355].map((rxVal, idx) => {
-            const p1 = iso(rxVal, 253, 21, ORIGIN_X, ORIGIN_Y);
-            const p2 = iso(rxVal + 40, 253, 21, ORIGIN_X, ORIGIN_Y);
+          {Array.from({ length: Math.ceil(lotWidth / 80) }).map((_, idx) => {
+            const rxVal = -50 + idx * 80;
+            if (rxVal + 40 > -95 + lotWidth - 20) return null;
+            const p1 = iso(rxVal, roadY + 23, 21);
+            const p2 = iso(rxVal + 40, roadY + 23, 21);
             return (
               <line
                 key={idx}
@@ -1210,11 +1270,11 @@ export default function IsometricBuildingView({
             );
           })}
 
-          {/* ── 3. MAIN MERALCO & MAYNILAD UTILITY DISTRIBUTION STATION ── */}
+          {/* ── 4. MAIN MERALCO & MAYNILAD UTILITY DISTRIBUTION STATION ── */}
           <g>
             <IsoBox
               x={-72}
-              y={65}
+              y={hubBaseY}
               z={19}
               dx={72}
               dy={125}
@@ -1222,13 +1282,10 @@ export default function IsometricBuildingView({
               topColor="#CBD5E1"
               leftColor="#64748B"
               rightColor="#94A3B8"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
-            {/* Main Meralco Transformer Unit */}
             <IsoBox
               x={-60}
-              y={76}
+              y={hubBaseY + 11}
               z={24}
               dx={42}
               dy={40}
@@ -1237,13 +1294,10 @@ export default function IsometricBuildingView({
               leftColor="#1E3A8A"
               rightColor="#1D4ED8"
               stroke="#172554"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
-            {/* Main Water Pump & Filtration Tank */}
             <IsoBox
               x={-60}
-              y={132}
+              y={hubBaseY + 67}
               z={24}
               dx={42}
               dy={40}
@@ -1252,11 +1306,9 @@ export default function IsometricBuildingView({
               leftColor="#155E75"
               rightColor="#0891B2"
               stroke="#083344"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
             {(() => {
-              const hubLabel = iso(-40, 108, 86, ORIGIN_X, ORIGIN_Y);
+              const hubLabel = iso(-40, hubBaseY + 42, 86);
               return (
                 <g transform={`translate(${hubLabel.x}, ${hubLabel.y})`}>
                   <rect x="-50" y="-12" width="100" height="20" rx="6" fill="#0F172A" opacity="0.9" />
@@ -1276,11 +1328,11 @@ export default function IsometricBuildingView({
             })()}
           </g>
 
-          {/* ── 4. ANIMATED POWER & WATER SUB-METER CONDUIT LINES ── */}
+          {/* ── 5. ANIMATED POWER & WATER SUB-METER CONDUIT LINES ── */}
           {positionedRooms.map(({ room, rx, ry, rz }) => {
-            const roomMeterPt = iso(rx + 25, ry + ROOM_D, rz + 22, ORIGIN_X, ORIGIN_Y);
-            const midPowerPt = iso(-8, ry + ROOM_D + 8, rz + 12, ORIGIN_X, ORIGIN_Y);
-            const midWaterPt = iso(-15, ry + ROOM_D + 14, rz + 8, ORIGIN_X, ORIGIN_Y);
+            const roomMeterPt = iso(rx + 25, ry + ROOM_D, rz + 20);
+            const midPowerPt = iso(-8, ry + ROOM_D + 8, rz + 12);
+            const midWaterPt = iso(-15, ry + ROOM_D + 14, rz + 8);
             const isSel = room.id === effectiveSelectedId;
             const isActiveRoom = Number(room.occupied_count || 0) > 0;
 
@@ -1333,7 +1385,7 @@ export default function IsometricBuildingView({
             );
           })}
 
-          {/* ── 5. 3D ISOMETRIC ROOM UNITS (Sorted back-to-front) ── */}
+          {/* ── 6. 3D ISOMETRIC ROOM UNITS (Sorted back-to-front so front rows never get overlapped!) ── */}
           {[...positionedRooms]
             .sort((a, b) => a.rx + a.ry + a.rz - (b.rx + b.ry + b.rz))
             .map(({ room, rx, ry, rz }) => (
@@ -1353,41 +1405,36 @@ export default function IsometricBuildingView({
                 showWater={showWaterGrid}
                 showRoof={showRoof}
                 roomStats={roomTelemetryMap[room.id]}
-                originX={ORIGIN_X}
-                originY={ORIGIN_Y}
               />
             ))}
 
-          {/* Hallway Front Pillars along the Veranda */}
-          {Array.from({ length: wingCols + 1 }).map((_, idx) => (
+          {/* Front Veranda Pillars (Always positioned at the actual front veranda edge!) */}
+          {Array.from({ length: maxCols + 1 }).map((_, idx) => (
             <IsoBox
               key={`pillar-${idx}`}
-              x={30 + idx * ROOM_W - (idx === wingCols ? 6 : 0)}
-              y={35 + ROOM_D + 26}
+              x={START_X + idx * ROOM_W - (idx === maxCols ? 6 : 0)}
+              y={verandaY + verandaDepth - 6}
               z={28}
               dx={6}
               dy={6}
-              dz={50}
+              dz={46}
               topColor="#93C5FD"
               leftColor="#1E3A8A"
               rightColor="#2563EB"
               stroke="#172554"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
           ))}
 
-          {/* ── 6. LANDSCAPE TREES & ANIMATED UTILITY SERVICE VEHICLE ── */}
-          <IsoTree x={-55} y={-20} z={19} scale={1.15} originX={ORIGIN_X} originY={ORIGIN_Y} />
-          <IsoTree x={35} y={-25} z={19} scale={0.95} originX={ORIGIN_X} originY={ORIGIN_Y} />
-          <IsoTree x={400} y={195} z={19} scale={1.15} originX={ORIGIN_X} originY={ORIGIN_Y} />
-          <IsoTree x={400} y={70} z={19} scale={0.95} originX={ORIGIN_X} originY={ORIGIN_Y} />
+          {/* ── 7. DYNAMIC LANDSCAPE TREES & SERVICE VEHICLE (Always along the outer perimeter & front road!) ── */}
+          <IsoTree x={-55} y={-20} z={19} scale={1.15} />
+          <IsoTree x={START_X + wingWidth + 45} y={START_Y + 20} z={19} scale={0.95} />
+          <IsoTree x={START_X + wingWidth + 45} y={verandaY - 10} z={19} scale={1.15} />
 
           {/* Animated Utility Service Truck on Front Road */}
           <g className="iso-van-anim" pointerEvents="none">
             <IsoBox
-              x={65}
-              y={238}
+              x={START_X + 35}
+              y={roadY + 8}
               z={21}
               dx={44}
               dy={20}
@@ -1396,12 +1443,10 @@ export default function IsometricBuildingView({
               leftColor="#CBD5E1"
               rightColor="#E2E8F0"
               stroke="#475569"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
             <IsoBox
-              x={65}
-              y={238}
+              x={START_X + 35}
+              y={roadY + 8}
               z={28}
               dx={44}
               dy={20.5}
@@ -1410,12 +1455,10 @@ export default function IsometricBuildingView({
               leftColor="#1D4ED8"
               rightColor="#3B82F6"
               stroke="none"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
             <IsoBox
-              x={109}
-              y={239}
+              x={START_X + 79}
+              y={roadY + 9}
               z={21}
               dx={16}
               dy={18}
@@ -1424,8 +1467,6 @@ export default function IsometricBuildingView({
               leftColor="#1D4ED8"
               rightColor="#2563EB"
               stroke="#1E3A8A"
-              originX={ORIGIN_X}
-              originY={ORIGIN_Y}
             />
           </g>
         </svg>
