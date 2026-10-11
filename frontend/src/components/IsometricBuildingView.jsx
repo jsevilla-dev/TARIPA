@@ -1279,6 +1279,7 @@ export default function IsometricBuildingView({
 
           {/* ── 4. MAIN MERALCO & MAYNILAD UTILITY DISTRIBUTION STATION ── */}
           <g>
+            {/* Concrete Utility Pad */}
             <IsoBox
               x={-72}
               y={hubBaseY}
@@ -1286,46 +1287,141 @@ export default function IsometricBuildingView({
               dx={72}
               dy={125}
               dz={5}
-              topColor="#CBD5E1"
-              leftColor="#64748B"
-              rightColor="#94A3B8"
+              topColor="#E2E8F0"
+              leftColor="#94A3B8"
+              rightColor="#CBD5E1"
+              stroke="#64748B"
             />
+
+            {/* Box 1: Meralco Main Power Transformer Hub (Upper Box) */}
             <IsoBox
               x={-60}
               y={hubBaseY + 11}
               z={24}
               dx={42}
               dy={40}
-              dz={46}
-              topColor="#60A5FA"
-              leftColor="#1E3A8A"
-              rightColor="#1D4ED8"
-              stroke="#172554"
+              dz={42}
+              topColor="#FFFFFF"
+              leftColor="#CBD5E1"
+              rightColor="#E2E8F0"
+              stroke="#475569"
             />
+            {/* Meralco Orange Top Cap / Band */}
+            <IsoBox
+              x={-60.2}
+              y={hubBaseY + 10.8}
+              z={60}
+              dx={42.4}
+              dy={40.4}
+              dz={6}
+              topColor="#FF5A00"
+              leftColor="#C2410C"
+              rightColor="#EA580C"
+              stroke="#9A3412"
+            />
+            {(() => {
+              const meralcoHubLogo = iso(-39, hubBaseY + 31, 67);
+              return (
+                <g transform={`translate(${meralcoHubLogo.x}, ${meralcoHubLogo.y})`} pointerEvents="none">
+                  <circle cx="0" cy="0" r="10.5" fill="#FFFFFF" stroke="#FF5A00" strokeWidth="1.4" />
+                  <clipPath id="hubMeralcoClip">
+                    <circle cx="0" cy="0" r="9.2" />
+                  </clipPath>
+                  <image
+                    href="/meralco-logo.png"
+                    x="-9.5"
+                    y="-9.5"
+                    width="19"
+                    height="19"
+                    clipPath="url(#hubMeralcoClip)"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                </g>
+              );
+            })()}
+
+            {/* Box 2: Maynilad Main Water Meter Hub (Lower Box) */}
             <IsoBox
               x={-60}
               y={hubBaseY + 67}
               z={24}
               dx={42}
               dy={40}
-              dz={36}
-              topColor="#67E8F9"
-              leftColor="#155E75"
-              rightColor="#0891B2"
-              stroke="#083344"
+              dz={32}
+              topColor="#FFFFFF"
+              leftColor="#CBD5E1"
+              rightColor="#E2E8F0"
+              stroke="#475569"
+            />
+            {/* Maynilad Blue & Green Top Cap / Band */}
+            <IsoBox
+              x={-60.2}
+              y={hubBaseY + 66.8}
+              z={51}
+              dx={42.4}
+              dy={40.4}
+              dz={3.5}
+              topColor="#0284C7"
+              leftColor="#075985"
+              rightColor="#0369A1"
+              stroke="none"
+            />
+            <IsoBox
+              x={-60.2}
+              y={hubBaseY + 66.8}
+              z={54.5}
+              dx={42.4}
+              dy={40.4}
+              dz={3.5}
+              topColor="#22C55E"
+              leftColor="#15803D"
+              rightColor="#16A34A"
+              stroke="#14532D"
             />
             {(() => {
-              const hubLabel = iso(-40, hubBaseY + 42, 86);
+              const mayniladHubLogo = iso(-39, hubBaseY + 87, 59);
               return (
-                <g transform={`translate(${hubLabel.x}, ${hubLabel.y})`}>
-                  <rect x="-50" y="-12" width="100" height="20" rx="6" fill="#0F172A" opacity="0.92" />
+                <g transform={`translate(${mayniladHubLogo.x}, ${mayniladHubLogo.y})`} pointerEvents="none">
+                  <circle cx="0" cy="0" r="10.5" fill="#FFFFFF" stroke="#0284C7" strokeWidth="1.4" />
+                  <clipPath id="hubMayniladClip">
+                    <circle cx="0" cy="0" r="9.2" />
+                  </clipPath>
+                  <image
+                    href="/maynilad-logo.png"
+                    x="-9.5"
+                    y="-9.5"
+                    width="19"
+                    height="19"
+                    clipPath="url(#hubMayniladClip)"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                </g>
+              );
+            })()}
+
+            {/* Blended Light-Theme MAIN GRID HUB Header Badge */}
+            {(() => {
+              const hubLabel = iso(-39, hubBaseY + 31, 90);
+              return (
+                <g transform={`translate(${hubLabel.x}, ${hubLabel.y})`} pointerEvents="none">
+                  <rect
+                    x="-54"
+                    y="-12"
+                    width="108"
+                    height="21"
+                    rx="10.5"
+                    fill="#FFFFFF"
+                    stroke="#BFDBFE"
+                    strokeWidth="1.4"
+                  />
                   <text
                     x="0"
                     y="2"
                     textAnchor="middle"
-                    fontSize="9.5"
+                    fontSize="9"
                     fontWeight="800"
-                    fill="#38BDF8"
+                    letterSpacing="0.06em"
+                    fill="#1D4ED8"
                     fontFamily="Plus Jakarta Sans, sans-serif"
                   >
                     MAIN GRID HUB
