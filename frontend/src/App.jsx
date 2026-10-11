@@ -631,6 +631,8 @@ function App() {
             <button
               key={id}
               type="button"
+              title={label}
+              aria-label={label}
               className={`nav-item ${activePage === id ? "active" : ""}`}
               onClick={() => {
                 setActivePage(id);
@@ -647,6 +649,8 @@ function App() {
           <p className="nav-section-title" style={{ marginTop: "20px" }}>PREVIEW</p>
           <a
             href="/client"
+            title="Tenant Portal"
+            aria-label="Tenant Portal"
             className="nav-item"
             style={{ textDecoration: "none" }}
             onClick={() => {
