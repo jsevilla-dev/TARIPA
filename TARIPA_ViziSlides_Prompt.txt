@@ -3,7 +3,8 @@ Create a 10-slide professional academic project defense presentation for our Inf
 
 Team Members:
 - James Sevilla (Full-Stack Developer & Database Architect)
-- Lorrely (Co-Developer, System Analyst & UI/UX Presenter)
+- Lorrely Paga (Co-Developer, System Analyst & UI/UX Presenter)
+- Mathew Alarcon (Co-Developer, System Tester & Documentation Analyst)
 
 Instructor: Prof. Xerxes
 Color Palette Preference: Clean White, Deep Slate (#0F172A), and Cobalt Blue (#2563EB)
@@ -16,7 +17,7 @@ Title: TARIPA: Apartment Electricity & Water Sub-Meter Billing Management System
 Subtitle: A Web-Based Relational Database Solution for Transparent Residential Utility Tracking & Automated Billing
  metadata:
 - Course: Information Management 2 (IM 2)
-- Proponents: James Sevilla & Lorrely
+- Proponents: James Sevilla, Lorrely Paga & Mathew Alarcon
 - Instructor: Prof. Xerxes
 
 ---
@@ -100,3 +101,4 @@ Bullet Points:
   2. 3D Building Digital Twin (Meralco & Maynilad Grid)
   3. Tenant Registration -> Meter Reading -> Invoice Generation
   4. Tenant Portal Sub-Meter Odometer & Official Receipt
+
