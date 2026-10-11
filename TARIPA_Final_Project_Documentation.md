@@ -59,10 +59,10 @@ To design, develop, test, and deploy **TARIPA**, a secure, full-stack residentia
 4. **Comprehensive Data Retrieval & Analytics:** Provide real-time dashboard analytics, search, filtering by payment status (`Pending`, `Paid`, `Overdue`), and digital printable receipts.
 
 ### 1.4 Project Description
-**TARIPA** is an enterprise-grade, lightweight web application built on modern full-stack web technologies. The front-end leverages **React 19** and **Vite 8**, featuring a high-contrast **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19` to `#111726`) paired with Light Liquid Glass content cards, pixel-perfect **Tabler Icons** (`@tabler/icons-react`), and an Instagram-inspired dual-column login interface enhanced with **Magic UI** animations (`NumberTicker`, `BorderBeam`, `DotPattern`) and **Lenis** smooth momentum scrolling. The back-end is powered by **Node.js** and **Express 5.x**, adhering to RESTful API architectural principles with custom in-memory brute-force rate limiting (`loginLimiter.js`). Data persistence is managed by **MySQL 8.0** using an optimized connection pool (`mysql2/promise`).
+**TARIPA** is an enterprise-grade, lightweight web application built on modern full-stack web technologies. The front-end leverages **React 19** and **Vite 8**, featuring a high-contrast **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19` to `#111726`) paired with Light Liquid Glass content cards, an **Interactive 3D Isometric Building Digital Twin** (`IsometricBuildingView.jsx`) for spatial room and utility sub-meter visualization, pixel-perfect **Tabler Icons** (`@tabler/icons-react`), and an Instagram-inspired dual-column login interface enhanced with **Magic UI** animations (`NumberTicker`, `BorderBeam`, `DotPattern`) and **Lenis** smooth momentum scrolling. The back-end is powered by **Node.js** and **Express 5.x**, adhering to RESTful API architectural principles with custom in-memory brute-force rate limiting (`loginLimiter.js`). Data persistence is managed by **MySQL 8.0** using an optimized connection pool (`mysql2/promise`).
 
 The system supports two primary user workflows:
-- **Administrative Operations:** Administrators log in to configure rooms, register tenants with move-in dates, set effective utility rates, record monthly submeter readings, generate consolidated billing statements, monitor collection metrics with live toast feedback, and track overall collection metrics.
+- **Administrative Operations:** Administrators log in to configure rooms (with both Standard Card View and Interactive 3D Building Digital Twin View), register tenants with move-in dates, set effective utility rates, record monthly submeter readings, generate consolidated billing statements, monitor collection metrics with live toast feedback, and track overall collection metrics.
 - **Tenant Operations:** Tenants log in using credentials provisioned by the administrator to inspect their assigned room, view their current and historical billing statements, inspect meter consumption differentials, receive interactive notification alerts for unpaid bills, view official payment instructions, and print receipts.
 
 ### 1.5 Target Users
@@ -74,7 +74,7 @@ The system supports two primary user workflows:
 ### 1.6 Scope and Limitations
 
 #### Project Scope
-- **Room & Capacity Management:** Adding, editing, and monitoring rooms with assigned capacities and active occupant counts.
+- **Room & Capacity Management (with 3D Digital Twin):** Adding, editing, and monitoring rooms with assigned capacities and active occupant counts, visualized via both standard cards and an interactive 3D isometric building cutaway with live utility conduit animations.
 - **Tenant Records:** Registering tenant profiles with contact numbers, assigned rooms, move-in dates, and activation/inactivation toggles.
 - **Utility Rate Configuration:** Managing effective rates for Electricity (₱/kWh) and Water (₱/m³) with historical effective-date tracking.
 - **Submeter Tracking:** Monthly input of previous and current meter readings for electricity and water with validation checks ensuring current readings $\ge$ previous readings.
@@ -111,10 +111,11 @@ The system supports two primary user workflows:
 | **FR-14** | Client Portal | The system must provide a dedicated, isolated interface for authenticated tenants to inspect their personal statement and reading history only. | **High** |
 | **FR-15** | Brute-Force Rate Limiting | The system must enforce a 5-attempt login threshold per client IP and username target, locking out subsequent attempts for 30 seconds with HTTP 429 status and client-side countdown timer persisted in `localStorage`. | **High** |
 | **FR-16** | Notification Center | The system must deliver contextual floating toast notifications for user operations and provide an interactive dropdown displaying pending bills and property alerts. | **Medium** |
+| **FR-17** | 3D Building Digital Twin | The system must provide an interactive 3D isometric building cutaway view displaying real-time bedspace occupancy, animated power/water sub-meter feeds, and unit telemetry inspection. | **Medium** |
 
 ### 2.2 Non-Functional Requirements
 
-- **Usability:** The interface is built with responsive CSS, visual hierarchy, Liquid Glass tokens, distinct status badges, and interactive feedback toasts (`useToast`). The Admin Portal features a **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19`), pixel-perfect **Tabler Icons** (`@tabler/icons-react`), **Lenis** smooth momentum scrolling, and **Magic UI** components (`NumberTicker`, `BorderBeam`, `DotPattern`). The login page provides an Instagram-inspired layout with dynamic button state indicators (requiring 6+ character passwords before activation).
+- **Usability:** The interface is built with responsive CSS, visual hierarchy, Liquid Glass tokens, distinct status badges, and interactive feedback toasts (`useToast`). The Admin Portal features a **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19`), an **Interactive 3D Isometric Building View** (`IsometricBuildingView.jsx`), pixel-perfect **Tabler Icons** (`@tabler/icons-react`), **Lenis** smooth momentum scrolling, and **Magic UI** components (`NumberTicker`, `BorderBeam`, `DotPattern`). The login page provides an Instagram-inspired layout with dynamic button state indicators (requiring 6+ character passwords before activation).
 - **Performance:** Database queries are optimized with primary and unique indexes. The frontend compiles via Vite with production bundle sizes $< 130\text{ KB}$ CSS and $< 450\text{ KB}$ JS, achieving sub-second page loads.
 - **Security:** 
   - Passwords are never stored in plaintext; bcrypt hashing with cost factor 12 is enforced.

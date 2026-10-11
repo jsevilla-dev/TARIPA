@@ -6,6 +6,7 @@ import { NumberTicker } from "./components/magicui/NumberTicker.jsx";
 import { BorderBeam } from "./components/magicui/BorderBeam.jsx";
 import { DotPattern } from "./components/magicui/DotPattern.jsx";
 import "./components/magicui/magicui.css";
+import IsometricBuildingView from "./components/IsometricBuildingView.jsx";
 import {
   IconLayoutDashboard,
   IconUsers,
@@ -2003,6 +2004,7 @@ function RoomsPage() {
   const { showToast } = useToast();
   const [rooms, setRooms] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [viewMode, setViewMode] = useState("3d");
   const [showForm, setShowForm] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
   const [formData, setFormData] = useState({ room_number: "", capacity: "" });
@@ -2157,31 +2159,81 @@ function RoomsPage() {
         </p>
       </div>
 
-      {/* ── CONTROLS ROW: TABS & ADD BUTTON ── */}
+      {/* ── CONTROLS ROW: TABS, VIEW SWITCHER & ADD BUTTON ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-        <div className="glass" style={{ display: "inline-flex", borderRadius: "9999px", padding: "4px", gap: "4px" }}>
-          {["All", "Available", "Full"].map((f) => (
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <div className="glass" style={{ display: "inline-flex", borderRadius: "9999px", padding: "4px", gap: "4px" }}>
+            {["All", "Available", "Full"].map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFilter(f)}
+                className={filter === f ? "glass-pill-active" : ""}
+                style={{
+                  height: "32px",
+                  padding: "0 16px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  background: filter === f ? undefined : "transparent",
+                  color: filter === f ? "#090D16" : "#64748B",
+                  fontSize: "12.5px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+
+          {/* ── 3D DIGITAL TWIN VS STANDARD GRID SWITCHER ── */}
+          <div className="glass" style={{ display: "inline-flex", borderRadius: "9999px", padding: "4px", gap: "4px" }}>
             <button
-              key={f}
               type="button"
-              onClick={() => setFilter(f)}
-              className={filter === f ? "glass-pill-active" : ""}
+              onClick={() => setViewMode("3d")}
+              className={viewMode === "3d" ? "glass-pill-active" : ""}
               style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
                 height: "32px",
-                padding: "0 16px",
+                padding: "0 14px",
                 borderRadius: "9999px",
                 border: "none",
-                background: filter === f ? undefined : "transparent",
-                color: filter === f ? "#090D16" : "#64748B",
+                background: viewMode === "3d" ? undefined : "transparent",
+                color: viewMode === "3d" ? "#2563EB" : "#64748B",
+                fontSize: "12.5px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <IconBuilding size={15} /> 3D Building View
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              className={viewMode === "grid" ? "glass-pill-active" : ""}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                height: "32px",
+                padding: "0 14px",
+                borderRadius: "9999px",
+                border: "none",
+                background: viewMode === "grid" ? undefined : "transparent",
+                color: viewMode === "grid" ? "#090D16" : "#64748B",
                 fontSize: "12.5px",
                 fontWeight: 600,
                 cursor: "pointer",
                 transition: "all 0.15s ease",
               }}
             >
-              {f}
+              <IconLayoutDashboard size={15} /> Standard Cards
             </button>
-          ))}
+          </div>
         </div>
 
         <button
@@ -2205,99 +2257,109 @@ function RoomsPage() {
         </button>
       </div>
 
-      {/* ── ROOMS GRID (3 COLUMNS) ── */}
-      <div className="rooms-grid-3col">
-        {visibleRooms.length === 0 ? (
-          <div className="glass" style={{ gridColumn: "1 / -1", padding: "48px 24px", textAlign: "center", borderRadius: "24px" }}>
-            <span className="glass-inset" style={{ width: "48px", height: "48px", borderRadius: "14px", display: "inline-grid", placeItems: "center", color: "#2563EB", marginBottom: "12px" }}>
-              <Icons.DoorOpen />
-            </span>
-            <p style={{ margin: 0, fontWeight: 700, color: "#090D16", fontSize: "15px" }}>No Rooms Found</p>
-            <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#64748B" }}>
-              {filter !== "All" ? `No rooms matching "${filter}" status.` : "Click \"+ Add Room\" above to create a room."}
-            </p>
-          </div>
-        ) : (
-          visibleRooms.map((room) => {
-            const occupied = Number(room.occupied_count || 0);
-            const capacity = Number(room.capacity || 1);
-            const left = Math.max(0, capacity - occupied);
-            const isFull = occupied >= capacity;
-            const fillPct = Math.min(100, Math.round((occupied / capacity) * 100));
+      {/* ── VIEW CONTENT: 3D DIGITAL TWIN OR 3-COLUMN CARDS GRID ── */}
+      {viewMode === "3d" ? (
+        <IsometricBuildingView
+          rooms={visibleRooms}
+          onEditRoom={openEditForm}
+          onDeleteRoom={handleDeleteClick}
+          onAddRoom={openAddForm}
+          authFetch={authFetch}
+        />
+      ) : (
+        <div className="rooms-grid-3col">
+          {visibleRooms.length === 0 ? (
+            <div className="glass" style={{ gridColumn: "1 / -1", padding: "48px 24px", textAlign: "center", borderRadius: "24px" }}>
+              <span className="glass-inset" style={{ width: "48px", height: "48px", borderRadius: "14px", display: "inline-grid", placeItems: "center", color: "#2563EB", marginBottom: "12px" }}>
+                <Icons.DoorOpen />
+              </span>
+              <p style={{ margin: 0, fontWeight: 700, color: "#090D16", fontSize: "15px" }}>No Rooms Found</p>
+              <p style={{ margin: "4px 0 0", fontSize: "13px", color: "#64748B" }}>
+                {filter !== "All" ? `No rooms matching "${filter}" status.` : "Click \"+ Add Room\" above to create a room."}
+              </p>
+            </div>
+          ) : (
+            visibleRooms.map((room) => {
+              const occupied = Number(room.occupied_count || 0);
+              const capacity = Number(room.capacity || 1);
+              const left = Math.max(0, capacity - occupied);
+              const isFull = occupied >= capacity;
+              const fillPct = Math.min(100, Math.round((occupied / capacity) * 100));
 
-            return (
-              <div key={room.id} className="glass" style={{ borderRadius: "24px", padding: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-                {/* Card Top */}
-                <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
-                  <span style={{ width: "44px", height: "44px", borderRadius: "14px", background: "#EFF6FF", border: "1px solid #DBEAFE", display: "grid", placeItems: "center", color: "#2563EB", flexShrink: 0 }}>
-                    <Icons.DoorOpen />
-                  </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#090D16", margin: 0, letterSpacing: "-0.01em" }}>
-                      Room {room.room_number}
-                    </h3>
-                    <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      Residential unit · {capacity} bedspaces
-                    </p>
-                  </div>
-                  <span style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "5px",
-                    padding: "2px 10px",
-                    borderRadius: "9999px",
-                    fontSize: "11.5px",
-                    fontWeight: 700,
-                    background: isFull ? "#FEF2F2" : "#ECFDF5",
-                    color: isFull ? "#DC2626" : "#059669",
-                    border: isFull ? "1px solid #FECACA" : "1px solid #A7F3D0",
-                  }}>
-                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }} />
-                    {isFull ? "Full" : "Available"}
-                  </span>
-                </div>
-
-                {/* Occupancy Liquid Progress */}
-                <div>
-                  <div className="glass-inset" style={{ height: "8px", borderRadius: "9999px", overflow: "hidden" }}>
-                    <div className="liquid-bar" style={{ width: `${fillPct}%`, height: "100%", borderRadius: "9999px" }} />
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", fontSize: "12.5px" }}>
-                    <span style={{ color: "#090D16" }}>
-                      <strong style={{ fontWeight: 700 }}>{occupied}/{capacity}</strong> occupied
+              return (
+                <div key={room.id} className="glass" style={{ borderRadius: "24px", padding: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
+                  {/* Card Top */}
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                    <span style={{ width: "44px", height: "44px", borderRadius: "14px", background: "#EFF6FF", border: "1px solid #DBEAFE", display: "grid", placeItems: "center", color: "#2563EB", flexShrink: 0 }}>
+                      <Icons.DoorOpen />
                     </span>
-                    <span style={{ color: "#64748B", fontWeight: 500 }}>
-                      {left} {left === 1 ? "slot" : "slots"} left
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#090D16", margin: 0, letterSpacing: "-0.01em" }}>
+                        Room {room.room_number}
+                      </h3>
+                      <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        Residential unit · {capacity} bedspaces
+                      </p>
+                    </div>
+                    <span style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      padding: "2px 10px",
+                      borderRadius: "9999px",
+                      fontSize: "11.5px",
+                      fontWeight: 700,
+                      background: isFull ? "#FEF2F2" : "#ECFDF5",
+                      color: isFull ? "#DC2626" : "#059669",
+                      border: isFull ? "1px solid #FECACA" : "1px solid #A7F3D0",
+                    }}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "currentColor" }} />
+                      {isFull ? "Full" : "Available"}
                     </span>
                   </div>
-                </div>
 
-                {/* Actions */}
-                <div style={{ display: "flex", gap: "8px", paddingTop: "14px", borderTop: "1px solid rgba(15, 23, 42, 0.06)" }}>
-                  <button
-                    type="button"
-                    className="btn-pill-action"
-                    style={{ flex: 1 }}
-                    onClick={() => openEditForm(room)}
-                  >
-                    <Icons.Edit /> Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="btn-pill-action btn-pill-action-danger"
-                    style={{ flex: 1 }}
-                    onClick={() => handleDeleteClick(room)}
-                    disabled={occupied > 0}
-                    title={occupied > 0 ? "Cannot delete room with active tenants" : undefined}
-                  >
-                    <Icons.Delete /> Delete
-                  </button>
+                  {/* Occupancy Liquid Progress */}
+                  <div>
+                    <div className="glass-inset" style={{ height: "8px", borderRadius: "9999px", overflow: "hidden" }}>
+                      <div className="liquid-bar" style={{ width: `${fillPct}%`, height: "100%", borderRadius: "9999px" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px", fontSize: "12.5px" }}>
+                      <span style={{ color: "#090D16" }}>
+                        <strong style={{ fontWeight: 700 }}>{occupied}/{capacity}</strong> occupied
+                      </span>
+                      <span style={{ color: "#64748B", fontWeight: 500 }}>
+                        {left} {left === 1 ? "slot" : "slots"} left
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: "flex", gap: "8px", paddingTop: "14px", borderTop: "1px solid rgba(15, 23, 42, 0.06)" }}>
+                    <button
+                      type="button"
+                      className="btn-pill-action"
+                      style={{ flex: 1 }}
+                      onClick={() => openEditForm(room)}
+                    >
+                      <Icons.Edit /> Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-pill-action btn-pill-action-danger"
+                      style={{ flex: 1 }}
+                      onClick={() => handleDeleteClick(room)}
+                      disabled={occupied > 0}
+                      title={occupied > 0 ? "Cannot delete room with active tenants" : undefined}
+                    >
+                      <Icons.Delete /> Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
+      )}
 
       {/* ── ADD / EDIT ROOM SLIDE-OVER DRAWER (Exact Screenshot 2) ── */}
       {showForm && (
