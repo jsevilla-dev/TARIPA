@@ -912,6 +912,100 @@ function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Card 3: Digital Sub-Meter Odometer & Room Telemetry */}
+          <div style={{
+            background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
+            borderRadius: "24px",
+            padding: "20px 22px",
+            color: "#FFFFFF",
+            border: "1px solid rgba(148, 163, 184, 0.18)",
+            boxShadow: "0 12px 28px rgba(15, 23, 42, 0.14)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <div>
+                <span style={{ fontSize: "10px", fontWeight: 800, color: "#60A5FA", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  DIGITAL SUB-METER ODOMETER
+                </span>
+                <h3 style={{ fontSize: "15px", fontWeight: 800, color: "#FFFFFF", margin: "2px 0 0" }}>
+                  Room {tenant.room_number || "—"} Meter Verification
+                </h3>
+              </div>
+              <span style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "4px 10px",
+                borderRadius: "9999px",
+                background: "rgba(16, 185, 129, 0.15)",
+                border: "1px solid rgba(16, 185, 129, 0.35)",
+                color: "#34D399",
+                fontSize: "11px",
+                fontWeight: 700,
+              }}>
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
+                Synced
+              </span>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+              {/* Electric Odometer Box */}
+              <div style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "14px",
+                padding: "12px",
+              }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#93C5FD", marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+                  <span>⚡ ELECTRIC (kWh)</span>
+                  <span>+{elecConsumption.toFixed(1)}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "monospace", fontSize: "12.5px" }}>
+                  <div>
+                    <div style={{ fontSize: "9.5px", color: "#94A3B8" }}>PREV</div>
+                    <strong style={{ color: "#E2E8F0" }}>
+                      {Number(latest_meter?.electricity_previous || 0).toFixed(1)}
+                    </strong>
+                  </div>
+                  <span style={{ color: "#60A5FA", fontWeight: 800 }}>→</span>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "9.5px", color: "#94A3B8" }}>PRES</div>
+                    <strong style={{ color: "#38BDF8" }}>
+                      {Number(latest_meter?.electricity_current || elecConsumption).toFixed(1)}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Water Odometer Box */}
+              <div style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "14px",
+                padding: "12px",
+              }}>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#67E8F9", marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
+                  <span>💧 WATER (Cu.M)</span>
+                  <span>+{waterConsumption.toFixed(1)}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "monospace", fontSize: "12.5px" }}>
+                  <div>
+                    <div style={{ fontSize: "9.5px", color: "#94A3B8" }}>PREV</div>
+                    <strong style={{ color: "#E2E8F0" }}>
+                      {Number(latest_meter?.water_previous || 0).toFixed(1)}
+                    </strong>
+                  </div>
+                  <span style={{ color: "#22D3EE", fontWeight: 800 }}>→</span>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "9.5px", color: "#94A3B8" }}>PRES</div>
+                    <strong style={{ color: "#67E8F9" }}>
+                      {Number(latest_meter?.water_current || waterConsumption).toFixed(1)}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ── RIGHT COLUMN ── */}
