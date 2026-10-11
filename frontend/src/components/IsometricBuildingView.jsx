@@ -761,7 +761,7 @@ export default function IsometricBuildingView({
       iso(-105 + lotWidth, -75, 0),
       iso(-105 + lotWidth, -75 + lotDepth, 0),
       iso(-105, -75 + lotDepth, 0),
-      iso(START_X + wingWidth / 2, START_Y, 130), // Rooftop sign peak
+      iso(START_X + wingWidth / 2, START_Y, 168), // Rooftop sign peak
     ];
     const xs = corners.map((c) => c.x);
     const ys = corners.map((c) => c.y);
@@ -1199,50 +1199,19 @@ export default function IsometricBuildingView({
             stroke="#1E3A8A"
           />
 
-          {/* Architectural Rear Blue Facade Wall */}
+          {/* Architectural Rear Blue Facade Wall (Dynamic height for 1st vs 2nd floor) */}
           <IsoBox
             x={START_X - 4}
             y={START_Y - 8}
             z={25}
             dx={wingWidth + 8}
             dy={8}
-            dz={64}
+            dz={positionedRooms.some((r) => r.rz > 30) ? 114 : 64}
             topColor="#3B82F6"
             leftColor="#1E3A8A"
             rightColor="#1D4ED8"
             stroke="#172554"
           />
-
-          {/* Building Rooftop Sign ("TARIPA RESIDENCES") */}
-          {(() => {
-            const signAnchor = iso(START_X + wingWidth / 2, START_Y - 4, 102);
-            return (
-              <g transform={`translate(${signAnchor.x}, ${signAnchor.y})`} pointerEvents="none">
-                <rect
-                  x="-80"
-                  y="-13"
-                  width="160"
-                  height="22"
-                  rx="8"
-                  fill="#1E3A8A"
-                  stroke="#60A5FA"
-                  strokeWidth="1.2"
-                />
-                <text
-                  x="0"
-                  y="2"
-                  textAnchor="middle"
-                  fontSize="10"
-                  fontWeight="800"
-                  letterSpacing="0.08em"
-                  fill="#FFFFFF"
-                  fontFamily="Plus Jakarta Sans, sans-serif"
-                >
-                  TARIPA RESIDENCES
-                </text>
-              </g>
-            );
-          })()}
 
           {/* ── 3. DYNAMIC FRONT ASPHALT STREET & CROSSWALK (Always in front of all rooms!) ── */}
           <IsoBox
@@ -1510,6 +1479,64 @@ export default function IsometricBuildingView({
                 roomStats={roomTelemetryMap[room.id]}
               />
             ))}
+
+          {/* Building Rooftop Sign ("TARIPA RESIDENCES" — Rendered after rooms so it never gets overlapped!) */}
+          {(() => {
+            const has2ndFloor = positionedRooms.some((r) => r.rz > 30);
+            const wallTopZ = has2ndFloor ? 139 : 89;
+            const signZ = wallTopZ + 16;
+            const signAnchor = iso(START_X + wingWidth / 2, START_Y - 4, signZ);
+            const postLeftBase = iso(START_X + wingWidth / 2 - 36, START_Y - 4, wallTopZ);
+            const postLeftTop = iso(START_X + wingWidth / 2 - 36, START_Y - 4, signZ - 4);
+            const postRightBase = iso(START_X + wingWidth / 2 + 36, START_Y - 4, wallTopZ);
+            const postRightTop = iso(START_X + wingWidth / 2 + 36, START_Y - 4, signZ - 4);
+            return (
+              <g pointerEvents="none">
+                <line
+                  x1={postLeftBase.x}
+                  y1={postLeftBase.y}
+                  x2={postLeftTop.x}
+                  y2={postLeftTop.y}
+                  stroke="#1E3A8A"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1={postRightBase.x}
+                  y1={postRightBase.y}
+                  x2={postRightTop.x}
+                  y2={postRightTop.y}
+                  stroke="#1E3A8A"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                <g transform={`translate(${signAnchor.x}, ${signAnchor.y})`}>
+                  <rect
+                    x="-82"
+                    y="-13"
+                    width="164"
+                    height="24"
+                    rx="12"
+                    fill="#FFFFFF"
+                    stroke="#2563EB"
+                    strokeWidth="1.6"
+                  />
+                  <text
+                    x="0"
+                    y="2.5"
+                    textAnchor="middle"
+                    fontSize="10"
+                    fontWeight="800"
+                    letterSpacing="0.08em"
+                    fill="#1D4ED8"
+                    fontFamily="Plus Jakarta Sans, sans-serif"
+                  >
+                    TARIPA RESIDENCES
+                  </text>
+                </g>
+              </g>
+            );
+          })()}
 
           {/* Front Veranda Pillars (Always positioned at the actual front veranda edge!) */}
           {Array.from({ length: maxCols + 1 }).map((_, idx) => (
