@@ -700,24 +700,27 @@ export default function IsometricBuildingView({
       return matchRoom || matchTenant;
     });
 
-    // Determine floor for each room:
-    // If room starts with '2', '3', etc. -> Floor 2.
-    // Otherwise, if there are more than 6 rooms and none start with '2', put rooms 7+ on Floor 2 so the 1st & 2nd floor tabs are both useful!
-    const hasExplicitFloor2 = searched.some((r) => {
-      const s = String(r.room_number);
-      return s.startsWith("2") || s.startsWith("3") || s.startsWith("4");
-    });
+    // Boarding house floor capacity rule (Max 6 rooms on 1st Floor; overflow or 2xx goes to 2nd Floor)
+    const MAX_PER_FLOOR = 6;
+    let f1Assigned = 0;
+    const roomFloorMap = {};
 
-    const withFloors = searched.map((rm, idx) => {
+    const withFloors = searched.map((rm) => {
       const s = String(rm.room_number);
+      const isExplicit2nd = s.startsWith("2") || s.startsWith("3") || s.startsWith("4");
       let fl = 1;
-      if (hasExplicitFloor2) {
-        fl = s.startsWith("2") || s.startsWith("3") || s.startsWith("4") ? 2 : 1;
-      } else if (searched.length > 6 && idx >= 6) {
+      if (isExplicit2nd || f1Assigned >= MAX_PER_FLOOR) {
         fl = 2;
+      } else {
+        fl = 1;
+        f1Assigned += 1;
       }
+      roomFloorMap[rm.id] = fl;
       return { room: rm, floor: fl };
     });
+
+    const floor1Count = withFloors.filter((i) => i.floor === 1).length;
+    const floor2Count = withFloors.filter((i) => i.floor === 2).length;
 
     const visibleList = withFloors.filter((item) => {
       if (floorFilter === "all") return true;
@@ -784,6 +787,9 @@ export default function IsometricBuildingView({
       roadY,
       lotDepth,
       lotWidth,
+      floor1Count,
+      floor2Count,
+      roomFloorMap,
       viewBox: `${Math.round(minX)} ${Math.round(minY)} ${Math.round(maxX - minX)} ${Math.round(maxY - minY)}`,
     };
   }, [rooms, floorFilter, searchQuery, roomTelemetryMap]);
@@ -817,6 +823,9 @@ export default function IsometricBuildingView({
     roadY,
     lotDepth,
     lotWidth,
+    floor1Count,
+    floor2Count,
+    roomFloorMap,
     viewBox,
   } = campusLayout;
 
@@ -1861,7 +1870,7 @@ export default function IsometricBuildingView({
                   letterSpacing: "0.06em",
                 }}
               >
-                LIVE UNIT TELEMETRY
+                LIVE UNIT TELEMETRY · {roomFloorMap[selectedRoom.id] === 2 ? "2ND FLOOR" : "1ST FLOOR"}
               </span>
               <h3
                 style={{
@@ -2176,9 +2185,9 @@ export default function IsometricBuildingView({
 
         <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
           {[
-            { id: "all", label: "All Floors" },
-            { id: "1", label: "1st Floor" },
-            { id: "2", label: "2nd Floor" },
+            { id: "all", label: `All Floors (${floor1Count + floor2Count})` },
+            { id: "1", label: `1st Floor (${floor1Count}/6)` },
+            { id: "2", label: `2nd Floor (${floor2Count})` },
           ].map((fl) => (
             <button
               key={fl.id}
