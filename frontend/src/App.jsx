@@ -1376,43 +1376,46 @@ function Dashboard({ onNavigate }) {
 
           {/* ── 3D DIGITAL TWIN QUICK-LAUNCH CARD ── */}
           <div
+            className="glass-inset"
             onClick={() => onNavigate?.("rooms")}
             style={{
               marginTop: "6px",
               padding: "14px 16px",
-              borderRadius: "18px",
-              background: "linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)",
-              color: "#FFFFFF",
+              borderRadius: "20px",
+              background: "linear-gradient(135deg, rgba(239, 246, 255, 0.85) 0%, rgba(255, 255, 255, 0.9) 100%)",
+              border: "1px solid #BFDBFE",
+              color: "#090D16",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
               gap: "12px",
               cursor: "pointer",
-              boxShadow: "0 10px 24px rgba(30, 58, 138, 0.22)",
-              transition: "transform 0.15s ease",
+              boxShadow: "0 2px 10px rgba(37, 99, 235, 0.06)",
+              transition: "all 0.15s ease",
             }}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <span
                 style={{
-                  width: "38px",
-                  height: "38px",
-                  borderRadius: "12px",
-                  background: "rgba(96, 165, 250, 0.18)",
-                  border: "1px solid rgba(147, 197, 253, 0.35)",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "13px",
+                  background: "#FFFFFF",
+                  border: "1px solid #DBEAFE",
                   display: "grid",
                   placeItems: "center",
-                  color: "#60A5FA",
+                  color: "#2563EB",
+                  boxShadow: "0 1px 3px rgba(15, 23, 42, 0.08)",
                   flexShrink: 0,
                 }}
               >
                 <IconBuilding size={19} />
               </span>
               <div>
-                <div style={{ fontSize: "10px", fontWeight: 800, color: "#93C5FD", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                <div style={{ fontSize: "10px", fontWeight: 800, color: "#2563EB", letterSpacing: "0.06em", textTransform: "uppercase" }}>
                   INTERACTIVE FLOOR PLAN
                 </div>
-                <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#FFFFFF", marginTop: "1px" }}>
+                <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#090D16", marginTop: "1px" }}>
                   Launch 3D Building Twin
                 </div>
               </div>
@@ -1422,10 +1425,11 @@ function Dashboard({ onNavigate }) {
                 width: "30px",
                 height: "30px",
                 borderRadius: "9999px",
-                background: "rgba(255, 255, 255, 0.14)",
+                background: "#EFF6FF",
+                border: "1px solid #BFDBFE",
                 display: "grid",
                 placeItems: "center",
-                color: "#FFFFFF",
+                color: "#2563EB",
               }}
             >
               <IconArrowUpRight size={16} />
