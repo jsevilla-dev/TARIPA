@@ -688,10 +688,10 @@ function DashboardPage() {
   const waterDiffPct = avgWater > 0 ? Math.round(((waterConsumption - avgWater) / avgWater) * 100) : 0;
 
   return (
-    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 24px" }}>
+    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 clamp(14px, 4vw, 24px)" }}>
       {/* ── WELCOME TITLE ── */}
       <div style={{ margin: "28px 0 24px" }}>
-        <h1 style={{ fontSize: "30px", fontWeight: 800, color: "#0F172A", margin: 0, letterSpacing: "-0.025em" }}>
+        <h1 style={{ fontSize: "clamp(22px, 5vw, 30px)", fontWeight: 800, color: "#0F172A", margin: 0, letterSpacing: "-0.025em" }}>
           {greeting}, {firstName}
         </h1>
         <p style={{ fontSize: "14.5px", color: "#64748B", margin: "4px 0 0" }}>
@@ -703,13 +703,13 @@ function DashboardPage() {
       <div className="tenant-dashboard-grid">
         
         {/* ── LEFT COLUMN ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", minWidth: 0 }}>
           
           {/* Card 1: Vibrant Cobalt Blue Balance Card */}
           <div style={{
             background: "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
             borderRadius: "24px",
-            padding: "26px",
+            padding: "clamp(18px, 4vw, 26px)",
             color: "#FFFFFF",
             boxShadow: "0 14px 34px rgba(37, 99, 235, 0.28)",
             position: "relative",
@@ -727,7 +727,7 @@ function DashboardPage() {
               CURRENT OUTSTANDING BALANCE
             </p>
             <div style={{
-              fontSize: "38px",
+              fontSize: "clamp(28px, 7vw, 38px)",
               fontWeight: 800,
               letterSpacing: "-0.03em",
               margin: "10px 0 16px",
@@ -746,6 +746,8 @@ function DashboardPage() {
               gap: "8px",
               fontSize: "11.5px",
               color: "#FFFFFF",
+              maxWidth: "100%",
+              flexWrap: "wrap",
             }}>
               <Icons.Calendar />
               <span>
@@ -755,7 +757,7 @@ function DashboardPage() {
               </span>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "22px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 130px), 1fr))", gap: "10px", marginTop: "22px" }}>
               <button
                 type="button"
                 onClick={() => setShowPaymentModal(true)}
@@ -922,7 +924,7 @@ function DashboardPage() {
             border: "1px solid #E2E8F0",
             boxShadow: "0 4px 20px -2px rgba(15, 23, 42, 0.04)",
           }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", marginBottom: "14px" }}>
               <div>
                 <span style={{ fontSize: "10px", fontWeight: 800, color: "#2563EB", letterSpacing: "0.08em", textTransform: "uppercase" }}>
                   DIGITAL SUB-METER ODOMETER
@@ -948,7 +950,7 @@ function DashboardPage() {
               </span>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 145px), 1fr))", gap: "10px" }}>
               {/* Electric Odometer Box */}
               <div style={{
                 background: "#F8FAFC",
@@ -1009,10 +1011,10 @@ function DashboardPage() {
         </div>
 
         {/* ── RIGHT COLUMN ── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", minWidth: 0 }}>
           
           {/* Dual Consumption Cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 155px), 1fr))", gap: "16px" }}>
             
             {/* Electricity Gauge Card */}
             <div style={{
@@ -1473,7 +1475,7 @@ function MeterReadingsPage() {
       </div>
 
       {latestReading && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px", marginBottom: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "20px", marginBottom: "16px" }}>
           <div className="tg-gauge-card tg-glass-card" style={{ padding: "20px 24px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <span className="tg-gauge-icon-badge" style={{ width: "40px", height: "40px", borderRadius: "12px" }}>
@@ -1510,7 +1512,7 @@ function MeterReadingsPage() {
           <p>Your meter recordings will appear here once logged by the property manager.</p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(460px, 1fr))", gap: "20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: "20px" }}>
           {readings.map((r) => (
             <article className="cb-reading-card tg-glass-card" key={r.id}>
               <div className="cb-reading-month" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #F1F5F9", padding: "16px 22px" }}>
@@ -1520,7 +1522,7 @@ function MeterReadingsPage() {
                 )}
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 210px), 1fr))" }}>
                 <div className="cb-reading-section cb-reading-electric" style={{ borderRight: "1px solid #E2E8F0" }}>
                   <div className="cb-reading-section-label">
                     <Icons.Electricity /> Electricity Submeter
@@ -1615,12 +1617,12 @@ function ProfilePage() {
         <p className="tg-page-desc">Your verified residential information and room allocation.</p>
       </div>
 
-      <div className="cb-profile-card tg-glass-card" style={{ maxWidth: "680px", margin: "0 auto", padding: "40px 40px" }}>
+      <div className="cb-profile-card tg-glass-card" style={{ maxWidth: "680px", margin: "0 auto", padding: "clamp(20px, 5vw, 40px)" }}>
         <div className="cb-profile-avatar" style={{ background: "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)", boxShadow: "0 8px 24px rgba(37, 99, 235, 0.3)" }}>
           {profile.full_name.charAt(0).toUpperCase()}
         </div>
         <h3 className="cb-profile-name" style={{ fontSize: "22px", color: "#0F172A", marginTop: "4px" }}>{profile.full_name}</h3>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
           <StatusBadge status={profile.status} />
           {profile.room_number && (
             <span style={{ fontSize: "11px", fontWeight: 700, padding: "3px 10px", borderRadius: "999px", background: "#EFF6FF", color: "#2563EB", border: "1px solid #DBEAFE" }}>
@@ -1722,7 +1724,7 @@ function PortalShell({ tenant, onLogout }) {
       <div className="tenant-top-capsule">
         <header className="tenant-top-capsule-bar">
           {/* Left: Tenant Identity */}
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
             <div style={{
               width: "38px",
               height: "38px",
@@ -1737,8 +1739,8 @@ function PortalShell({ tenant, onLogout }) {
             }}>
               {getInitials(tenant?.full_name)}
             </div>
-            <div>
-              <div style={{ fontSize: "14px", fontWeight: 700, color: "#0F172A", lineHeight: 1.2 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: "14px", fontWeight: 700, color: "#0F172A", lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {tenant?.full_name || "Maria Santos"}
               </div>
               <div style={{ fontSize: "11.5px", color: "#64748B", lineHeight: 1.2, marginTop: "2px" }}>
@@ -1817,7 +1819,7 @@ function PortalShell({ tenant, onLogout }) {
                   position: "absolute",
                   top: "calc(100% + 12px)",
                   right: 0,
-                  width: "320px",
+                  width: "min(320px, calc(100vw - 28px))",
                   background: "#FFFFFF",
                   borderRadius: "20px",
                   boxShadow: "0 16px 40px -8px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08)",
@@ -1979,17 +1981,17 @@ function PortalShell({ tenant, onLogout }) {
       <main style={{ paddingBottom: "48px" }}>
         {activePage === "dashboard" && <DashboardPage />}
         {activePage === "bills" && (
-          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 24px" }}>
+          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 clamp(14px, 4vw, 24px)" }}>
             <BillsPage />
           </div>
         )}
         {activePage === "meters" && (
-          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 24px" }}>
+          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 clamp(14px, 4vw, 24px)" }}>
             <MeterReadingsPage />
           </div>
         )}
         {activePage === "profile" && (
-          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 24px" }}>
+          <div style={{ maxWidth: "1400px", margin: "24px auto 0", padding: "0 clamp(14px, 4vw, 24px)" }}>
             <ProfilePage />
           </div>
         )}

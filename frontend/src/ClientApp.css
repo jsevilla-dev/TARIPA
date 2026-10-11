@@ -2201,22 +2201,50 @@
 @media (max-width: 960px) {
   .tenant-dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .tenant-top-capsule {
+    padding: 0 14px;
+    margin-top: 12px;
   }
   .tenant-top-capsule-bar {
-    border-radius: 20px;
+    border-radius: 22px;
     flex-wrap: wrap;
     padding: 10px 14px;
+    gap: 10px;
   }
   .tenant-nav-pill-group {
     order: 3;
     width: 100%;
-    justify-content: space-around;
-    margin-top: 6px;
+    justify-content: space-between;
+    margin-top: 4px;
+    overflow-x: auto;
   }
   .tenant-nav-pill-btn {
-    padding: 6px 8px;
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 7px 8px;
     font-size: 11.5px;
+    white-space: nowrap;
   }
 }
+
+@media (max-width: 480px) {
+  .tenant-nav-pill-btn {
+    padding: 6px 6px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .cb-reading-section.cb-reading-electric {
+    border-right: none !important;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .cb-profile-detail-row {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 4px;
+  }
+}
+
 
 

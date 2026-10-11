@@ -836,6 +836,7 @@ export default function IsometricBuildingView({
 
   return (
     <div
+      className="iso-twin-shell"
       style={{
         position: "relative",
         width: "100%",
@@ -883,12 +884,92 @@ export default function IsometricBuildingView({
         .iso-van-maynilad {
           animation: taripaVanMaynilad 8.5s ease-in-out infinite;
         }
+        @media (max-width: 960px) {
+          .iso-twin-shell {
+            min-height: auto !important;
+            padding: 14px !important;
+            gap: 12px !important;
+            border-radius: 22px !important;
+          }
+          .iso-hud-top-left {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            order: 1;
+          }
+          .iso-search-pill {
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            border-radius: 18px !important;
+          }
+          .iso-search-input {
+            width: auto !important;
+            flex: 1 1 140px !important;
+            min-width: 0 !important;
+          }
+          .iso-telemetry-row {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 8px !important;
+          }
+          .iso-telemetry-card {
+            padding: 8px 10px !important;
+            gap: 6px !important;
+          }
+          .iso-canvas-stage {
+            min-height: 290px !important;
+            padding: 8px 0 !important;
+            order: 2;
+          }
+          .iso-svg {
+            height: clamp(250px, 64vw, 390px) !important;
+          }
+          .iso-hud-bottom-left {
+            position: relative !important;
+            bottom: auto !important;
+            left: auto !important;
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            padding: 10px 12px !important;
+            order: 3;
+          }
+          .iso-hud-bottom-right {
+            position: relative !important;
+            bottom: auto !important;
+            right: auto !important;
+            width: 100% !important;
+            flex-wrap: wrap !important;
+            justify-content: center !important;
+            border-radius: 18px !important;
+            padding: 8px 10px !important;
+            order: 4;
+          }
+          .iso-hud-inspector {
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 100% !important;
+            max-height: none !important;
+            order: 5;
+          }
+        }
+        @media (max-width: 480px) {
+          .iso-telemetry-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
       `}</style>
 
       {/* ══════════════════════════════════════════════════════════════════
           TOP-LEFT FLOATING HUD: SEARCH & LIVE BUILDING TELEMETRY PILLS
       ══════════════════════════════════════════════════════════════════ */}
       <div
+        className="iso-hud-top-left"
         style={{
           position: "absolute",
           top: "20px",
@@ -901,6 +982,7 @@ export default function IsometricBuildingView({
         }}
       >
         <div
+          className="iso-search-pill"
           style={{
             display: "flex",
             alignItems: "center",
@@ -925,6 +1007,7 @@ export default function IsometricBuildingView({
               padding: "4px 10px",
               borderRadius: "9999px",
               letterSpacing: "0.02em",
+              flexShrink: 0,
             }}
           >
             <IconSparkles size={13} color="#60A5FA" /> 3D DIGITAL TWIN
@@ -932,6 +1015,7 @@ export default function IsometricBuildingView({
           <IconSearch size={15} color="#64748B" />
           <input
             type="text"
+            className="iso-search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search room # or tenant name..."
@@ -966,8 +1050,9 @@ export default function IsometricBuildingView({
         </div>
 
         {/* Live Telemetry Mini Cards Row */}
-        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <div className="iso-telemetry-row" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
           <div
+            className="iso-telemetry-card"
             style={{
               background: "rgba(255, 255, 255, 0.88)",
               backdropFilter: "blur(12px)",
@@ -989,6 +1074,7 @@ export default function IsometricBuildingView({
                 color: "#2563EB",
                 display: "grid",
                 placeItems: "center",
+                flexShrink: 0,
               }}
             >
               <IconBolt size={16} />
@@ -1004,6 +1090,7 @@ export default function IsometricBuildingView({
           </div>
 
           <div
+            className="iso-telemetry-card"
             style={{
               background: "rgba(255, 255, 255, 0.88)",
               backdropFilter: "blur(12px)",
@@ -1025,6 +1112,7 @@ export default function IsometricBuildingView({
                 color: "#0891B2",
                 display: "grid",
                 placeItems: "center",
+                flexShrink: 0,
               }}
             >
               <IconDroplet size={16} />
@@ -1040,6 +1128,7 @@ export default function IsometricBuildingView({
           </div>
 
           <div
+            className="iso-telemetry-card"
             style={{
               background: "rgba(255, 255, 255, 0.88)",
               backdropFilter: "blur(12px)",
@@ -1061,6 +1150,7 @@ export default function IsometricBuildingView({
                 color: "#059669",
                 display: "grid",
                 placeItems: "center",
+                flexShrink: 0,
               }}
             >
               <IconBed size={16} />
@@ -1081,6 +1171,7 @@ export default function IsometricBuildingView({
           CENTER STAGE: DYNAMICALLY SCALED 3D ISOMETRIC BUILDING SVG CANVAS
       ══════════════════════════════════════════════════════════════════ */}
       <div
+        className="iso-canvas-stage"
         style={{
           flex: 1,
           width: "100%",
@@ -1094,6 +1185,7 @@ export default function IsometricBuildingView({
         }}
       >
         <svg
+          className="iso-svg"
           viewBox={viewBox}
           preserveAspectRatio="xMidYMid meet"
           style={{
@@ -1840,6 +1932,7 @@ export default function IsometricBuildingView({
       ══════════════════════════════════════════════════════════════════ */}
       {selectedRoom && (
         <div
+          className="iso-hud-inspector"
           style={{
             position: "absolute",
             top: "20px",
@@ -2145,6 +2238,7 @@ export default function IsometricBuildingView({
           BOTTOM-LEFT FLOATING HUD: SUB-METER PIPELINE TRACKER
       ══════════════════════════════════════════════════════════════════ */}
       <div
+        className="iso-hud-bottom-left"
         style={{
           position: "absolute",
           bottom: "20px",
@@ -2169,6 +2263,7 @@ export default function IsometricBuildingView({
               borderRadius: "50%",
               background: "#10B981",
               boxShadow: "0 0 0 4px rgba(16, 185, 129, 0.2)",
+              flexShrink: 0,
             }}
           />
           <div>
@@ -2181,9 +2276,9 @@ export default function IsometricBuildingView({
           </div>
         </div>
 
-        <div style={{ width: "1px", height: "28px", background: "#CBD5E1" }} />
+        <div style={{ width: "1px", height: "28px", background: "#CBD5E1", flexShrink: 0 }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "4px", flexWrap: "wrap" }}>
           {[
             { id: "all", label: `All Floors (${floor1Count + floor2Count})` },
             { id: "1", label: `1st Floor (${floor1Count}/6)` },
@@ -2215,6 +2310,7 @@ export default function IsometricBuildingView({
           BOTTOM-RIGHT FLOATING HUD: LAYER TOGGLES & ZOOM CONTROLS
       ══════════════════════════════════════════════════════════════════ */}
       <div
+        className="iso-hud-bottom-right"
         style={{
           position: "absolute",
           bottom: "20px",

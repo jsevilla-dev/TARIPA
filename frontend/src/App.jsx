@@ -1875,9 +1875,9 @@ function TenantsPage() {
             </p>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "10px", width: "100%", maxWidth: "560px", justifyContent: "flex-end" }}>
             {/* Search Input */}
-            <div style={{ position: "relative", minWidth: "220px" }}>
+            <div style={{ position: "relative", flex: "1 1 180px", minWidth: "0" }}>
               <span style={{ position: "absolute", top: "50%", left: "14px", transform: "translateY(-50%)", color: "#94A3B8", pointerEvents: "none", display: "grid", placeItems: "center" }}>
                 <Icons.Search />
               </span>
@@ -1887,7 +1887,7 @@ function TenantsPage() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search name or number"
                 className="v0-input"
-                style={{ paddingLeft: "38px", height: "38px" }}
+                style={{ paddingLeft: "38px", height: "38px", width: "100%" }}
               />
             </div>
 
@@ -1896,7 +1896,7 @@ function TenantsPage() {
               value={roomFilter}
               onChange={(e) => setRoomFilter(e.target.value)}
               className="v0-input"
-              style={{ width: "auto", minWidth: "130px", height: "38px", cursor: "pointer" }}
+              style={{ width: "auto", minWidth: "120px", height: "38px", cursor: "pointer", flex: "0 1 auto" }}
             >
               <option>All rooms</option>
               {rooms.map((r) => (
@@ -2898,7 +2898,7 @@ function MeterReadingsPage() {
 
       {/* ── CONTROLS ROW: TABS SWITCHER & LOG READING ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "12px" }}>
-        <div className="glass" style={{ display: "inline-flex", borderRadius: "9999px", padding: "4px", gap: "4px" }}>
+        <div className="glass" style={{ display: "inline-flex", flexWrap: "wrap", maxWidth: "100%", borderRadius: "20px", padding: "4px", gap: "4px" }}>
           <button
             type="button"
             onClick={() => setActiveTab("electric")}
@@ -2906,21 +2906,23 @@ function MeterReadingsPage() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "8px",
-              height: "36px",
-              padding: "0 18px",
+              gap: "6px",
+              minHeight: "36px",
+              padding: "4px 14px",
               borderRadius: "9999px",
               border: "none",
               background: isElectric ? undefined : "transparent",
               color: isElectric ? "#090D16" : "#64748B",
-              fontSize: "13px",
+              fontSize: "12.5px",
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.15s ease",
+              flex: "1 1 auto",
+              justifyContent: "center",
             }}
           >
             <span style={{ color: isElectric ? "#2563EB" : "inherit" }}><Icons.Electricity /></span>
-            Electricity Submeters <span style={{ color: "#64748B", fontSize: "12px" }}>(kWh)</span>
+            Electricity Submeters <span style={{ color: "#64748B", fontSize: "11.5px" }}>(kWh)</span>
           </button>
           <button
             type="button"
@@ -2929,21 +2931,23 @@ function MeterReadingsPage() {
             style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: "8px",
-              height: "36px",
-              padding: "0 18px",
+              gap: "6px",
+              minHeight: "36px",
+              padding: "4px 14px",
               borderRadius: "9999px",
               border: "none",
               background: !isElectric ? undefined : "transparent",
               color: !isElectric ? "#090D16" : "#64748B",
-              fontSize: "13px",
+              fontSize: "12.5px",
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.15s ease",
+              flex: "1 1 auto",
+              justifyContent: "center",
             }}
           >
             <span style={{ color: !isElectric ? "#2563EB" : "inherit" }}><Icons.Droplets /></span>
-            Water Submeters <span style={{ color: "#64748B", fontSize: "12px" }}>(Cu.M)</span>
+            Water Submeters <span style={{ color: "#64748B", fontSize: "11.5px" }}>(Cu.M)</span>
           </button>
         </div>
 
@@ -3435,7 +3439,7 @@ function UtilityRatesPage() {
       </div>
 
       {/* ── DUAL RATE CARDS (Exact Screenshot 1) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
         {/* Electricity Card */}
         <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: "20px" }}>
           <div>
@@ -4067,7 +4071,7 @@ function BillingPage() {
       </div>
 
       {/* ── 3 KPI METRICS CARDS (Exact Screenshot 2) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: "16px" }}>
         <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", gap: "8px" }}>
           <p className="eyebrow" style={{ margin: 0 }}>
             TOTAL BILLED · {currentMonthLabel}
@@ -4866,12 +4870,12 @@ function ReportsPage() {
       </div>
 
       {/* ── 2-COLUMN VISUAL CHARTS (Exact Screenshot 3) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: "16px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
         {/* Monthly Revenue Stacked Bar Chart */}
-        <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0, overflowX: "auto" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "20px" }}>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Monthly Collections Trend</h3>
                 {availableYears.length > 1 ? (
                   <select
@@ -4894,7 +4898,7 @@ function ReportsPage() {
                 Rent, electricity, and water breakdown (Full Year {chartYear})
               </p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B", flexWrap: "wrap" }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
                 <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
               </span>
@@ -4907,20 +4911,20 @@ function ReportsPage() {
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: "8px", height: "200px", alignItems: "flex-end" }}>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10px", color: "#94A3B8", textAlign: "right", minWidth: "36px" }}>
+          <div style={{ display: "flex", gap: "6px", height: "200px", alignItems: "flex-end", minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10px", color: "#94A3B8", textAlign: "right", minWidth: "32px" }}>
               {yAxisLabels.map((lbl, idx) => (
                 <span key={idx}>{lbl}</span>
               ))}
             </div>
 
-            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-between", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "3px" }}>
+            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-between", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "2px", minWidth: 0 }}>
               {monthlyData.map((d) => {
                 const sum = d.rent + d.electric + d.water;
                 const totalPct = ceiling > 0 ? Math.min(100, (sum / ceiling) * 100) : 0;
                 const isCurrent = d.year === new Date().getFullYear() && d.monthIndex === new Date().getMonth();
                 return (
-                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "16px", maxWidth: "28px", height: "100%", justifyContent: "flex-end" }}>
+                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "12px", maxWidth: "28px", height: "100%", justifyContent: "flex-end" }}>
                     <div
                       style={{
                         width: "100%",

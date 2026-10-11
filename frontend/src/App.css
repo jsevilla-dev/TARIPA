@@ -108,13 +108,55 @@
 @media (max-width: 992px) {
   .sidebar,
   .sidebar.collapsed {
-    width: 260px;
+    width: min(270px, calc(100vw - 28px));
     padding: 16px 12px 14px;
     align-items: stretch;
-    transform: translateX(calc(-100% - 20px));
+    transform: translateX(calc(-100% - 24px));
     box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .sidebar.collapsed .sidebar-brand-header {
+    justify-content: space-between;
+    padding: 2px 6px 14px;
+  }
+
+  .sidebar.collapsed .sidebar-brand-header .brand {
+    justify-content: flex-start;
+    flex: 1;
+  }
+
+  .sidebar.collapsed .brand-text,
+  .sidebar.collapsed .nav-section-title,
+  .sidebar.collapsed .nav-label-text,
+  .sidebar.collapsed .sidebar-admin-info {
+    display: block !important;
+  }
+
+  .sidebar.collapsed .sidebar-close-btn {
+    display: grid !important;
+  }
+
+  .sidebar.collapsed .navigation {
+    align-items: stretch;
+    padding: 6px 2px 8px;
+  }
+
+  .sidebar.collapsed .nav-item {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    justify-content: flex-start;
+    border-radius: 9999px;
+    margin-bottom: 3px;
+  }
+
+  .sidebar.collapsed .sidebar-admin-user {
+    flex-direction: row;
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 20px;
   }
 
   .sidebar.mobile-open {
@@ -2969,22 +3011,6 @@
 }
 
 @media (max-width: 1024px) {
-  .sidebar {
-    width: 220px;
-  }
-
-  .main-content {
-    width: calc(100% - 220px);
-    margin-left: 220px;
-    padding: 24px 28px;
-  }
-
-  .sidebar.collapsed~.main-content,
-  .app-shell.sidebar-collapsed .main-content {
-    width: 100% !important;
-    margin-left: 0 !important;
-  }
-
   .dash-header {
     padding: 28px 30px;
   }
@@ -3027,76 +3053,12 @@
 }
 
 @media (max-width: 768px) {
-
-  .sidebar {
-    width: min(300px, 86vw);
-    position: fixed;
-    transform: translateX(-100%);
-    inset: 0 auto 0 0;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    min-height: 100vh;
-    background: #0B0F19;
-    background: linear-gradient(180deg, #111726 0%, #0A0D17 100%);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    border-bottom: none;
-    padding: 16px 12px 14px;
-    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.6);
-  }
-
-  .sidebar.mobile-open {
-    transform: translateX(0);
-  }
-
-  .sidebar.collapsed {
-    transform: translateX(-100%);
-  }
-
-  .sidebar-toggle {
-    display: grid;
-  }
-
-  .brand {
-    padding: 24px 18px 20px;
-  }
-
-  .navigation {
-    display: block;
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 4px 12px;
-  }
-
-  .nav-label {
-    display: block;
-  }
-
-  .nav-item {
-    width: 100%;
-    flex-shrink: 1;
-    padding: 10px 12px;
-    font-size: 13.5px;
-  }
-
-  .sidebar-footer {
-    display: flex;
-  }
-
-  .app-shell {
-    flex-direction: row;
-  }
-
-  .main-content {
-    width: calc(100% - min(300px, 86vw));
-    margin-left: min(300px, 86vw);
-    padding: 20px 16px;
-  }
-
-  .sidebar.collapsed~.main-content,
+  .main-content,
+  .sidebar.collapsed ~ .main-content,
   .app-shell.sidebar-collapsed .main-content {
     width: 100% !important;
     margin-left: 0 !important;
+    padding: 12px 14px 40px !important;
   }
 
   .kpi-grid {
@@ -4961,19 +4923,147 @@
 @media (max-width: 900px) {
   .insta-top-brand {
     position: static;
-    margin: 24px 0 12px;
+    margin: 16px 0 8px;
     justify-content: center;
   }
   .insta-main-container {
     grid-template-columns: 1fr;
-    padding: 16px 20px;
+    padding: 12px 16px;
   }
   .insta-left-col,
   .insta-divider {
     display: none;
   }
   .insta-right-col {
-    padding: 20px 0;
+    padding: 12px 0;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   UNIVERSAL MOBILE RESPONSIVE OVERRIDES (All Mobile Screen Sizes)
+   ══════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 992px) {
+  .app-shell {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  .main-content,
+  .sidebar.collapsed ~ .main-content,
+  .app-shell.sidebar-collapsed .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    padding: 12px 16px 40px !important;
+    box-sizing: border-box;
+  }
+
+  .page-content {
+    padding: 4px 0 36px !important;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    gap: 8px;
+    margin-bottom: 16px;
+    top: 8px;
+  }
+
+  .topbar-left {
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .topbar-right {
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .topbar-capsule {
+    padding: 0 12px;
+    height: 38px;
+    font-size: 12.5px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-menu-btn,
+  .mobile-menu-btn,
+  .topbar-bell-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .topbar-search-capsule {
+    width: clamp(115px, 34vw, 185px);
+    height: 38px;
+    padding: 0 12px;
+  }
+
+  .notifications-dropdown,
+  .search-results-dropdown {
+    width: min(340px, calc(100vw - 28px)) !important;
+    right: 0 !important;
+  }
+
+  .v0-drawer {
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    width: auto !important;
+    max-width: none !important;
+    border-radius: 22px;
+  }
+
+  .v0-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 32px) !important;
+    border-radius: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content,
+  .sidebar.collapsed ~ .main-content,
+  .app-shell.sidebar-collapsed .main-content {
+    padding: 10px 12px 36px !important;
+  }
+
+  /* Compact breadcrumb on narrow phones: show current page title cleanly */
+  .topbar-capsule > span:first-child,
+  .topbar-capsule .context-sep {
+    display: none;
+  }
+
+  .topbar-search-capsule {
+    width: clamp(100px, 36vw, 150px);
+    padding: 0 10px;
+  }
+
+  .topbar-search-input {
+    font-size: 12px;
+  }
+
+  .insta-login-page {
+    padding: 16px 12px;
+  }
+
+  .insta-main-container {
+    padding: 8px 4px;
+  }
+
+  .insta-form-title {
+    font-size: 21px;
+  }
+}
+
 
