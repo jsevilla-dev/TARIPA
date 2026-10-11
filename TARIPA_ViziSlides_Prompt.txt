@@ -1,0 +1,102 @@
+Create a 10-slide professional academic project defense presentation for our Information Management 2 (IM 2) final project titled:
+"TARIPA: Apartment Electricity and Water Sub-Meter Billing Management System"
+
+Team Members:
+- James Sevilla (Full-Stack Developer & Database Architect)
+- Lorrely (Co-Developer, System Analyst & UI/UX Presenter)
+
+Instructor: Prof. Xerxes
+Color Palette Preference: Clean White, Deep Slate (#0F172A), and Cobalt Blue (#2563EB)
+
+Use the following exact 10-slide structure and content:
+
+---
+SLIDE 1: TITLE SLIDE
+Title: TARIPA: Apartment Electricity & Water Sub-Meter Billing Management System
+Subtitle: A Web-Based Relational Database Solution for Transparent Residential Utility Tracking & Automated Billing
+ metadata:
+- Course: Information Management 2 (IM 2)
+- Proponents: James Sevilla & Lorrely
+- Instructor: Prof. Xerxes
+
+---
+SLIDE 2: PROBLEM STATEMENT (Why We Built TARIPA)
+Title: The Problem with Manual Sub-Meter Billing
+Bullet Points:
+- Prone to Human Error: Landlords manually compute sub-meter readings (Current Reading minus Previous Reading × Rate) using paper ledgers or disconnected spreadsheets.
+- Lack of Billing Transparency: Tenants often dispute utility charges because they cannot see their previous vs. present meter readings or exact kWh and Cu.M tariff computations.
+- Fragmented Records: Room capacities, tenant assignments, monthly meter logs, and payment statuses (Paid, Pending, Overdue) are scattered without relational integrity.
+- Security & Audit Gaps: Paper receipts and shared spreadsheets have no role-based access control or audit trail.
+
+---
+SLIDE 3: PROJECT OBJECTIVES & KEY INNOVATIONS
+Title: Our Solution — The TARIPA Platform
+Bullet Points:
+- Automated Sub-Meter Computation: Automatically pulls previous readings, computes exact consumption (kWh & Cu.M), and applies active Meralco & Maynilad tariff rates.
+- Interactive 3D Building Digital Twin: Visualizes the apartment building in an isometric 3D floor plan with live Meralco power grid & Maynilad water conduit lines, 6-room floor capacity tracking, and per-room telemetry.
+- Dedicated Tenant Self-Service Portal: Gives every resident an auto-provisioned account with a Digital Sub-Meter Odometer (PREV -> PRES verification), 6-month trend comparisons, and official printable receipts.
+- Relational Data Integrity & Security: Enforces strict foreign-key constraints, room capacity checks, and SAST-hardened API security.
+
+---
+SLIDE 4: 3-TIER SYSTEM ARCHITECTURE
+Title: 3-Tier Full-Stack Architecture
+Bullet Points:
+- Presentation Tier (Frontend): React 19 + Vite SPA with Liquid Glass UI, Interactive SVG 3D Isometric Digital Twin, and responsive Admin & Tenant Portals.
+- Application Tier (Backend API): Node.js & Express 5 RESTful API with JWT HS256 Authentication, Role-Based Access Control (Admin vs. Tenant), and Server-Side Business Logic Validation.
+- Data Tier (Database): MySQL 8.0 Relational Database (`taripa_db`) using `mysql2/promise` connection pooling and 100% parameterized prepared statements.
+
+---
+SLIDE 5: RELATIONAL DATABASE SCHEMA (ERD & 3NF DESIGN)
+Title: 5-Table Normalized Database Schema (`taripa_db`)
+Bullet Points:
+- `rooms`: Stores room number, bedspace capacity (1–6 rooms per floor), and base rent.
+- `tenants`: Stores resident profile, contact number, move-in date, status, and foreign key `room_id -> rooms(id) ON DELETE SET NULL`.
+- `tenant_accounts`: Stores auto-generated `@username` and BCrypt-hashed password linked `1:1` to `tenants(id) ON DELETE CASCADE`.
+- `utility_rates`: Stores active tariff rates per unit for Electricity (`₱/kWh`) and Water (`₱/Cu.M`).
+- `meter_readings` & `billing_records`: Tracks monthly `previous_reading`, `current_reading`, computed consumption, itemized charges, and payment status (`Pending`, `Paid`, `Overdue`).
+
+---
+SLIDE 6: CORE ADMIN WORKFLOW & AUTOMATION
+Title: End-to-End Admin Management Workflow
+Bullet Points:
+1. Room & Capacity Control: Create rooms with strict bedspace capacity limits; system prevents over-assigning tenants to full rooms.
+2. Zero-Touch Tenant Provisioning: Registering a tenant automatically creates their portal login (`@firstname.lastname`) and default hashed password.
+3. Smart Meter Reading Entry: Selecting a tenant auto-fills their previous reading and prevents meter rollback (`Current < Previous` is blocked).
+4. One-Click Invoice Generation: Multiplies consumption by current Meralco/Maynilad rates, tracks collections via a 12-Month Trend Bar Graph, and issues official statements.
+
+---
+SLIDE 7: FEATURE SPOTLIGHT — 3D BUILDING DIGITAL TWIN
+Title: Interactive 3D Isometric Building Digital Twin
+Bullet Points:
+- Real-Time Architectural Visualization: Converts standard room cards into an interactive 3D isometric campus view with 1st Floor (6/6 capacity) and 2nd Floor switching.
+- Meralco & Maynilad Grid Simulation: Displays animated power lines and water pipelines flowing from the Main Grid Hub (with Meralco & Maynilad service trucks) directly into each occupied room's sub-meter.
+- Live Unit Telemetry Inspector: Clicking any 3D room unit opens a glass HUD showing bedspace occupancy slots, real-time kWh & Cu.M usage, and unpaid bill alerts.
+
+---
+SLIDE 8: FEATURE SPOTLIGHT — TENANT SELF-SERVICE PORTAL
+Title: Transparent Tenant Portal & Sub-Meter Odometer
+Bullet Points:
+- Digital Sub-Meter Odometer Card: Allows tenants to verify their exact `PREV -> PRES` meter readings for both Electricity (kWh) and Water (Cu.M) with a live `Synced` indicator.
+- Itemized Bill Breakdown & Gauges: Shows circular consumption gauges and a 6-month historical comparison (`% vs. 6-month average`).
+- Instant Payment & Official Receipt: Supports GCash, Maya, and Bank Transfer settlement with an instant printable Official Receipt (`OR-XXXX`).
+
+---
+SLIDE 9: SYSTEM SECURITY & DEFENSIVE HARDENING (SAST AUDIT)
+Title: Enterprise-Grade Security & Data Privacy
+Bullet Points:
+- 100% SQL Injection Immunity: All database queries across all 7 route modules use parameterized prepared statements (`?`).
+- Strict RBAC & IDOR Protection: Separate `adminAuth` and `clientAuth` middlewares with pinned `HS256` JWT verification; tenants can only query their own `req.clientTenantId`.
+- Brute-Force & DoS Protection: 5-attempt login rate limiter with a 30-second lockout (`HTTP 429`), JSON type/length guards, and a `100kb` payload limit.
+- HTTP Security Headers & XSS Sanitization: Protected with `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, and HTML escaping on printable billing statements.
+
+---
+SLIDE 10: CONCLUSION & LIVE SYSTEM DEMONSTRATION
+Title: Summary & Live System Walkthrough
+Bullet Points:
+- TARIPA eliminates manual billing errors, enforces relational database integrity, and builds trust between landlords and tenants through visual transparency.
+- Combines solid Information Management principles (3NF normalization, foreign-key constraints, SQL aggregations) with modern 3D visualization and defensive security.
+- Transition to Live Demo:
+  1. Admin Dashboard & 12-Month Collections Bar Graph
+  2. 3D Building Digital Twin (Meralco & Maynilad Grid)
+  3. Tenant Registration -> Meter Reading -> Invoice Generation
+  4. Tenant Portal Sub-Meter Odometer & Official Receipt
