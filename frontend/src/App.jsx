@@ -1060,6 +1060,77 @@ function Dashboard({ onNavigate }) {
   const totalCapacity = Number(dashboardData?.total_capacity || (dashboardData?.total_rooms ? dashboardData.total_rooms * 2 : 0));
   const occPercent = totalCapacity > 0 ? ((totalTenants / totalCapacity) * 100).toFixed(1) : "0.0";
 
+  const [chartYear, setChartYear] = useState(new Date().getFullYear());
+
+  const availableYears = useMemo(() => {
+    const years = new Set([2026, new Date().getFullYear()]);
+    (dbInvoices || []).forEach((r) => {
+      const ym = r.billing_month ? String(r.billing_month).slice(0, 7) : "";
+      if (ym) {
+        const y = Number(ym.split("-")[0]);
+        if (!isNaN(y) && y > 2000) years.add(y);
+      }
+    });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [dbInvoices]);
+
+  const { monthlyData, ceiling, yAxisLabels } = useMemo(() => {
+    const targetYear = chartYear || new Date().getFullYear();
+    const months = [];
+    for (let monthIndex = 0; monthIndex < 12; monthIndex++) {
+      const d = new Date(targetYear, monthIndex, 1);
+      const key = `${targetYear}-${String(monthIndex + 1).padStart(2, "0")}`;
+      const month = d.toLocaleDateString("en-US", { month: "short" });
+      months.push({ key, month, year: targetYear, monthIndex, rent: 0, electric: 0, water: 0, total: 0 });
+    }
+
+    (dbInvoices || []).forEach((r) => {
+      const ym = r.billing_month ? String(r.billing_month).slice(0, 7) : "";
+      const bucket = months.find((m) => m.key === ym);
+      if (bucket) {
+        const electric = Number(r.electricity_charge || 0);
+        const water = Number(r.water_charge || 0);
+        const total = Number(r.total_amount || 0);
+        const rent = Math.max(0, total - electric - water);
+        bucket.electric += electric;
+        bucket.water += water;
+        bucket.rent += rent;
+        bucket.total += total;
+      }
+    });
+
+    const maxTotal = Math.max(...months.map((d) => d.total), 0);
+    let ceil = 1000;
+    if (maxTotal <= 500) ceil = 500;
+    else if (maxTotal <= 1000) ceil = 1000;
+    else if (maxTotal <= 2000) ceil = 2000;
+    else if (maxTotal <= 3000) ceil = 3000;
+    else if (maxTotal <= 5000) ceil = 5000;
+    else if (maxTotal <= 10000) ceil = 10000;
+    else if (maxTotal <= 25000) ceil = 25000;
+    else if (maxTotal <= 50000) ceil = 50000;
+    else ceil = Math.ceil(maxTotal / 25000) * 25000;
+
+    const formatK = (val) => {
+      if (val === 0) return "₱0";
+      if (val >= 1000) {
+        const k = val / 1000;
+        return Number.isInteger(k) ? `₱${k}k` : `₱${k.toFixed(1)}k`;
+      }
+      return `₱${val}`;
+    };
+
+    const labels = [
+      formatK(ceil),
+      formatK(Math.round(ceil * 0.75)),
+      formatK(Math.round(ceil * 0.5)),
+      formatK(Math.round(ceil * 0.25)),
+      "₱0",
+    ];
+
+    return { monthlyData: months, ceiling: ceil, yAxisLabels: labels };
+  }, [dbInvoices, chartYear]);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
       {/* ── HEADER ── */}
@@ -1200,6 +1271,116 @@ function Dashboard({ onNavigate }) {
           </div>
         </div>
       </section>
+
+      {/* ── MONTHLY COLLECTIONS TREND BAR GRAPH (DASHBOARD OVERVIEW) ── */}
+      <div className="glass" style={{ borderRadius: "24px", padding: "22px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "18px" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <h2 style={{ fontSize: "15.5px", fontWeight: 700, color: "#090D16", margin: 0 }}>Monthly Collections Trend</h2>
+              {availableYears.length > 1 ? (
+                <select
+                  value={chartYear}
+                  onChange={(e) => setChartYear(Number(e.target.value))}
+                  className="v0-input"
+                  style={{ height: "26px", padding: "0 8px", fontSize: "11px", minWidth: "65px", cursor: "pointer", fontWeight: 700 }}
+                >
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>{yr}</option>
+                  ))}
+                </select>
+              ) : (
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
+                  {chartYear}
+                </span>
+              )}
+            </div>
+            <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
+              Monthly electricity, water, and rent billing breakdown (Jan – Dec {chartYear})
+            </p>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#60A5FA" }} /> Electric
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#CBD5E1" }} /> Water
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate?.("reports")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                background: "#EFF6FF",
+                border: "1px solid #BFDBFE",
+                color: "#2563EB",
+                fontSize: "12px",
+                fontWeight: 700,
+                cursor: "pointer",
+                padding: "4px 12px",
+                borderRadius: "9999px",
+              }}
+            >
+              Full Reports ↗
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", height: "185px", alignItems: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10.5px", color: "#94A3B8", textAlign: "right", minWidth: "38px", fontWeight: 600 }}>
+            {yAxisLabels.map((lbl, idx) => (
+              <span key={idx}>{lbl}</span>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-between", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "6px" }}>
+            {monthlyData.map((d) => {
+              const sum = d.rent + d.electric + d.water;
+              const totalPct = ceiling > 0 ? Math.min(100, (sum / ceiling) * 100) : 0;
+              const isCurrent = d.year === new Date().getFullYear() && d.monthIndex === new Date().getMonth();
+              return (
+                <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "20px", maxWidth: "42px", height: "100%", justifyContent: "flex-end" }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: sum > 0 ? `${Math.max(8, totalPct)}%` : "4px",
+                      borderRadius: "6px 6px 0 0",
+                      overflow: "hidden",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-end",
+                      background: sum === 0 ? "rgba(148,163,184,0.16)" : undefined,
+                      boxShadow: sum > 0 ? "0 3px 8px rgba(37,99,235,0.12)" : undefined,
+                      transition: "height 0.3s ease",
+                      cursor: "pointer",
+                    }}
+                    title={`${d.month} ${d.year}: ${formatCurrency(sum)} (Electric: ${formatCurrency(d.electric)}, Water: ${formatCurrency(d.water)}${d.rent > 0 ? `, Rent: ${formatCurrency(d.rent)}` : ""})`}
+                  >
+                    {sum > 0 ? (
+                      <>
+                        {d.rent > 0 && <div style={{ height: `${(d.rent / sum) * 100}%`, background: "#1D4ED8" }} />}
+                        {d.electric > 0 && <div style={{ height: `${(d.electric / sum) * 100}%`, background: "#60A5FA" }} />}
+                        {d.water > 0 && <div style={{ height: `${(d.water / sum) * 100}%`, background: "#CBD5E1" }} />}
+                      </>
+                    ) : null}
+                  </div>
+                  <span style={{ fontSize: "10.5px", fontWeight: isCurrent ? 800 : 600, color: isCurrent ? "#2563EB" : (sum > 0 ? "#090D16" : "#94A3B8"), marginTop: "8px" }}>
+                    {d.month}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
 
       {/* ── 2-COLUMN SECTION: RECENT INVOICES & UTILITY CONSUMPTION ── */}
       <div className="dashboard-grid-2col">
