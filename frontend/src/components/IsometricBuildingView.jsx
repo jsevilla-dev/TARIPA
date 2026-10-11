@@ -849,9 +849,13 @@ export default function IsometricBuildingView({
           0%, 100% { transform: scale(1); opacity: 0.75; }
           50% { transform: scale(1.45); opacity: 0.15; }
         }
-        @keyframes taripaVanDrive {
+        @keyframes taripaVanMeralco {
           0%, 100% { transform: translate(0px, 0px); }
-          50% { transform: translate(52px, 30px); }
+          50% { transform: translate(26px, 15px); }
+        }
+        @keyframes taripaVanMaynilad {
+          0%, 100% { transform: translate(22px, 12.7px); }
+          50% { transform: translate(-8px, -4.6px); }
         }
         .iso-flow-line {
           animation: taripaFlowDash 1s linear infinite;
@@ -864,8 +868,11 @@ export default function IsometricBuildingView({
           transform-origin: center;
           animation: taripaPulse 2s ease-in-out infinite;
         }
-        .iso-van-anim {
-          animation: taripaVanDrive 7s ease-in-out infinite;
+        .iso-van-meralco {
+          animation: taripaVanMeralco 7.5s ease-in-out infinite;
+        }
+        .iso-van-maynilad {
+          animation: taripaVanMaynilad 8.5s ease-in-out infinite;
         }
       `}</style>
 
@@ -1231,7 +1238,7 @@ export default function IsometricBuildingView({
                   fill="#FFFFFF"
                   fontFamily="Plus Jakarta Sans, sans-serif"
                 >
-                  🏢 TARIPA RESIDENCES
+                  TARIPA RESIDENCES
                 </text>
               </g>
             );
@@ -1243,7 +1250,7 @@ export default function IsometricBuildingView({
             y={roadY}
             z={15}
             dx={lotWidth}
-            dy={46}
+            dy={52}
             dz={5}
             topColor="#334155"
             leftColor="#0F172A"
@@ -1253,8 +1260,8 @@ export default function IsometricBuildingView({
           {Array.from({ length: Math.ceil(lotWidth / 80) }).map((_, idx) => {
             const rxVal = -50 + idx * 80;
             if (rxVal + 40 > -95 + lotWidth - 20) return null;
-            const p1 = iso(rxVal, roadY + 23, 21);
-            const p2 = iso(rxVal + 40, roadY + 23, 21);
+            const p1 = iso(rxVal, roadY + 26, 21);
+            const p2 = iso(rxVal + 40, roadY + 26, 21);
             return (
               <line
                 key={idx}
@@ -1311,7 +1318,7 @@ export default function IsometricBuildingView({
               const hubLabel = iso(-40, hubBaseY + 42, 86);
               return (
                 <g transform={`translate(${hubLabel.x}, ${hubLabel.y})`}>
-                  <rect x="-50" y="-12" width="100" height="20" rx="6" fill="#0F172A" opacity="0.9" />
+                  <rect x="-50" y="-12" width="100" height="20" rx="6" fill="#0F172A" opacity="0.92" />
                   <text
                     x="0"
                     y="2"
@@ -1321,7 +1328,7 @@ export default function IsometricBuildingView({
                     fill="#38BDF8"
                     fontFamily="Plus Jakarta Sans, sans-serif"
                   >
-                    ⚡ MAIN GRID HUB
+                    MAIN GRID HUB
                   </text>
                 </g>
               );
@@ -1425,50 +1432,274 @@ export default function IsometricBuildingView({
             />
           ))}
 
-          {/* ── 7. DYNAMIC LANDSCAPE TREES & SERVICE VEHICLE (Always along the outer perimeter & front road!) ── */}
+          {/* ── 7. DYNAMIC LANDSCAPE TREES & DUAL UTILITY TRUCKS (MERALCO & MAYNILAD) ── */}
           <IsoTree x={-55} y={-20} z={19} scale={1.15} />
           <IsoTree x={START_X + wingWidth + 45} y={START_Y + 20} z={19} scale={0.95} />
           <IsoTree x={START_X + wingWidth + 45} y={verandaY - 10} z={19} scale={1.15} />
 
-          {/* Animated Utility Service Truck on Front Road */}
-          <g className="iso-van-anim" pointerEvents="none">
-            <IsoBox
-              x={START_X + 35}
-              y={roadY + 8}
-              z={21}
-              dx={44}
-              dy={20}
-              dz={21}
-              topColor="#FFFFFF"
-              leftColor="#CBD5E1"
-              rightColor="#E2E8F0"
-              stroke="#475569"
-            />
-            <IsoBox
-              x={START_X + 35}
-              y={roadY + 8}
-              z={28}
-              dx={44}
-              dy={20.5}
-              dz={4.5}
-              topColor="#2563EB"
-              leftColor="#1D4ED8"
-              rightColor="#3B82F6"
-              stroke="none"
-            />
-            <IsoBox
-              x={START_X + 79}
-              y={roadY + 9}
-              z={21}
-              dx={16}
-              dy={18}
-              dz={15}
-              topColor="#3B82F6"
-              leftColor="#1D4ED8"
-              rightColor="#2563EB"
-              stroke="#1E3A8A"
-            />
-          </g>
+          {/* ── TRUCK 1: MERALCO ELECTRIC SERVICE TRUCK (Upper Lane) ── */}
+          {(() => {
+            const meralcoX = START_X - 5;
+            const meralcoY = roadY + 4;
+            const badgeAnchor = iso(meralcoX + 24, meralcoY + 10, 52);
+            const roofLogoPt = iso(meralcoX + 21, meralcoY + 10, 43);
+            return (
+              <g className="iso-van-meralco" pointerEvents="none">
+                {/* Dark Undercarriage / Wheels Shadow */}
+                <IsoBox
+                  x={meralcoX + 3}
+                  y={meralcoY + 2}
+                  z={20}
+                  dx={54}
+                  dy={16}
+                  dz={3}
+                  topColor="#0F172A"
+                  leftColor="#0F172A"
+                  rightColor="#1E293B"
+                  stroke="none"
+                />
+                {/* Main Cargo Box (Clean White) */}
+                <IsoBox
+                  x={meralcoX}
+                  y={meralcoY}
+                  z={22}
+                  dx={44}
+                  dy={20}
+                  dz={20}
+                  topColor="#FFFFFF"
+                  leftColor="#E2E8F0"
+                  rightColor="#F1F5F9"
+                  stroke="#64748B"
+                />
+                {/* Meralco Signature Orange Stripe */}
+                <IsoBox
+                  x={meralcoX}
+                  y={meralcoY}
+                  z={28}
+                  dx={44.2}
+                  dy={20.4}
+                  dz={5}
+                  topColor="#FF5A00"
+                  leftColor="#C2410C"
+                  rightColor="#EA580C"
+                  stroke="none"
+                />
+                {/* Truck Cab (Meralco Orange) */}
+                <IsoBox
+                  x={meralcoX + 44}
+                  y={meralcoY + 1}
+                  z={22}
+                  dx={16}
+                  dy={18}
+                  dz={15}
+                  topColor="#FB923C"
+                  leftColor="#C2410C"
+                  rightColor="#EA580C"
+                  stroke="#9A3412"
+                />
+                {/* Windshield Accent */}
+                <IsoBox
+                  x={meralcoX + 55}
+                  y={meralcoY + 2.5}
+                  z={28}
+                  dx={5.5}
+                  dy={15}
+                  dz={6}
+                  topColor="#BAE6FD"
+                  leftColor="#0284C7"
+                  rightColor="#38BDF8"
+                  stroke="none"
+                />
+                {/* Meralco Logo Decal on Truck Roof */}
+                <g transform={`translate(${roofLogoPt.x}, ${roofLogoPt.y})`}>
+                  <circle cx="0" cy="0" r="8.5" fill="#FFFFFF" stroke="#FF5A00" strokeWidth="1" />
+                  <image
+                    href="/meralco-logo.png"
+                    x="-7.5"
+                    y="-7.5"
+                    width="15"
+                    height="15"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                </g>
+                {/* Floating Meralco Pill Badge Above Truck */}
+                <g transform={`translate(${badgeAnchor.x}, ${badgeAnchor.y})`}>
+                  <rect
+                    x="-44"
+                    y="-12"
+                    width="88"
+                    height="22"
+                    rx="11"
+                    fill="#FFFFFF"
+                    stroke="#FDBA74"
+                    strokeWidth="1.3"
+                  />
+                  <clipPath id="meralcoBadgeClip">
+                    <circle cx="-31" cy="-1" r="8" />
+                  </clipPath>
+                  <image
+                    href="/meralco-logo.png"
+                    x="-39"
+                    y="-9"
+                    width="16"
+                    height="16"
+                    clipPath="url(#meralcoBadgeClip)"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <text
+                    x="6"
+                    y="2.5"
+                    textAnchor="middle"
+                    fontSize="9"
+                    fontWeight="800"
+                    letterSpacing="0.05em"
+                    fill="#C2410C"
+                    fontFamily="Plus Jakarta Sans, sans-serif"
+                  >
+                    MERALCO
+                  </text>
+                </g>
+              </g>
+            );
+          })()}
+
+          {/* ── TRUCK 2: MAYNILAD WATER SERVICE TRUCK (Lower Lane) ── */}
+          {(() => {
+            const mayniladX = START_X + Math.max(115, wingWidth - 90);
+            const mayniladY = roadY + 26;
+            const badgeAnchor = iso(mayniladX + 24, mayniladY + 10, 52);
+            const roofLogoPt = iso(mayniladX + 21, mayniladY + 10, 43);
+            return (
+              <g className="iso-van-maynilad" pointerEvents="none">
+                {/* Dark Undercarriage / Wheels Shadow */}
+                <IsoBox
+                  x={mayniladX + 3}
+                  y={mayniladY + 2}
+                  z={20}
+                  dx={54}
+                  dy={16}
+                  dz={3}
+                  topColor="#0F172A"
+                  leftColor="#0F172A"
+                  rightColor="#1E293B"
+                  stroke="none"
+                />
+                {/* Main Cargo Box (Clean White) */}
+                <IsoBox
+                  x={mayniladX}
+                  y={mayniladY}
+                  z={22}
+                  dx={44}
+                  dy={20}
+                  dz={20}
+                  topColor="#FFFFFF"
+                  leftColor="#E2E8F0"
+                  rightColor="#F1F5F9"
+                  stroke="#64748B"
+                />
+                {/* Maynilad Signature Green & Blue Dual Stripe */}
+                <IsoBox
+                  x={mayniladX}
+                  y={mayniladY}
+                  z={30}
+                  dx={44.2}
+                  dy={20.4}
+                  dz={3.5}
+                  topColor="#22C55E"
+                  leftColor="#15803D"
+                  rightColor="#16A34A"
+                  stroke="none"
+                />
+                <IsoBox
+                  x={mayniladX}
+                  y={mayniladY}
+                  z={26.5}
+                  dx={44.2}
+                  dy={20.4}
+                  dz={3.5}
+                  topColor="#0284C7"
+                  leftColor="#075985"
+                  rightColor="#0369A1"
+                  stroke="none"
+                />
+                {/* Truck Cab (Maynilad Deep Blue) */}
+                <IsoBox
+                  x={mayniladX + 44}
+                  y={mayniladY + 1}
+                  z={22}
+                  dx={16}
+                  dy={18}
+                  dz={15}
+                  topColor="#38BDF8"
+                  leftColor="#075985"
+                  rightColor="#0284C7"
+                  stroke="#0C4A6E"
+                />
+                {/* Windshield Accent */}
+                <IsoBox
+                  x={mayniladX + 55}
+                  y={mayniladY + 2.5}
+                  z={28}
+                  dx={5.5}
+                  dy={15}
+                  dz={6}
+                  topColor="#E0F2FE"
+                  leftColor="#0369A1"
+                  rightColor="#7DD3FC"
+                  stroke="none"
+                />
+                {/* Maynilad Logo Decal on Truck Roof */}
+                <g transform={`translate(${roofLogoPt.x}, ${roofLogoPt.y})`}>
+                  <circle cx="0" cy="0" r="8.5" fill="#FFFFFF" stroke="#0284C7" strokeWidth="1" />
+                  <image
+                    href="/maynilad-logo.png"
+                    x="-7"
+                    y="-7"
+                    width="14"
+                    height="14"
+                    preserveAspectRatio="xMidYMid meet"
+                  />
+                </g>
+                {/* Floating Maynilad Pill Badge Above Truck */}
+                <g transform={`translate(${badgeAnchor.x}, ${badgeAnchor.y})`}>
+                  <rect
+                    x="-46"
+                    y="-12"
+                    width="92"
+                    height="22"
+                    rx="11"
+                    fill="#FFFFFF"
+                    stroke="#7DD3FC"
+                    strokeWidth="1.3"
+                  />
+                  <clipPath id="mayniladBadgeClip">
+                    <circle cx="-33" cy="-1" r="8" />
+                  </clipPath>
+                  <image
+                    href="/maynilad-logo.png"
+                    x="-41"
+                    y="-9"
+                    width="16"
+                    height="16"
+                    clipPath="url(#mayniladBadgeClip)"
+                    preserveAspectRatio="xMidYMid slice"
+                  />
+                  <text
+                    x="6"
+                    y="2.5"
+                    textAnchor="middle"
+                    fontSize="9"
+                    fontWeight="800"
+                    letterSpacing="0.05em"
+                    fill="#0369A1"
+                    fontFamily="Plus Jakarta Sans, sans-serif"
+                  >
+                    MAYNILAD
+                  </text>
+                </g>
+              </g>
+            );
+          })()}
         </svg>
       </div>
 
