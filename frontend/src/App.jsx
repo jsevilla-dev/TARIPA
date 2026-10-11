@@ -1068,26 +1068,50 @@ function Dashboard({ onNavigate }) {
             Property overview and billing performance for this cycle.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-cobalt"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            height: "42px",
-            padding: "0 22px",
-            borderRadius: "9999px",
-            fontSize: "13.5px",
-            fontWeight: 600,
-            cursor: "pointer",
-            color: "#FFFFFF",
-          }}
-          onClick={() => onNavigate?.("billing")}
-        >
-          <Icons.Plus />
-          Generate Monthly Bills
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="glass"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "42px",
+              padding: "0 18px",
+              borderRadius: "9999px",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+              color: "#1D4ED8",
+              border: "1px solid #BFDBFE",
+              background: "linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)",
+            }}
+            onClick={() => onNavigate?.("rooms")}
+          >
+            <IconBuilding size={17} />
+            3D Building Twin
+          </button>
+          <button
+            type="button"
+            className="btn-cobalt"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "42px",
+              padding: "0 22px",
+              borderRadius: "9999px",
+              fontSize: "13.5px",
+              fontWeight: 600,
+              cursor: "pointer",
+              color: "#FFFFFF",
+            }}
+            onClick={() => onNavigate?.("billing")}
+          >
+            <Icons.Plus />
+            Generate Monthly Bills
+          </button>
+        </div>
       </div>
 
       {paidToast && (
@@ -1348,6 +1372,64 @@ function Dashboard({ onNavigate }) {
                 ? `Room ${dashboardData.highest_usage_room.room_number} · ${Number(dashboardData.highest_usage_room.kwh).toFixed(0)} kWh`
                 : "No submeter records yet"}
             </strong>
+          </div>
+
+          {/* ── 3D DIGITAL TWIN QUICK-LAUNCH CARD ── */}
+          <div
+            onClick={() => onNavigate?.("rooms")}
+            style={{
+              marginTop: "6px",
+              padding: "14px 16px",
+              borderRadius: "18px",
+              background: "linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%)",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              cursor: "pointer",
+              boxShadow: "0 10px 24px rgba(30, 58, 138, 0.22)",
+              transition: "transform 0.15s ease",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "12px",
+                  background: "rgba(96, 165, 250, 0.18)",
+                  border: "1px solid rgba(147, 197, 253, 0.35)",
+                  display: "grid",
+                  placeItems: "center",
+                  color: "#60A5FA",
+                  flexShrink: 0,
+                }}
+              >
+                <IconBuilding size={19} />
+              </span>
+              <div>
+                <div style={{ fontSize: "10px", fontWeight: 800, color: "#93C5FD", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  INTERACTIVE FLOOR PLAN
+                </div>
+                <div style={{ fontSize: "13.5px", fontWeight: 800, color: "#FFFFFF", marginTop: "1px" }}>
+                  Launch 3D Building Twin
+                </div>
+              </div>
+            </div>
+            <span
+              style={{
+                width: "30px",
+                height: "30px",
+                borderRadius: "9999px",
+                background: "rgba(255, 255, 255, 0.14)",
+                display: "grid",
+                placeItems: "center",
+                color: "#FFFFFF",
+              }}
+            >
+              <IconArrowUpRight size={16} />
+            </span>
           </div>
         </div>
       </div>
