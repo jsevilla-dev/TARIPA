@@ -956,8 +956,8 @@ function DashboardPage() {
                 borderRadius: "14px",
                 padding: "12px",
               }}>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#2563EB", marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
-                  <span>⚡ ELECTRIC (kWh)</span>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#2563EB", marginBottom: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>ELECTRIC (kWh)</span>
                   <span style={{ background: "#EFF6FF", padding: "1px 6px", borderRadius: "6px", fontWeight: 800 }}>+{elecConsumption.toFixed(1)}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "monospace", fontSize: "12.5px" }}>
@@ -984,8 +984,8 @@ function DashboardPage() {
                 borderRadius: "14px",
                 padding: "12px",
               }}>
-                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#0284C7", marginBottom: "6px", display: "flex", justifyContent: "space-between" }}>
-                  <span>💧 WATER (Cu.M)</span>
+                <div style={{ fontSize: "10.5px", fontWeight: 700, color: "#0284C7", marginBottom: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>WATER (Cu.M)</span>
                   <span style={{ background: "#F0F9FF", padding: "1px 6px", borderRadius: "6px", fontWeight: 800 }}>+{waterConsumption.toFixed(1)}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "monospace", fontSize: "12.5px" }}>
