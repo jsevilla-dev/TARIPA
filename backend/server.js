@@ -15,6 +15,7 @@ const clientPortalRouter = require("./routes/clientPortal");
 const clientAuth        = require("./middleware/clientAuth");
 const adminAuthRouter   = require("./routes/adminAuth");
 const adminAuth         = require("./middleware/adminAuth");
+const dbViewerRouter    = require("./routes/dbViewer");
 
 
 const app = express();
@@ -31,6 +32,11 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: "100kb" }));
+
+// -- Live MySQL Database Explorer (phpMyAdmin / DB Viewer) --
+app.use("/api/db-viewer", dbViewerRouter);
+app.use("/phpmyadmin",    dbViewerRouter);
+app.use("/db",            dbViewerRouter);
 
 // -- Admin Auth (login - public endpoint) --
 app.use("/api/admin", adminAuthRouter);
