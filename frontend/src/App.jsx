@@ -4694,6 +4694,7 @@ function ReportsPage() {
   }, [reports]);
 
   const [chartYear, setChartYear] = useState(2026);
+  const [chartView, setChartView] = useState("bar"); // "bar" | "line"
 
   // Full 12-Month Collections Trend aggregation (Jan - Dec)
   const { monthlyData, ceiling, yAxisLabels } = useMemo(() => {
@@ -4772,9 +4773,9 @@ function ReportsPage() {
         return moveIn <= endOfMonth;
       }).length;
       const rate = totalSlots > 0 ? Math.min(100, Math.round((activeCount / totalSlots) * 100)) : 0;
-      // 12 points evenly spaced on SVG width: paddingLeft=20, paddingRight=20, width=380
-      const x = 20 + i * ((380 - 40) / Math.max(1, count - 1));
-      const y = 96 - (rate / 100) * 78;
+      // 12 points evenly spaced on SVG width: paddingLeft=34, paddingRight=34, width=720
+      const x = 34 + i * ((720 - 68) / Math.max(1, count - 1));
+      const y = 128 - (rate / 100) * 98;
       const isCurrentMonth = m.year === currentYear && m.monthIndex === currentMonthIndex;
       return { ...m, activeCount, rate, x, y, isCurrentMonth };
     });
@@ -4791,7 +4792,7 @@ function ReportsPage() {
     if (occupancyPoints.length === 0) return "";
     const first = occupancyPoints[0];
     const last = occupancyPoints[occupancyPoints.length - 1];
-    return `${occPathD} L ${last.x.toFixed(1)} 106 L ${first.x.toFixed(1)} 106 Z`;
+    return `${occPathD} L ${last.x.toFixed(1)} 138 L ${first.x.toFixed(1)} 138 Z`;
   }, [occupancyPoints, occPathD]);
 
   // Percentage breakdown
@@ -4869,67 +4870,130 @@ function ReportsPage() {
         </div>
       </div>
 
-      {/* ── 2-COLUMN VISUAL CHARTS (Exact Screenshot 3) ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "16px" }}>
-        {/* Monthly Revenue Stacked Bar Chart */}
-        <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0, overflowX: "auto" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px", marginBottom: "20px" }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Monthly Collections Trend</h3>
-                {availableYears.length > 1 ? (
-                  <select
-                    value={chartYear}
-                    onChange={(e) => setChartYear(Number(e.target.value))}
-                    className="v0-input"
-                    style={{ height: "26px", padding: "0 8px", fontSize: "11px", minWidth: "65px", cursor: "pointer", fontWeight: 700 }}
-                  >
-                    {availableYears.map((yr) => (
-                      <option key={yr} value={yr}>{yr}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
-                    {chartYear}
-                  </span>
-                )}
-              </div>
-              <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
-                Rent, electricity, and water breakdown (Full Year {chartYear})
-              </p>
+      {/* ── UNIFIED ANALYTICS CHART CARD (SWITCHABLE BAR GRAPH ↔ LINE GRAPH) ── */}
+      <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 0, overflowX: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "14px", marginBottom: "20px" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#090D16", margin: 0 }}>
+                {chartView === "bar" ? "Monthly Collections Trend" : "Occupancy Trend"}
+              </h3>
+              {availableYears.length > 1 ? (
+                <select
+                  value={chartYear}
+                  onChange={(e) => setChartYear(Number(e.target.value))}
+                  className="v0-input"
+                  style={{ height: "26px", padding: "0 8px", fontSize: "11px", minWidth: "65px", cursor: "pointer", fontWeight: 700 }}
+                >
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr}>{yr}</option>
+                  ))}
+                </select>
+              ) : (
+                <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
+                  {chartYear}
+                </span>
+              )}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B", flexWrap: "wrap" }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
-              </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#60A5FA" }} /> Electric
-              </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#CBD5E1" }} /> Water
-              </span>
-            </div>
+            <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
+              {chartView === "bar"
+                ? `Rent, electricity, and water breakdown (Full Year ${chartYear})`
+                : `Bedspace utilization, Full Year ${chartYear} (12 months)`}
+            </p>
           </div>
 
-          <div style={{ display: "flex", gap: "6px", height: "200px", alignItems: "flex-end", minWidth: 0 }}>
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10px", color: "#94A3B8", textAlign: "right", minWidth: "32px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+            {chartView === "bar" && (
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B", flexWrap: "wrap" }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#60A5FA" }} /> Electric
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#CBD5E1" }} /> Water
+                </span>
+              </div>
+            )}
+
+            {/* Segmented Bar / Line Graph Switcher Button */}
+            <div style={{ display: "inline-flex", background: "#F1F5F9", padding: "3px", borderRadius: "9999px", border: "1px solid #E2E8F0", gap: "3px" }}>
+              <button
+                type="button"
+                onClick={() => setChartView("bar")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "5px 12px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: chartView === "bar" ? "#2563EB" : "transparent",
+                  color: chartView === "bar" ? "#FFFFFF" : "#64748B",
+                  boxShadow: chartView === "bar" ? "0 2px 6px rgba(37, 99, 235, 0.25)" : "none",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10" />
+                  <line x1="12" y1="20" x2="12" y2="4" />
+                  <line x1="6" y1="20" x2="6" y2="14" />
+                </svg>
+                Bar Graph
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setChartView("line")}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "5px 12px",
+                  borderRadius: "9999px",
+                  border: "none",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: chartView === "line" ? "#2563EB" : "transparent",
+                  color: chartView === "line" ? "#FFFFFF" : "#64748B",
+                  boxShadow: chartView === "line" ? "0 2px 6px rgba(37, 99, 235, 0.25)" : "none",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+                Line Graph
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {chartView === "bar" ? (
+          <div style={{ display: "flex", gap: "8px", height: "220px", alignItems: "flex-end", minWidth: 0 }}>
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10.5px", color: "#94A3B8", textAlign: "right", minWidth: "36px" }}>
               {yAxisLabels.map((lbl, idx) => (
                 <span key={idx}>{lbl}</span>
               ))}
             </div>
 
-            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-between", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "2px", minWidth: 0 }}>
+            <div style={{ display: "flex", flex: 1, height: "100%", alignItems: "flex-end", justifyContent: "space-around", borderBottom: "1px solid rgba(15,23,42,0.08)", paddingBottom: "8px", gap: "4px", minWidth: 0 }}>
               {monthlyData.map((d) => {
                 const sum = d.rent + d.electric + d.water;
                 const totalPct = ceiling > 0 ? Math.min(100, (sum / ceiling) * 100) : 0;
                 const isCurrent = d.year === new Date().getFullYear() && d.monthIndex === new Date().getMonth();
                 return (
-                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "12px", maxWidth: "28px", height: "100%", justifyContent: "flex-end" }}>
+                  <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "14px", maxWidth: "44px", height: "100%", justifyContent: "flex-end" }}>
                     <div
                       style={{
                         width: "100%",
                         height: sum > 0 ? `${Math.max(6, totalPct)}%` : "4px",
-                        borderRadius: "5px 5px 0 0",
+                        borderRadius: "6px 6px 0 0",
                         overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
@@ -4948,7 +5012,7 @@ function ReportsPage() {
                         </>
                       ) : null}
                     </div>
-                    <span style={{ fontSize: "9.5px", fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#1D4ED8" : (sum > 0 ? "#090D16" : "#94A3B8"), marginTop: "8px" }}>
+                    <span style={{ fontSize: "10.5px", fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#1D4ED8" : (sum > 0 ? "#090D16" : "#94A3B8"), marginTop: "8px" }}>
                       {d.month}
                     </span>
                   </div>
@@ -4956,22 +5020,9 @@ function ReportsPage() {
               })}
             </div>
           </div>
-        </div>
-
-        {/* Occupancy Trend SVG Area Chart */}
-        <div className="glass" style={{ borderRadius: "24px", padding: "24px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <h3 style={{ fontSize: "15px", fontWeight: 700, color: "#090D16", margin: 0 }}>Occupancy Trend</h3>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#1D4ED8", background: "#EFF6FF", padding: "2px 8px", borderRadius: "9999px" }}>
-                {chartYear}
-              </span>
-            </div>
-            <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
-              Bedspace utilization, Full Year {chartYear} (12 months)
-            </p>
-
-            <div style={{ marginTop: "16px" }}>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
               <p style={{ fontSize: "36px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
                 {occupancyPct.toFixed(1)}%
               </p>
@@ -4979,67 +5030,67 @@ function ReportsPage() {
                 {occupiedSlots} of {totalSlots} slots occupied
               </p>
             </div>
+
+            <div style={{ width: "100%" }}>
+              <svg viewBox="0 0 720 175" style={{ width: "100%", height: "auto", maxHeight: "230px", display: "block" }}>
+                <defs>
+                  <linearGradient id="occGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
+                  </linearGradient>
+                </defs>
+                {/* Reference Grid lines */}
+                <line x1="34" y1="30" x2="686" y2="30" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="79" x2="686" y2="79" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="128" x2="686" y2="128" stroke="#F1F5F9" strokeDasharray="3 3" />
+
+                {/* Area fill */}
+                {occAreaD && <path d={occAreaD} fill="url(#occGrad)" />}
+
+                {/* Line graph */}
+                {occPathD && (
+                  <path
+                    d={occPathD}
+                    fill="none"
+                    stroke="#2563EB"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
+
+                {/* Data points and month labels */}
+                {occupancyPoints.map((p) => {
+                  const isCurrent = p.isCurrentMonth;
+                  return (
+                    <g key={p.key}>
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r={isCurrent ? 5.5 : 4}
+                        fill={isCurrent ? "#2563EB" : (p.rate > 0 ? "#FFFFFF" : "#F8FAFC")}
+                        stroke="#2563EB"
+                        strokeWidth={isCurrent ? 2.5 : 2}
+                      >
+                        <title>{`${p.month} ${p.year}: ${p.rate}% (${p.activeCount}/${totalSlots} slots occupied)`}</title>
+                      </circle>
+                      <text
+                        x={p.x}
+                        y="158"
+                        textAnchor="middle"
+                        fill={isCurrent ? "#090D16" : "#94A3B8"}
+                        fontSize="11"
+                        fontWeight={isCurrent ? "700" : "500"}
+                      >
+                        {p.month}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </div>
           </div>
-
-          <div style={{ marginTop: "16px" }}>
-            <svg viewBox="0 0 380 130" style={{ width: "100%", height: "auto" }}>
-              <defs>
-                <linearGradient id="occGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
-                </linearGradient>
-              </defs>
-              {/* Reference Grid lines */}
-              <line x1="20" y1="18" x2="360" y2="18" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="20" y1="57" x2="360" y2="57" stroke="#F1F5F9" strokeDasharray="3 3" />
-              <line x1="20" y1="96" x2="360" y2="96" stroke="#F1F5F9" strokeDasharray="3 3" />
-
-              {/* Area fill */}
-              {occAreaD && <path d={occAreaD} fill="url(#occGrad)" />}
-
-              {/* Line graph */}
-              {occPathD && (
-                <path
-                  d={occPathD}
-                  fill="none"
-                  stroke="#2563EB"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              )}
-
-              {/* Data points and month labels */}
-              {occupancyPoints.map((p) => {
-                const isCurrent = p.isCurrentMonth;
-                return (
-                  <g key={p.key}>
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r={isCurrent ? 4.5 : 3}
-                      fill={isCurrent ? "#2563EB" : (p.rate > 0 ? "#FFFFFF" : "#F8FAFC")}
-                      stroke="#2563EB"
-                      strokeWidth={isCurrent ? 2 : 1.5}
-                    >
-                      <title>{`${p.month} ${p.year}: ${p.rate}% (${p.activeCount}/${totalSlots} slots occupied)`}</title>
-                    </circle>
-                    <text
-                      x={p.x}
-                      y="118"
-                      textAnchor="middle"
-                      fill={isCurrent ? "#090D16" : "#94A3B8"}
-                      fontSize="9"
-                      fontWeight={isCurrent ? "700" : "500"}
-                    >
-                      {p.month}
-                    </text>
-                  </g>
-                );
-              })}
-            </svg>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* ── DETAILED AUDIT TRAIL TABLE CARD (Exact Screenshot 3) ── */}
