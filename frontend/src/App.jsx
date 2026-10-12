@@ -4975,7 +4975,7 @@ function ReportsPage() {
         </div>
 
         {chartView === "bar" ? (
-          <div style={{ display: "flex", gap: "8px", height: "220px", alignItems: "flex-end", minWidth: 0 }}>
+          <div style={{ display: "flex", gap: "8px", height: "230px", alignItems: "flex-end", minWidth: 0 }}>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10.5px", color: "#94A3B8", textAlign: "right", minWidth: "36px" }}>
               {yAxisLabels.map((lbl, idx) => (
                 <span key={idx}>{lbl}</span>
@@ -4987,8 +4987,22 @@ function ReportsPage() {
                 const sum = d.rent + d.electric + d.water;
                 const totalPct = ceiling > 0 ? Math.min(100, (sum / ceiling) * 100) : 0;
                 const isCurrent = d.year === new Date().getFullYear() && d.monthIndex === new Date().getMonth();
+                const barLabel = sum >= 1000 ? `₱${(sum / 1000).toFixed(1)}k` : `₱${Math.round(sum)}`;
                 return (
                   <div key={d.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: "14px", maxWidth: "44px", height: "100%", justifyContent: "flex-end" }}>
+                    {sum > 0 && (
+                      <span
+                        style={{
+                          fontSize: "9.5px",
+                          fontWeight: 800,
+                          color: "#1D4ED8",
+                          marginBottom: "4px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {barLabel}
+                      </span>
+                    )}
                     <div
                       style={{
                         width: "100%",
@@ -5059,11 +5073,21 @@ function ReportsPage() {
                   />
                 )}
 
-                {/* Data points and month labels */}
+                {/* Data points, value labels, and month labels */}
                 {occupancyPoints.map((p) => {
                   const isCurrent = p.isCurrentMonth;
                   return (
                     <g key={p.key}>
+                      <text
+                        x={p.x}
+                        y={Math.max(14, p.y - 10)}
+                        textAnchor="middle"
+                        fill={isCurrent ? "#1D4ED8" : "#64748B"}
+                        fontSize="9.5"
+                        fontWeight={isCurrent ? "800" : "600"}
+                      >
+                        {p.rate}%
+                      </text>
                       <circle
                         cx={p.x}
                         cy={p.y}
