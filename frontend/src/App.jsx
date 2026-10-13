@@ -4757,8 +4757,8 @@ function ReportsPage() {
     return { monthlyData: months, ceiling: ceil, yAxisLabels: labels };
   }, [chartYear, filteredReports]);
 
-  // Real 12-Month Occupancy Trend curve calculation (Jan - Dec)
-  const occupancyPoints = useMemo(() => {
+  // 12-Month Collections Trend curve calculation (Jan - Dec)
+  const collectionsPoints = useMemo(() => {
     if (!monthlyData.length) return [];
     const count = monthlyData.length; // 12
     const now = new Date();
@@ -4766,34 +4766,29 @@ function ReportsPage() {
     const currentMonthIndex = now.getMonth();
 
     return monthlyData.map((m, i) => {
-      const endOfMonth = new Date(m.year, m.monthIndex + 1, 0, 23, 59, 59);
-      const activeCount = tenants.filter((t) => {
-        if (!t.move_in_date) return false;
-        const moveIn = new Date(t.move_in_date);
-        return moveIn <= endOfMonth;
-      }).length;
-      const rate = totalSlots > 0 ? Math.min(100, Math.round((activeCount / totalSlots) * 100)) : 0;
+      const sum = m.total;
       // 12 points evenly spaced on SVG width: paddingLeft=34, paddingRight=34, width=720
       const x = 34 + i * ((720 - 68) / Math.max(1, count - 1));
-      const y = 128 - (rate / 100) * 98;
+      const y = ceiling > 0 ? 132 - (sum / ceiling) * 106 : 132;
       const isCurrentMonth = m.year === currentYear && m.monthIndex === currentMonthIndex;
-      return { ...m, activeCount, rate, x, y, isCurrentMonth };
+      const label = sum >= 1000 ? `₱${(sum / 1000).toFixed(1)}k` : sum > 0 ? `₱${Math.round(sum)}` : "";
+      return { ...m, sum, x, y, isCurrentMonth, label };
     });
-  }, [monthlyData, tenants, totalSlots]);
+  }, [monthlyData, ceiling]);
 
-  const occPathD = useMemo(() => {
-    if (occupancyPoints.length === 0) return "";
-    return occupancyPoints
+  const collectionsPathD = useMemo(() => {
+    if (collectionsPoints.length === 0) return "";
+    return collectionsPoints
       .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
       .join(" ");
-  }, [occupancyPoints]);
+  }, [collectionsPoints]);
 
-  const occAreaD = useMemo(() => {
-    if (occupancyPoints.length === 0) return "";
-    const first = occupancyPoints[0];
-    const last = occupancyPoints[occupancyPoints.length - 1];
-    return `${occPathD} L ${last.x.toFixed(1)} 138 L ${first.x.toFixed(1)} 138 Z`;
-  }, [occupancyPoints, occPathD]);
+  const collectionsAreaD = useMemo(() => {
+    if (collectionsPoints.length === 0) return "";
+    const first = collectionsPoints[0];
+    const last = collectionsPoints[collectionsPoints.length - 1];
+    return `${collectionsPathD} L ${last.x.toFixed(1)} 132 L ${first.x.toFixed(1)} 132 Z`;
+  }, [collectionsPoints, collectionsPathD]);
 
   // Percentage breakdown
   const rentShare = totalAmount > 0 ? ((totalRent / totalAmount) * 100).toFixed(1) : "0.0";
@@ -4876,7 +4871,7 @@ function ReportsPage() {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
               <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#090D16", margin: 0 }}>
-                {chartView === "bar" ? "Monthly Collections Trend" : "Occupancy Trend"}
+                Monthly Collections Trend
               </h3>
               {availableYears.length > 1 ? (
                 <select
@@ -4896,26 +4891,22 @@ function ReportsPage() {
               )}
             </div>
             <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0" }}>
-              {chartView === "bar"
-                ? `Rent, electricity, and water breakdown (Full Year ${chartYear})`
-                : `Bedspace utilization, Full Year ${chartYear} (12 months)`}
+              Rent, electricity, and water revenue breakdown (Full Year {chartYear})
             </p>
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
-            {chartView === "bar" && (
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B", flexWrap: "wrap" }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
-                </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#60A5FA" }} /> Electric
-                </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
-                  <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#CBD5E1" }} /> Water
-                </span>
-              </div>
-            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", fontSize: "12px", fontWeight: 600, color: "#64748B", flexWrap: "wrap" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#1D4ED8" }} /> Rent
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#60A5FA" }} /> Electric
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}>
+                <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#CBD5E1" }} /> Water
+              </span>
+            </div>
 
             {/* Segmented Bar / Line Graph Switcher Button */}
             <div style={{ display: "inline-flex", background: "#F1F5F9", padding: "3px", borderRadius: "9999px", border: "1px solid #E2E8F0", gap: "3px" }}>
@@ -5035,75 +5026,78 @@ function ReportsPage() {
             </div>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div>
-              <p style={{ fontSize: "36px", fontWeight: 800, color: "#090D16", margin: 0, letterSpacing: "-0.02em" }}>
-                {occupancyPct.toFixed(1)}%
-              </p>
-              <p style={{ fontSize: "12.5px", color: "#64748B", margin: "2px 0 0", fontWeight: 500 }}>
-                {occupiedSlots} of {totalSlots} slots occupied
-              </p>
+          <div style={{ display: "flex", gap: "8px", height: "230px", alignItems: "flex-end", minWidth: 0 }}>
+            {/* Currency Y-Axis matching Bar Graph */}
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%", paddingBottom: "24px", fontSize: "10.5px", color: "#94A3B8", textAlign: "right", minWidth: "36px" }}>
+              {yAxisLabels.map((lbl, idx) => (
+                <span key={idx}>{lbl}</span>
+              ))}
             </div>
 
-            <div style={{ width: "100%" }}>
-              <svg viewBox="0 0 720 175" style={{ width: "100%", height: "auto", maxHeight: "230px", display: "block" }}>
+            {/* Line Graph SVG Container */}
+            <div style={{ flex: 1, height: "100%", minWidth: 0 }}>
+              <svg viewBox="0 0 720 175" style={{ width: "100%", height: "100%", display: "block" }}>
                 <defs>
-                  <linearGradient id="occGrad" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="collectionsLineGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
                     <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 {/* Reference Grid lines */}
-                <line x1="34" y1="30" x2="686" y2="30" stroke="#F1F5F9" strokeDasharray="3 3" />
-                <line x1="34" y1="79" x2="686" y2="79" stroke="#F1F5F9" strokeDasharray="3 3" />
-                <line x1="34" y1="128" x2="686" y2="128" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="26" x2="686" y2="26" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="61" x2="686" y2="61" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="97" x2="686" y2="97" stroke="#F1F5F9" strokeDasharray="3 3" />
+                <line x1="34" y1="132" x2="686" y2="132" stroke="rgba(15,23,42,0.08)" />
 
                 {/* Area fill */}
-                {occAreaD && <path d={occAreaD} fill="url(#occGrad)" />}
+                {collectionsAreaD && <path d={collectionsAreaD} fill="url(#collectionsLineGrad)" />}
 
                 {/* Line graph */}
-                {occPathD && (
+                {collectionsPathD && (
                   <path
-                    d={occPathD}
+                    d={collectionsPathD}
                     fill="none"
                     stroke="#2563EB"
-                    strokeWidth="2.5"
+                    strokeWidth="2.6"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 )}
 
                 {/* Data points, value labels, and month labels */}
-                {occupancyPoints.map((p) => {
+                {collectionsPoints.map((p) => {
                   const isCurrent = p.isCurrentMonth;
+                  const hasData = p.sum > 0;
                   return (
                     <g key={p.key}>
-                      <text
-                        x={p.x}
-                        y={Math.max(14, p.y - 10)}
-                        textAnchor="middle"
-                        fill={isCurrent ? "#1D4ED8" : "#64748B"}
-                        fontSize="9.5"
-                        fontWeight={isCurrent ? "800" : "600"}
-                      >
-                        {p.rate}%
-                      </text>
+                      {hasData && (
+                        <text
+                          x={p.x}
+                          y={Math.max(16, p.y - 10)}
+                          textAnchor="middle"
+                          fill="#1D4ED8"
+                          fontSize="10"
+                          fontWeight="800"
+                        >
+                          {p.label}
+                        </text>
+                      )}
                       <circle
                         cx={p.x}
                         cy={p.y}
-                        r={isCurrent ? 5.5 : 4}
-                        fill={isCurrent ? "#2563EB" : (p.rate > 0 ? "#FFFFFF" : "#F8FAFC")}
-                        stroke="#2563EB"
-                        strokeWidth={isCurrent ? 2.5 : 2}
+                        r={hasData ? 5.5 : 3}
+                        fill={hasData ? "#2563EB" : "#F8FAFC"}
+                        stroke={hasData ? "#2563EB" : "#CBD5E1"}
+                        strokeWidth={hasData ? 2.5 : 1.5}
                       >
-                        <title>{`${p.month} ${p.year}: ${p.rate}% (${p.activeCount}/${totalSlots} slots occupied)`}</title>
+                        <title>{`${p.month} ${p.year}: ${formatCurrency(p.sum)}`}</title>
                       </circle>
                       <text
                         x={p.x}
                         y="158"
                         textAnchor="middle"
-                        fill={isCurrent ? "#090D16" : "#94A3B8"}
-                        fontSize="11"
+                        fill={isCurrent ? "#1D4ED8" : hasData ? "#090D16" : "#94A3B8"}
+                        fontSize="10.5"
                         fontWeight={isCurrent ? "700" : "500"}
                       >
                         {p.month}
