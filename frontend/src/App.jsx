@@ -4903,7 +4903,7 @@ function ReportsPage() {
             Collections, occupancy, and an audit trail of every administrative action.
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+        <div>
           <button
             type="button"
             className="btn-pill-action"
@@ -4926,17 +4926,7 @@ function ReportsPage() {
               cursor: "pointer",
             }}
           >
-            <Icons.Download style={{ width: "15px", height: "15px" }} /> Export Excel (.xlsx)
-          </button>
-          <button
-            type="button"
-            className="btn-pill-action"
-            onClick={exportToCSV}
-            disabled={filteredReports.length === 0}
-            title="Export standard CSV data file (.csv)"
-            style={{ height: "38px", padding: "0 16px", fontSize: "13px" }}
-          >
-            Export CSV
+            <Icons.Download style={{ width: "15px", height: "15px" }} /> Export Report (.xlsx)
           </button>
         </div>
       </div>
@@ -5291,55 +5281,6 @@ function ReportsPage() {
                 Reset
               </button>
             )}
-
-            <button
-              type="button"
-              className="btn-pill-action"
-              onClick={exportToExcel}
-              disabled={filteredReports.length === 0}
-              title="Export formatted Excel spreadsheet (.xlsx)"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                height: "36px",
-                padding: "0 14px",
-                fontSize: "12px",
-                fontWeight: 600,
-                background: "#16A34A",
-                color: "#FFFFFF",
-                border: "none",
-                borderRadius: "9999px",
-                boxShadow: "0 1px 3px rgba(22, 163, 74, 0.25)",
-                cursor: "pointer",
-              }}
-            >
-              <Icons.Download style={{ width: "13px", height: "13px" }} />
-              Export Excel (.xlsx)
-            </button>
-            <button
-              type="button"
-              className="btn-pill-action"
-              onClick={exportToCSV}
-              disabled={filteredReports.length === 0}
-              title="Export raw CSV data (.csv)"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "5px",
-                height: "36px",
-                padding: "0 12px",
-                fontSize: "12px",
-                fontWeight: 600,
-                background: "#FFFFFF",
-                color: "#475569",
-                border: "1px solid rgba(15, 23, 42, 0.12)",
-                borderRadius: "9999px",
-                cursor: "pointer",
-              }}
-            >
-              CSV
-            </button>
           </div>
         </div>
 
