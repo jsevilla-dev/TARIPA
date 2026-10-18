@@ -4653,26 +4653,63 @@ function ReportsPage() {
 
   const exportToCSV = () => {
     if (!filteredReports.length) return;
-    const headers = ["ID", "Tenant", "Room", "Billing Month", "Electricity Charge", "Water Charge", "Total Amount", "Status"];
+    const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    const headers = [
+      "Invoice #",
+      "Tenant Name",
+      "Assigned Room",
+      "Billing Month",
+      "Electricity (PHP)",
+      "Water (PHP)",
+      "Total Amount (PHP)",
+      "Payment Status",
+    ];
+
     const rows = filteredReports.map((r) => [
-      r.id,
-      `"${(r.full_name || "").replace(/"/g, '""')}"`,
-      r.room_number || "Unassigned",
-      getBillingMonth(r.billing_month),
+      `"INV-${String(r.id).padStart(4, "0")}"`,
+      `"${(r.full_name || "Unknown").replace(/"/g, '""')}"`,
+      `"${r.room_number ? "Room " + r.room_number : "Unassigned"}"`,
+      `"${getBillingMonth(r.billing_month)}"`,
       Number(r.electricity_charge || 0).toFixed(2),
       Number(r.water_charge || 0).toFixed(2),
       Number(r.total_amount || 0).toFixed(2),
-      r.status,
+      `"${r.status || "Pending"}"`,
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const totalElec = filteredReports.reduce((s, r) => s + Number(r.electricity_charge || 0), 0).toFixed(2);
+    const totalWat = filteredReports.reduce((s, r) => s + Number(r.water_charge || 0), 0).toFixed(2);
+    const totalAll = filteredReports.reduce((s, r) => s + Number(r.total_amount || 0), 0).toFixed(2);
+
+    const summaryRow = [
+      `"TOTAL (${filteredReports.length} Invoices)"`,
+      `""`,
+      `""`,
+      `""`,
+      totalElec,
+      totalWat,
+      totalAll,
+      `""`,
+    ];
+
+    const csvContent =
+      "\uFEFF" +
+      `"TARIPA RESIDENCES - Invoices & Collections Audit Report"\n` +
+      `"Export Date: ${reportDate}"\n\n` +
+      headers.join(",") +
+      "\n" +
+      rows.map((e) => e.join(",")).join("\n") +
+      "\n" +
+      summaryRow.join(",");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `taripa_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `TARIPA_Collections_Report_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   // Real occupancy metrics
