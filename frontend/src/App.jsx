@@ -5171,6 +5171,32 @@ function ReportsPage() {
                 Reset
               </button>
             )}
+
+            <button
+              type="button"
+              className="btn-pill-action"
+              onClick={exportToCSV}
+              disabled={filteredReports.length === 0}
+              title="Export filtered records to CSV"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                height: "36px",
+                padding: "0 14px",
+                fontSize: "12px",
+                fontWeight: 600,
+                background: "#FFFFFF",
+                color: "#1D4ED8",
+                border: "1px solid rgba(29, 78, 216, 0.2)",
+                borderRadius: "9999px",
+                boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+                cursor: "pointer",
+              }}
+            >
+              <Icons.Download style={{ width: "13px", height: "13px" }} />
+              Export
+            </button>
           </div>
         </div>
 
@@ -5191,9 +5217,47 @@ function ReportsPage() {
             <tbody>
               {filteredReports.length === 0 ? (
                 <tr>
-                  <td colSpan={8} style={{ textAlign: "center", padding: "40px 20px" }}>
-                    <p style={{ margin: 0, fontWeight: 700, color: "#090D16", fontSize: "14px" }}>No Records Found</p>
-                    <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: "#64748B" }}>No records matched your selected criteria.</p>
+                  <td colSpan={8} style={{ textAlign: "center", padding: "48px 20px" }}>
+                    <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", maxWidth: "340px", margin: "0 auto" }}>
+                      <div style={{
+                        width: "50px",
+                        height: "50px",
+                        borderRadius: "50%",
+                        background: "rgba(241, 245, 249, 0.8)",
+                        border: "1px solid rgba(226, 232, 240, 0.8)",
+                        display: "grid",
+                        placeItems: "center",
+                        color: "#94A3B8",
+                        marginBottom: "12px",
+                      }}>
+                        <Icons.Search style={{ width: "20px", height: "20px" }} />
+                      </div>
+                      <p style={{ margin: 0, fontWeight: 700, color: "#090D16", fontSize: "15px" }}>No Invoices Found</p>
+                      <p style={{ margin: "4px 0 14px", fontSize: "12.5px", color: "#64748B", lineHeight: 1.5 }}>
+                        No billing records matched your selected criteria. Try adjusting your filters.
+                      </p>
+                      {hasActiveFilters && (
+                        <button
+                          type="button"
+                          className="btn-pill-action"
+                          onClick={clearFilters}
+                          style={{
+                            height: "32px",
+                            padding: "0 14px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            background: "#2563EB",
+                            color: "#FFFFFF",
+                            border: "none",
+                            borderRadius: "9999px",
+                            cursor: "pointer",
+                            boxShadow: "0 2px 8px rgba(37, 99, 235, 0.2)"
+                          }}
+                        >
+                          Clear Filters
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
