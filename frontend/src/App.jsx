@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import * as XLSX from "xlsx";
 import "./App.css";
 import { useToast } from "./components/Toast.jsx";
 import ConfirmDialog from "./components/ConfirmDialog.jsx";
@@ -4651,9 +4652,11 @@ function ReportsPage() {
 
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
-  const exportToCSV = () => {
+  // ── PRO-GRADE EXCEL SPREADSHEET EXPORT (.xlsx) ──
+  // Opens in Microsoft Excel with wide auto-fitted columns, bold headers, real numbers, and totals!
+  const exportToExcel = () => {
     if (!filteredReports.length) return;
-    const reportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
     const headers = [
       "Invoice #",
       "Tenant Name",
@@ -4666,42 +4669,97 @@ function ReportsPage() {
     ];
 
     const rows = filteredReports.map((r) => [
-      `"INV-${String(r.id).padStart(4, "0")}"`,
-      `"${(r.full_name || "Unknown").replace(/"/g, '""')}"`,
-      `"${r.room_number ? "Room " + r.room_number : "Unassigned"}"`,
-      `"${getBillingMonth(r.billing_month)}"`,
-      Number(r.electricity_charge || 0).toFixed(2),
-      Number(r.water_charge || 0).toFixed(2),
-      Number(r.total_amount || 0).toFixed(2),
-      `"${r.status || "Pending"}"`,
+      `INV-${String(r.id).padStart(4, "0")}`,
+      r.full_name || "Unknown",
+      r.room_number ? `Room ${r.room_number}` : "Unassigned",
+      getBillingMonth(r.billing_month),
+      Number(r.electricity_charge || 0),
+      Number(r.water_charge || 0),
+      Number(r.total_amount || 0),
+      r.status || "Pending",
     ]);
 
-    const totalElec = filteredReports.reduce((s, r) => s + Number(r.electricity_charge || 0), 0).toFixed(2);
-    const totalWat = filteredReports.reduce((s, r) => s + Number(r.water_charge || 0), 0).toFixed(2);
-    const totalAll = filteredReports.reduce((s, r) => s + Number(r.total_amount || 0), 0).toFixed(2);
+    const totalElec = Number(filteredReports.reduce((s, r) => s + Number(r.electricity_charge || 0), 0));
+    const totalWat = Number(filteredReports.reduce((s, r) => s + Number(r.water_charge || 0), 0));
+    const totalAll = Number(filteredReports.reduce((s, r) => s + Number(r.total_amount || 0), 0));
 
     const summaryRow = [
-      `"TOTAL (${filteredReports.length} Invoices)"`,
-      `""`,
-      `""`,
-      `""`,
+      `TOTAL (${filteredReports.length} Invoices)`,
+      "",
+      "",
+      "",
       totalElec,
       totalWat,
       totalAll,
-      `""`,
+      "",
     ];
 
-    const csvContent =
-      "\uFEFF" +
-      `"TARIPA RESIDENCES - Invoices & Collections Audit Report"\n` +
-      `"Export Date: ${reportDate}"\n\n` +
-      headers.join(",") +
-      "\n" +
-      rows.map((e) => e.join(",")).join("\n") +
-      "\n" +
-      summaryRow.join(",");
+    const data = [headers, ...rows, summaryRow];
+    const ws = XLSX.utils.aoa_to_sheet(data);
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    // Set custom column widths (in characters) so NOTHING is ever truncated in Excel!
+    ws["!cols"] = [
+      { wch: 16 }, // Invoice #
+      { wch: 26 }, // Tenant Name (e.g. "James Sevilla" is 13 chars, fits with ample breathing room)
+      { wch: 18 }, // Assigned Room (e.g. "Room 102")
+      { wch: 16 }, // Billing Month
+      { wch: 20 }, // Electricity (PHP)
+      { wch: 18 }, // Water (PHP)
+      { wch: 22 }, // Total Amount (PHP)
+      { wch: 16 }, // Payment Status
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Collections Audit");
+    XLSX.writeFile(wb, `TARIPA_Collections_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
+  // ── CLEAN RFC-4180 STANDARD CSV EXPORT (.csv) ──
+  const exportToCSV = () => {
+    if (!filteredReports.length) return;
+
+    const headers = [
+      "Invoice #",
+      "Tenant Name",
+      "Assigned Room",
+      "Billing Month",
+      "Electricity (PHP)",
+      "Water (PHP)",
+      "Total Amount (PHP)",
+      "Payment Status",
+    ];
+
+    const rows = filteredReports.map((r) => [
+      `INV-${String(r.id).padStart(4, "0")}`,
+      r.full_name || "Unknown",
+      r.room_number ? `Room ${r.room_number}` : "Unassigned",
+      getBillingMonth(r.billing_month),
+      Number(r.electricity_charge || 0).toFixed(2),
+      Number(r.water_charge || 0).toFixed(2),
+      Number(r.total_amount || 0).toFixed(2),
+      r.status || "Pending",
+    ]);
+
+    const totalElec = Number(filteredReports.reduce((s, r) => s + Number(r.electricity_charge || 0), 0)).toFixed(2);
+    const totalWat = Number(filteredReports.reduce((s, r) => s + Number(r.water_charge || 0), 0)).toFixed(2);
+    const totalAll = Number(filteredReports.reduce((s, r) => s + Number(r.total_amount || 0), 0)).toFixed(2);
+
+    const summaryRow = [
+      `TOTAL (${filteredReports.length} Invoices)`,
+      "",
+      "",
+      "",
+      totalElec,
+      totalWat,
+      totalAll,
+      "",
+    ];
+
+    const data = [headers, ...rows, summaryRow];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -4845,15 +4903,40 @@ function ReportsPage() {
             Collections, occupancy, and an audit trail of every administrative action.
           </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="btn-pill-action"
+            onClick={exportToExcel}
+            disabled={filteredReports.length === 0}
+            title="Export official formatted spreadsheet to Excel (.xlsx)"
+            style={{
+              height: "38px",
+              padding: "0 18px",
+              fontSize: "13px",
+              fontWeight: 600,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              background: "#16A34A",
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: "9999px",
+              boxShadow: "0 2px 8px rgba(22, 163, 74, 0.25)",
+              cursor: "pointer",
+            }}
+          >
+            <Icons.Download style={{ width: "15px", height: "15px" }} /> Export Excel (.xlsx)
+          </button>
           <button
             type="button"
             className="btn-pill-action"
             onClick={exportToCSV}
             disabled={filteredReports.length === 0}
-            style={{ height: "38px", padding: "0 18px", fontSize: "13px" }}
+            title="Export standard CSV data file (.csv)"
+            style={{ height: "38px", padding: "0 16px", fontSize: "13px" }}
           >
-            <Icons.Download /> Export CSV
+            Export CSV
           </button>
         </div>
       </div>
@@ -5212,9 +5295,9 @@ function ReportsPage() {
             <button
               type="button"
               className="btn-pill-action"
-              onClick={exportToCSV}
+              onClick={exportToExcel}
               disabled={filteredReports.length === 0}
-              title="Export filtered records to CSV"
+              title="Export formatted Excel spreadsheet (.xlsx)"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -5223,16 +5306,39 @@ function ReportsPage() {
                 padding: "0 14px",
                 fontSize: "12px",
                 fontWeight: 600,
-                background: "#FFFFFF",
-                color: "#1D4ED8",
-                border: "1px solid rgba(29, 78, 216, 0.2)",
+                background: "#16A34A",
+                color: "#FFFFFF",
+                border: "none",
                 borderRadius: "9999px",
-                boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+                boxShadow: "0 1px 3px rgba(22, 163, 74, 0.25)",
                 cursor: "pointer",
               }}
             >
               <Icons.Download style={{ width: "13px", height: "13px" }} />
-              Export
+              Export Excel (.xlsx)
+            </button>
+            <button
+              type="button"
+              className="btn-pill-action"
+              onClick={exportToCSV}
+              disabled={filteredReports.length === 0}
+              title="Export raw CSV data (.csv)"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                height: "36px",
+                padding: "0 12px",
+                fontSize: "12px",
+                fontWeight: 600,
+                background: "#FFFFFF",
+                color: "#475569",
+                border: "1px solid rgba(15, 23, 42, 0.12)",
+                borderRadius: "9999px",
+                cursor: "pointer",
+              }}
+            >
+              CSV
             </button>
           </div>
         </div>
