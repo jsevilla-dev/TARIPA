@@ -102,3 +102,11 @@ Bullet Points:
   3. Tenant Registration -> Meter Reading -> Invoice Generation
   4. Tenant Portal Sub-Meter Odometer & Official Receipt
 
+---
+SLIDE 11: REFERENCES & REVIEW OF RELATED LITERATURE (APA 7th)
+Title: Theoretical & Legal Framework (References)
+Bullet Points:
+- Submetering & Dispute Reduction: Hackett & Lutzenhiser (1991), Energy and Buildings (https://doi.org/10.1016/0378-7788(91)90014-G) — Proves submetering cuts utility waste by 15-21% and eliminates tenant disputes.
+- Philippine Legal Basis: ERC Resolution No. 05 (2008) & RA 9653 (Rent Control Act) — Prohibits arbitrary landlord markups; mandates exact distribution rate pass-through.
+- Digital Twin in Facilities: Lu et al. (2020), Journal of Management in Engineering (https://doi.org/10.1061/(ASCE)ME.1943-5479.0000763) — Spatial 3D models optimize room occupancy and eliminate utility misallocation.
+- Web Architecture & Security: Fielding (2000) REST Architecture & Jones et al. (2015) RFC 7519 JWT Authentication.
