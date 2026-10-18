@@ -1,0 +1,27 @@
+{
+  "name": "taripa",
+  "version": "1.0.0",
+  "description": "TARIPA — Boarding House Utility Billing & Tenant Management System",
+  "private": true,
+  "scripts": {
+    "start:backend": "node backend/server.js",
+    "dev:backend": "node backend/server.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "lint:frontend": "npm run lint --prefix frontend",
+    "setup:admin": "node scripts/set-admin-password.js",
+    "reset:tenant": "node scripts/reset-tenant-password.js",
+    "create:tenant": "node scripts/create-tenant-account.js"
+  },
+  "keywords": [
+    "boarding-house-management",
+    "utility-billing",
+    "tenant-portal",
+    "3d-digital-twin",
+    "react",
+    "express",
+    "mysql"
+  ],
+  "author": "TARIPA Development Team",
+  "license": "ISC"
+}
