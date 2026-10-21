@@ -1,31 +1,168 @@
-# CC316: APPLICATION DEVELOPMENT AND EMERGING TECHNOLOGIES
-## FINAL PROJECT COMPREHENSIVE DOCUMENTATION
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 18mm 16mm 18mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.52;
+    color: #1e293b;
+    padding: 0 !important;
+  }
+  /* Prevent empty pages caused by Chromium block formatting traps */
+  pre, code, table, div, figure, .mermaid, svg, blockquote {
+    overflow: visible !important;
+    overflow-x: visible !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+  .mermaid {
+    margin: 12px 0 !important;
+    text-align: center !important;
+  }
+  .mermaid svg {
+    max-height: 460px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+  pre {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace !important;
+    font-size: 8pt !important;
+    line-height: 1.35 !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    margin: 8px 0 !important;
+  }
+  code {
+    font-family: "Cascadia Code", Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    background-color: #f1f5f9;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 8.5pt !important;
+    margin: 10px 0 !important;
+    page-break-inside: auto !important;
+  }
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 5px 8px !important;
+    vertical-align: top !important;
+  }
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+  }
+  h1, h2, h3, h4 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    color: #0f172a;
+  }
+  h1 {
+    font-size: 16pt !important;
+    border-bottom: 2px solid #2563eb !important;
+    padding-bottom: 4px !important;
+    margin-top: 22px !important;
+    margin-bottom: 12px !important;
+  }
+  h2 {
+    font-size: 12.5pt !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding-bottom: 3px !important;
+    margin-top: 16px !important;
+    margin-bottom: 10px !important;
+  }
+  h3 {
+    font-size: 10.5pt !important;
+    margin-top: 12px !important;
+    margin-bottom: 6px !important;
+  }
+  hr {
+    border: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    margin: 16px 0 !important;
+  }
+  .cover-container {
+    text-align: center;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+  .cover-school {
+    font-size: 13pt;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  .cover-dept {
+    font-size: 10.5pt;
+    color: #475569;
+    margin-bottom: 40px;
+  }
+  .cover-title {
+    font-size: 19pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .cover-subtitle {
+    font-size: 11pt;
+    color: #475569;
+    margin-bottom: 60px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cover-details {
+    margin-top: 40px;
+    font-size: 10pt;
+    line-height: 1.8;
+  }
+</style>
 
----
+<div class="cover-container">
+  <div class="cover-school">FEU INSTITUTE OF TECHNOLOGY</div>
+  <div class="cover-dept">College of Computer Studies — Department of Computer Science</div>
 
-### **COVER PAGE**
+  <div class="cover-title">TARIPA</div>
+  <div class="cover-subtitle"><strong>Automated Residential Submeter Monitoring and Utility Billing Reconciliation Management System</strong><br>A Web-Based Full-Stack Information System</div>
 
-**PROJECT TITLE:**  
-**TARIPA: Automated Residential Submeter Monitoring and Utility Billing Reconciliation Management System**
+  <div class="cover-details">
+    <strong>Course & Subject:</strong><br>
+    CC316 — Application Development and Emerging Technologies<br>
+    BSCS 3rd Year (Section BS5MA)<br><br>
 
-**PROJECT PROPONENTS / MEMBERS:**  
-- **James Benedict Sevilla**
-- **Lorrely Paga**
-- **Mathew Alarcon**
+    <strong>Project Proponents:</strong><br>
+    <strong>James Benedict Sevilla</strong> (Lead Full-Stack Developer & Database Architect)<br>
+    <strong>Lorrely Paga</strong> (Systems Analyst & UI/UX Presenter)<br>
+    <strong>Mathew Alarcon</strong> (Quality Assurance & Documentation Specialist)<br><br>
 
-**COURSE, YEAR & SECTION:**  
-Bachelor of Science in Computer Science (BSCS) — 3rd Year, BS5MA
+    <strong>Course Professor:</strong><br>
+    <strong>Prof. Xerxes Von Plata</strong><br><br>
 
-**SUBJECT:**  
-CC316 — Application Development and Emerging Technologies
+    <strong>Date of Submission:</strong><br>
+    October 2026
+  </div>
+</div>
 
-**INSTRUCTOR / PROFESSOR:**  
-Prof. Xerxes Von Plata
-
-**DATE OF SUBMISSION:**  
-October 2026
-
----
+<div style="page-break-after: always;"></div>
 
 # CHAPTER 1: PROJECT OVERVIEW
 
@@ -306,68 +443,44 @@ The database comprises six normalized tables with explicit foreign key constrain
 
 ```mermaid
 erDiagram
-    ROOMS ||--o{ TENANTS : "houses"
-    TENANTS ||--|| TENANT_ACCOUNTS : "authenticates"
-    TENANTS ||--o{ METER_READINGS : "measured_for"
-    TENANTS ||--o{ BILLING_RECORDS : "billed_to"
+    ROOMS ||--o{ TENANTS : "houses (1:N)"
+    TENANTS ||--|| TENANT_ACCOUNTS : "authenticates (1:1)"
+    TENANTS ||--o{ METER_READINGS : "measured_for (1:N)"
+    TENANTS ||--o{ BILLING_RECORDS : "billed_to (1:N)"
+    UTILITY_RATES ||--o{ BILLING_RECORDS : "applied_to (1:N)"
 
     ROOMS {
         int id PK
         string room_number UK
         int capacity
-        datetime created_at
     }
-
     TENANTS {
         int id PK
-        string full_name
-        string contact_number
         int room_id FK
-        date move_in_date
+        string full_name
         string status
-        datetime created_at
     }
-
     TENANT_ACCOUNTS {
         int id PK
         int tenant_id FK
         string username UK
-        string password_hash
-        datetime created_at
-        datetime updated_at
     }
-
     UTILITY_RATES {
         int id PK
         string utility_type
         decimal rate_per_unit
-        date effective_from
-        datetime created_at
     }
-
     METER_READINGS {
         int id PK
         int tenant_id FK
-        date billing_month
-        decimal electricity_previous
         decimal electricity_current
-        decimal water_previous
         decimal water_current
-        datetime recorded_at
     }
-
     BILLING_RECORDS {
         int id PK
         int tenant_id FK
-        date billing_month
-        decimal electricity_consumption
-        decimal electricity_charge
-        decimal water_consumption
-        decimal water_charge
         decimal total_amount
         string status
-        datetime created_at
-        datetime updated_at
     }
 ```
 
@@ -468,15 +581,15 @@ The TARIPA user experience was constructed around two primary portals:
 ### 4.2 Front-End Implementation
 The front-end is structured into a Single Page Application (SPA) driven by React 19 and Vite 8. It features tailored CSS design tokens, a high-contrast **Dark Luxury Obsidian Sidebar Theme** (`#0B0F19`), pixel-perfect **Tabler Icons** (`@tabler/icons-react`), **Lenis** smooth momentum scrolling, and **Magic UI** micro-interactions (`NumberTicker`, `BorderBeam`, `DotPattern`).
 
-#### Key Front-End Code Excerpt: Dynamic Password Validation, Persistent Cooldown, & Portal Toggle
+#### 4.2.1 Client-Side Brute-Force Lockout & Cooldown Recovery
 *(From `frontend/src/App.jsx`)*
 ```jsx
+// Tracks persisted cooldown lockout in localStorage across page reloads
 const ADMIN_LOCK_KEY = "taripa_admin_lock_until";
 
 function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
   const [cooldown, setCooldown] = useState(() => {
     try {
       const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
@@ -484,22 +597,14 @@ function AdminLogin({ onLoginSuccess }) {
       return diff > 0 ? diff : 0;
     } catch { return 0; }
   });
-  const [error, setError] = useState(() => {
-    try {
-      const until = Number(localStorage.getItem(ADMIN_LOCK_KEY) || 0);
-      const diff = Math.ceil((until - Date.now()) / 1000);
-      return diff > 0 ? `Too many failed attempts. Login temporarily locked for ${diff}s.` : "";
-    } catch { return ""; }
-  });
-  const [loading, setLoading] = useState(false);
 
+  // Countdown timer decrementing every second until zero
   useEffect(() => {
     if (cooldown <= 0) return;
     const interval = setInterval(() => {
       setCooldown((prev) => {
         if (prev <= 1) {
           try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
-          setError("");
           return 0;
         }
         return prev - 1;
@@ -507,13 +612,17 @@ function AdminLogin({ onLoginSuccess }) {
     }, 1000);
     return () => clearInterval(interval);
   }, [cooldown]);
+```
 
+#### 4.2.2 Reactive Form Validation & JWT Authentication Handler
+*(From `frontend/src/App.jsx`)*
+```jsx
+  // Enforces non-empty username and 6+ character password before enabling submission
   const isFormValid = username.trim().length > 0 && password.length >= 6;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid || loading || cooldown > 0) return;
-    setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/admin/login", {
@@ -523,30 +632,26 @@ function AdminLogin({ onLoginSuccess }) {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.message || "Invalid username or password.");
         if (data.retryAfter) {
           const seconds = Number(data.retryAfter);
-          const until = Date.now() + seconds * 1000;
-          try { localStorage.setItem(ADMIN_LOCK_KEY, String(until)); } catch {}
+          localStorage.setItem(ADMIN_LOCK_KEY, String(Date.now() + seconds * 1000));
           setCooldown(seconds);
         }
         return;
       }
-      try { localStorage.removeItem(ADMIN_LOCK_KEY); } catch {}
       saveAdminAuth(data.data.token, data.data.admin);
       onLoginSuccess(data.data.token, data.data.admin);
-    } catch {
-      setError("Unable to reach the server. Check your connection.");
     } finally {
       setLoading(false);
     }
   };
+}
 ```
 
 ### 4.3 Back-End Implementation
 The Express backend enforces centralized database querying, JWT middleware validation, and in-memory brute-force rate limiting.
 
-#### Key Back-End Code Excerpt: In-Memory Brute-Force Rate Limiter & Cooldown Lockout
+#### 4.3.1 Active Rate Limit Verification (`checkLoginAttempt`)
 *(From `backend/middleware/loginLimiter.js`)*
 ```javascript
 const MAX_ATTEMPTS = 5;
@@ -568,7 +673,11 @@ function checkLoginAttempt(req, username) {
     }
     return { locked: false };
 }
+```
 
+#### 4.3.2 Failed Attempt Tracking & Dynamic Cooldown Lockout (`recordFailedAttempt`)
+*(From `backend/middleware/loginLimiter.js`)*
+```javascript
 function recordFailedAttempt(req, username) {
     const key = `${req.socket.remoteAddress || "127.0.0.1"}:${String(username || "").trim().toLowerCase()}`;
     const now = Date.now();
@@ -578,7 +687,6 @@ function recordFailedAttempt(req, username) {
         data.count = 0;
         data.lockUntil = 0;
     }
-
     data.count += 1;
     data.lastAttempt = now;
 
@@ -586,31 +694,21 @@ function recordFailedAttempt(req, username) {
         data.lockUntil = now + LOCKOUT_MS;
         attemptsMap.set(key, data);
         const remainingSeconds = Math.ceil(LOCKOUT_MS / 1000);
-        return { locked: true, remainingSeconds, remainingAttempts: 0, message: `Too many failed attempts. Login temporarily locked for ${remainingSeconds}s.` };
+        return { locked: true, remainingSeconds, message: `Locked for ${remainingSeconds}s.` };
     }
 
     attemptsMap.set(key, data);
-    const remainingAttempts = MAX_ATTEMPTS - data.count;
-    let message = remainingAttempts <= 2
-        ? `Invalid username or password. ${remainingAttempts} attempt${remainingAttempts > 1 ? "s" : ""} remaining.`
-        : "Invalid username or password.";
-
-    return { locked: false, remainingAttempts, message };
-}
-
-function recordSuccessfulLogin(req, username) {
-    const key = `${req.socket.remoteAddress || "127.0.0.1"}:${String(username || "").trim().toLowerCase()}`;
-    attemptsMap.delete(key);
+    return { locked: false, remainingAttempts: MAX_ATTEMPTS - data.count };
 }
 ```
 
-#### Key Back-End Code Excerpt: Automated Billing Computation Logic
+#### 4.3.3 Historical Tariff & Meter Reading Resolution
 *(From `backend/routes/billing.js`)*
 ```javascript
 router.post("/generate", async (req, res) => {
     const { tenant_id, billing_month } = req.body;
     try {
-        // 1. Fetch meter readings for the specified tenant and month
+        // 1. Fetch meter readings for the specified tenant and billing month
         const [readings] = await db.query(
             `SELECT * FROM meter_readings WHERE tenant_id = ? AND billing_month = ? LIMIT 1`,
             [tenant_id, billing_month]
@@ -628,8 +726,12 @@ router.post("/generate", async (req, res) => {
         );
         const elecRate  = rates.find(r => r.utility_type === 'Electricity')?.rate_per_unit || 14.00;
         const waterRate = rates.find(r => r.utility_type === 'Water')?.rate_per_unit || 35.00;
+```
 
-        // 3. Compute differential consumption
+#### 4.3.4 Differential Consumption Calculation & Idempotent SQL Upsert
+*(From `backend/routes/billing.js`)*
+```javascript
+        // 3. Compute differential consumption (non-negative)
         const elecConsumption  = Math.max(0, reading.electricity_current - reading.electricity_previous);
         const waterConsumption = Math.max(0, reading.water_current - reading.water_previous);
 
@@ -638,7 +740,7 @@ router.post("/generate", async (req, res) => {
         const waterCharge = Number((waterConsumption * waterRate).toFixed(2));
         const totalAmount = Number((elecCharge + waterCharge).toFixed(2));
 
-        // 5. Insert or update billing record
+        // 5. Insert or update billing record with idempotent ON DUPLICATE KEY UPDATE
         await db.query(
             `INSERT INTO billing_records 
              (tenant_id, billing_month, electricity_consumption, electricity_charge, 
@@ -652,11 +754,9 @@ router.post("/generate", async (req, res) => {
              total_amount = VALUES(total_amount)`,
             [tenant_id, billing_month, elecConsumption, elecCharge, waterConsumption, waterCharge, totalAmount]
         );
-
         res.json({ success: true, message: "Billing statement generated successfully." });
     } catch (err) {
-        console.error("Billing error:", err);
-        res.status(500).json({ success: false, message: "Internal server error during billing generation." });
+        res.status(500).json({ success: false, message: "Internal server error." });
     }
 });
 ```
@@ -847,11 +947,11 @@ TARIPA/
 
 ### Appendix B: Database Files (Complete Schema SQL)
 *(Located in `database/schema.sql`)*
+
+#### B.1 Property and Occupancy Entities (`rooms`, `tenants`)
 ```sql
 CREATE DATABASE IF NOT EXISTS taripa_db
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE taripa_db;
 
 CREATE TABLE rooms (
@@ -873,7 +973,10 @@ CREATE TABLE tenants (
     CONSTRAINT fk_tenants_room FOREIGN KEY (room_id)
         REFERENCES rooms(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
+```
 
+#### B.2 Utility Tariffs and Submeter Readings (`utility_rates`, `meter_readings`)
+```sql
 CREATE TABLE utility_rates (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     utility_type ENUM('Electricity', 'Water') NOT NULL,
@@ -899,7 +1002,10 @@ CREATE TABLE meter_readings (
     CONSTRAINT chk_water_reading CHECK (water_current >= water_previous),
     UNIQUE KEY uq_meter_tenant_month (tenant_id, billing_month)
 );
+```
 
+#### B.3 Billing Invoices and Tenant Authentication (`billing_records`, `tenant_accounts`)
+```sql
 CREATE TABLE billing_records (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id INT UNSIGNED NOT NULL,
