@@ -213,7 +213,6 @@ Run these commands from the project root:
 
 - Comprehensive Final Documentation: [`docs/TARIPA_Final_Project_Documentation.md`](docs/TARIPA_Final_Project_Documentation.md)
 - Defense Presentation Slide Deck: [`docs/presentation/TARIPA_Defense_Presentation.pptx`](docs/presentation/TARIPA_Defense_Presentation.pptx)
-- Master Presentation Prompt: [`docs/presentation/TARIPA_ViziSlides_Prompt.txt`](docs/presentation/TARIPA_ViziSlides_Prompt.txt)
 
 ---
 
