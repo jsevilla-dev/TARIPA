@@ -1,168 +1,42 @@
-<style>
-  @page {
-    size: A4;
-    margin: 16mm 18mm 16mm 18mm;
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 10pt;
-    line-height: 1.52;
-    color: #1e293b;
-    padding: 0 !important;
-  }
-  /* Prevent empty pages caused by Chromium block formatting traps */
-  pre, code, table, div, figure, .mermaid, svg, blockquote {
-    overflow: visible !important;
-    overflow-x: visible !important;
-    page-break-inside: auto !important;
-    break-inside: auto !important;
-  }
-  .mermaid {
-    margin: 12px 0 !important;
-    text-align: center !important;
-  }
-  .mermaid svg {
-    max-height: 460px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    display: block !important;
-    margin: 0 auto !important;
-  }
-  pre {
-    background-color: #f8fafc !important;
-    border: 1px solid #cbd5e1 !important;
-    border-radius: 4px !important;
-    padding: 8px 12px !important;
-    font-family: "Cascadia Code", Consolas, "Courier New", monospace !important;
-    font-size: 8pt !important;
-    line-height: 1.35 !important;
-    white-space: pre-wrap !important;
-    word-break: break-all !important;
-    margin: 8px 0 !important;
-  }
-  code {
-    font-family: "Cascadia Code", Consolas, monospace !important;
-    font-size: 8.5pt !important;
-    background-color: #f1f5f9;
-    padding: 1px 4px;
-    border-radius: 3px;
-  }
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    font-size: 8.5pt !important;
-    margin: 10px 0 !important;
-    page-break-inside: auto !important;
-  }
-  tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-  th, td {
-    border: 1px solid #cbd5e1 !important;
-    padding: 5px 8px !important;
-    vertical-align: top !important;
-  }
-  th {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-    font-weight: 600 !important;
-  }
-  h1, h2, h3, h4 {
-    page-break-after: avoid !important;
-    break-after: avoid !important;
-    color: #0f172a;
-  }
-  h1 {
-    font-size: 16pt !important;
-    border-bottom: 2px solid #2563eb !important;
-    padding-bottom: 4px !important;
-    margin-top: 22px !important;
-    margin-bottom: 12px !important;
-  }
-  h2 {
-    font-size: 12.5pt !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    padding-bottom: 3px !important;
-    margin-top: 16px !important;
-    margin-bottom: 10px !important;
-  }
-  h3 {
-    font-size: 10.5pt !important;
-    margin-top: 12px !important;
-    margin-bottom: 6px !important;
-  }
-  hr {
-    border: 0 !important;
-    border-top: 1px solid #e2e8f0 !important;
-    margin: 16px 0 !important;
-  }
-  .cover-container {
-    text-align: center;
-    padding-top: 60px;
-    padding-bottom: 60px;
-  }
-  .cover-school {
-    font-size: 13pt;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: #0f172a;
-    margin-bottom: 6px;
-  }
-  .cover-dept {
-    font-size: 10.5pt;
-    color: #475569;
-    margin-bottom: 40px;
-  }
-  .cover-title {
-    font-size: 19pt;
-    font-weight: 800;
-    color: #1e3a8a;
-    line-height: 1.3;
-    margin-bottom: 12px;
-  }
-  .cover-subtitle {
-    font-size: 11pt;
-    color: #475569;
-    margin-bottom: 60px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .cover-details {
-    margin-top: 40px;
-    font-size: 10pt;
-    line-height: 1.8;
-  }
-</style>
+<div align="center">
 
-<div class="cover-container">
-  <div class="cover-school">ASIAN INSTITUTE OF COMPUTER STUDIES</div>
-  <div class="cover-dept">Commonwealth Campus — Department of Computer Studies</div>
+# ASIAN INSTITUTE OF COMPUTER STUDIES
+### Commonwealth Campus — Department of Computer Studies
 
-  <div class="cover-title">TARIPA</div>
-  <div class="cover-subtitle"><strong>Automated Residential Submeter Monitoring and Utility Billing Reconciliation Management System</strong><br>A Web-Based Full-Stack Information System</div>
+<br>
 
-  <div class="cover-details">
-    <strong>Course & Subject:</strong><br>
-    CC316 — Application Development and Emerging Technologies<br>
-    BSCS 3rd Year (Section BS5MA)<br><br>
+# TARIPA
+### Automated Residential Submeter Monitoring and Utility Billing Reconciliation Management System
+*A Web-Based Full-Stack Information System*
 
-    <strong>Project Proponents:</strong><br>
-    <strong>James Benedict Sevilla</strong> (Lead Full-Stack Developer & Database Architect)<br>
-    <strong>Lorrely Paga</strong> (Systems Analyst & UI/UX Presenter)<br>
-    <strong>Mathew Alarcon</strong> (Quality Assurance & Documentation Specialist)<br><br>
+<br>
 
-    <strong>Course Professor:</strong><br>
-    <strong>Prof. Xerxes Von Plata</strong><br><br>
+**Course & Subject:**  
+CC316 — Application Development and Emerging Technologies  
+Bachelor of Science in Computer Science (BSCS) — 3rd Year, BS5MA  
 
-    <strong>Date of Submission:</strong><br>
-    October 2026
-  </div>
+<br>
+
+**Project Proponents:**  
+**James Benedict Sevilla** — Lead Full-Stack Developer & Database Architect  
+**Lorrely Paga** — Systems Analyst & UI/UX Presenter  
+**Mathew Alarcon** — Quality Assurance & Documentation Specialist  
+
+<br>
+
+**Course Professor:**  
+**Prof. Xerxes Von Plata**  
+
+<br>
+
+**Date of Submission:**  
+October 2026
+
 </div>
 
-<div style="page-break-after: always;"></div>
+<div class="page"></div>
+
+---
 
 # CHAPTER 1: PROJECT OVERVIEW
 
