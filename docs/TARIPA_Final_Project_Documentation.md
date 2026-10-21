@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/aics_logo.jpg" alt="AICS Logo" width="130" />
+
 # ASIAN INSTITUTE OF COMPUTER STUDIES
 ### Commonwealth Campus — Department of Computer Studies
 
