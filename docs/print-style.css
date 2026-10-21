@@ -1,4 +1,4 @@
-/* TARIPA Academic Documentation Print Stylesheet (FEU Tech / A4 Optimization) */
+/* TARIPA Academic Documentation Print Stylesheet (Asian Institute of Computer Studies - Commonwealth / A4 Optimization) */
 
 @page {
   size: A4;
@@ -125,3 +125,4 @@ hr {
   border-top: 1px solid #e2e8f0 !important;
   margin: 16px 0 !important;
 }
+

@@ -138,8 +138,8 @@
 </style>
 
 <div class="cover-container">
-  <div class="cover-school">FEU INSTITUTE OF TECHNOLOGY</div>
-  <div class="cover-dept">College of Computer Studies — Department of Computer Science</div>
+  <div class="cover-school">ASIAN INSTITUTE OF COMPUTER STUDIES</div>
+  <div class="cover-dept">Commonwealth Campus — Department of Computer Studies</div>
 
   <div class="cover-title">TARIPA</div>
   <div class="cover-subtitle"><strong>Automated Residential Submeter Monitoring and Utility Billing Reconciliation Management System</strong><br>A Web-Based Full-Stack Information System</div>
